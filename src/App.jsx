@@ -1425,11 +1425,14 @@ function UmzugsreinigungPage({ setPage }) {
                     }}
                   />
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (formState.name && formState.contact) {
+                        await fetch("https://formspree.io/f/xrerozyb", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ name: formState.name, contact: formState.contact, beschreibung: formState.desc, seite: "Umzugsreinigung" }),
+                        });
                         setFormSent(true);
-                        // TODO: POST zu Formspree endpoint
-                        // TODO: fbq('track','Lead',{content_name:'form_submit'})
                       }
                     }}
                     style={{
@@ -1915,11 +1918,14 @@ function UnterhaltsreinigungPage({ setPage }) {
                     }}
                   />
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (formState.name && formState.contact) {
+                        await fetch("https://formspree.io/f/xrerozyb", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ name: formState.name, contact: formState.contact, beschreibung: formState.desc, seite: "Unterhaltsreinigung" }),
+                        });
                         setFormSent(true);
-                        // TODO: POST zu Formspree
-                        // TODO: fbq('track','Lead',{content_name:'form_unterhalt'})
                       }
                     }}
                     style={{
@@ -2267,11 +2273,14 @@ function GartenpflegePage() {
                     }}
                   />
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (formState.name && formState.contact) {
+                        await fetch("https://formspree.io/f/xrerozyb", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ name: formState.name, contact: formState.contact, beschreibung: formState.desc, seite: "Gartenpflege" }),
+                        });
                         setFormSent(true);
-                        // TODO: POST zu Formspree
-                        // TODO: fbq('track','Lead',{content_name:'form_garten'})
                       }
                     }}
                     style={{
@@ -3146,11 +3155,15 @@ function KontaktPage() {
     "Fensterreinigung", "Baureinigung", "Büroreinigung", "Anderes",
   ];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!form.name.trim() || !form.contact.trim()) { setError(true); return; }
     setError(false);
+    await fetch("https://formspree.io/f/xrerozyb", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: form.name, contact: form.contact, leistung: form.service, beschreibung: form.desc, seite: "Kontakt" }),
+    });
     setSent(true);
-    // TODO: POST zu Formspree — https://formspree.io/f/XXXXXXXX
     // TODO: fbq('track','Lead',{content_name:'form_kontakt'})
     // TODO: gtag('event','form_submit',{page:'kontakt'})
   };
