@@ -475,6 +475,7 @@ function Footer({ setPage }) {
               ["datenschutz", "Datenschutz"],
               ["agb", "AGB"],
               ["faq", "FAQ"],
+              ["über-uns", "Über uns"],
             ].map(([id, label]) => (
               <button key={id}
                 onClick={() => setPage(id)}
@@ -627,6 +628,8 @@ function HomePage({ setPage }) {
         borderBottom: "1px solid #e8f2eb",
       }}>
         <Container>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>
+            <div>
           {isOfferActive() && (
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 6,
@@ -700,8 +703,11 @@ function HomePage({ setPage }) {
             <span>✓ Offizielle Rechnung</span>
             <span>✓ Versichert bis CHF 5 Mio.</span>
           </div>
+          </div>
+        </div>
         </Container>
       </div>
+      <style>{`@media(min-width:900px){.hero-img{display:block !important;}}`}</style>
 
       {/* 3 ШАГА */}
       <Container style={{ padding: "60px 20px" }}>
@@ -1352,6 +1358,14 @@ function UmzugsreinigungPage({ setPage }) {
               </div>
             ))}
           </div>
+          {/* До/после фото */}
+          <div style={{ marginTop: 32, borderRadius: 16, overflow: "hidden", maxHeight: 360 }}>
+            <img
+              src="https://i.ibb.co/84GQ71m8/a122fcea-22e5-4670-bf48-183b9f5bc805.png"
+              alt="Küche Vorher Nachher — Umzugsreinigung Aargau"
+              style={{ width: "100%", objectFit: "cover", display: "block" }}
+            />
+          </div>
         </Container>
       </div>
 
@@ -1959,6 +1973,8 @@ function GartenpflegePage() {
         borderBottom: "1px solid #e8f2eb",
       }}>
         <Container>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>
+            <div>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             background: "#f0f7f2", border: "1px solid #c8e6d0",
@@ -1993,8 +2009,18 @@ function GartenpflegePage() {
             <span>✓ Eigene Maschinen</span>
             <span>✓ Entsorgung auf Wunsch</span>
           </div>
+            </div>
+            <div style={{ borderRadius: 16, overflow: "hidden", width: 340, height: 280, flexShrink: 0, display: "none" }} className="garten-img">
+              <img
+                src="https://i.ibb.co/LDTVC0Sj/c99c4965-4e82-4ea4-a4c8-ac9c95a16e1f.png"
+                alt="Gartenpflege Aargau — Heckenschnitt"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
+          </div>
         </Container>
       </div>
+      <style>{`@media(min-width:900px){.garten-img{display:block !important;}}`}</style>
 
       {/* ПАКЕТЫ */}
       <Container style={{ padding: "60px 20px" }}>
@@ -3381,19 +3407,13 @@ function UeberUnsPage({ setPage }) {
               Unser Büro ist in Seengen — von dort decken wir den gesamten Kanton Aargau ab.
             </p>
           </div>
-          {/* Фото-плейсхолдер */}
-          <div style={{
-            background: "#f0f7f2", borderRadius: 16,
-            border: "2px dashed #c8e6d0", height: 260,
-            display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center",
-            gap: 8, color: "#6b7280",
-          }}>
-            <span style={{ fontSize: 40 }}>📸</span>
-            <div style={{ fontSize: 13, fontWeight: 600 }}>Foto des Teams</div>
-            <div style={{ fontSize: 11, color: "#9ca3af", textAlign: "center", padding: "0 20px" }}>
-              Ersetzen durch echtes Teamfoto<br />vor dem ersten Launch
-            </div>
+          {/* Фото команды */}
+          <div style={{ borderRadius: 16, overflow: "hidden", height: 260 }}>
+            <img
+              src="https://i.ibb.co/ZpsLx2sw/395a5e80-4965-41e3-b73f-19f3301ae96b.png"
+              alt="Fleissig Team — Reinigung Aargau"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
           </div>
         </div>
 
@@ -3483,7 +3503,7 @@ function UeberUnsPage({ setPage }) {
             ))}
           </div>
           <div style={{ marginTop: 12, fontSize: 12, color: "#9ca3af" }}>
-            // TODO: UID vor Launch eintragen
+            // UID уже заполнен в CONFIG
           </div>
         </div>
 
@@ -3541,7 +3561,19 @@ function UeberUnsPage({ setPage }) {
                 </div>
               ))}
               <div style={{ marginTop: 14 }}>
-                <WhatsAppButton service="general" label="Code anfragen" size="small" />
+                <a
+                  href={`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent("Grüezi Fleissig, ich möchte einen persönlichen Empfehlungscode erhalten. Mein Name: ")}`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    background: "#25D366", color: "#fff",
+                    padding: "8px 14px", borderRadius: 8,
+                    fontSize: 13, fontWeight: 600, textDecoration: "none",
+                  }}
+                >
+                  <MessageCircle size={14} />
+                  Code anfragen
+                </a>
               </div>
             </div>
           </div>
@@ -3654,7 +3686,7 @@ function LegalPage({ type }) {
         },
         {
           heading: "Hinweis",
-          text: "// TODO: Diese AGB vor Launch durch einen Treuhänder oder Anwalt prüfen lassen. Kosten ca. CHF 200–400.",
+          text: "Diese AGB wurden nach bestem Wissen erstellt. Vor der Nutzung für verbindliche Aufträge empfehlen wir eine Prüfung durch einen Treuhänder.",
         },
       ],
     },
