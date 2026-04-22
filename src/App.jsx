@@ -33,6 +33,7 @@
 // ============================================================
 
 import { useState, useEffect } from "react";
+import { useForm } from "@formspree/react";
 import {
   Menu, X, MessageCircle, ChevronDown, ChevronRight,
   MapPin, Shield, Star, Clock, Check, Phone, Mail,
@@ -1198,8 +1199,8 @@ function FAQAccordion({ items }) {
 }
 
 function UmzugsreinigungPage({ setPage }) {
+  const [fs, handleFsSubmit] = useForm("xrerozyb");
   const [formState, setFormState] = useState({ name: "", contact: "", desc: "" });
-  const [formSent, setFormSent]   = useState(false);
 
   const faqItems = [
     { q: "Muss ich zuhause sein?", a: "Nein. Schlüsselübergabe ist möglich — wir besprechen das bei der Offerte." },
@@ -1395,71 +1396,32 @@ function UmzugsreinigungPage({ setPage }) {
               <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 20 }}>
                 Formular ausfüllen — wir melden uns innerhalb von 2 Stunden.
               </div>
-              {!formSent ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {[
-                    { key: "name",    placeholder: "Ihr Name",                type: "text"  },
-                    { key: "contact", placeholder: "Telefon oder E-Mail",     type: "text"  },
-                  ].map(f => (
-                    <input key={f.key}
-                      type={f.type}
-                      placeholder={f.placeholder}
-                      value={formState[f.key]}
-                      onChange={e => setFormState(p => ({ ...p, [f.key]: e.target.value }))}
-                      style={{
-                        padding: "12px 14px", borderRadius: 8, fontSize: 14,
-                        border: "1.5px solid #e0e0e0", outline: "none",
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      }}
-                    />
-                  ))}
-                  <textarea
-                    placeholder="z.B. Umzugsreinigung 3.5-Zi in Lenzburg, Termin nächste Woche"
-                    value={formState.desc}
-                    onChange={e => setFormState(p => ({ ...p, desc: e.target.value }))}
-                    rows={3}
-                    style={{
-                      padding: "12px 14px", borderRadius: 8, fontSize: 14,
-                      border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    }}
+              {!fs.succeeded ? (
+                <form onSubmit={handleFsSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <input name="name" type="text" placeholder="Ihr Name" required
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   />
-                  <button
-                    onClick={async () => {
-                      if (formState.name && formState.contact) {
-                        await fetch("https://formspree.io/f/xrerozyb", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ name: formState.name, contact: formState.contact, beschreibung: formState.desc, seite: "Umzugsreinigung" }),
-                        });
-                        setFormSent(true);
-                      }
-                    }}
-                    style={{
-                      background: "#E87D3E", color: "#fff",
-                      padding: "13px", borderRadius: 8,
-                      fontSize: 14, fontWeight: 700, cursor: "pointer",
-                      border: "none", transition: "opacity 0.15s",
-                    }}
+                  <input name="contact" type="text" placeholder="Telefon oder E-Mail" required
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  />
+                  <textarea name="beschreibung" placeholder="z.B. Umzugsreinigung 3.5-Zi in Lenzburg, Termin nächste Woche" rows={3}
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  />
+                  <input type="hidden" name="seite" value="Umzugsreinigung" />
+                  <button type="submit" disabled={fs.submitting}
+                    style={{ background: "#E87D3E", color: "#fff", padding: "13px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", border: "none" }}
                   >
-                    Offerte anfordern
+                    {fs.submitting ? "Wird gesendet..." : "Offerte anfordern"}
                   </button>
                   <div style={{ fontSize: 11, color: "#9ca3af", textAlign: "center" }}>
                     Keine Anrufe — wir schreiben Ihnen zurück.
                   </div>
-                </div>
+                </form>
               ) : (
-                <div style={{
-                  background: "#f0f7f2", border: "1px solid #c8e6d0",
-                  borderRadius: 10, padding: "20px", textAlign: "center",
-                }}>
+                <div style={{ background: "#f0f7f2", border: "1px solid #c8e6d0", borderRadius: 10, padding: "20px", textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 8 }}>✓</div>
-                  <div style={{ fontWeight: 700, color: "#3D7B4F", marginBottom: 4 }}>
-                    Merci für Ihre Anfrage!
-                  </div>
-                  <div style={{ fontSize: 13, color: "#6b7280" }}>
-                    Wir melden uns innerhalb von 2 Stunden.
-                  </div>
+                  <div style={{ fontWeight: 700, color: "#3D7B4F", marginBottom: 4 }}>Merci für Ihre Anfrage!</div>
+                  <div style={{ fontSize: 13, color: "#6b7280" }}>Wir melden uns innerhalb von 2 Stunden.</div>
                 </div>
               )}
             </div>
@@ -1474,7 +1436,7 @@ function UmzugsreinigungPage({ setPage }) {
 // СТРАНИЦА UNTERHALTSREINIGUNG — абонементы и разовые уборки
 // ============================================================
 function UnterhaltsreinigungPage({ setPage }) {
-  const [formSent, setFormSent] = useState(false);
+  const [fs, handleFsSubmit] = useForm("xrerozyb");
   const [formState, setFormState] = useState({ name: "", contact: "", desc: "" });
 
   const abos = [
@@ -1884,71 +1846,29 @@ function UnterhaltsreinigungPage({ setPage }) {
               <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 20 }}>
                 Formular — wir melden uns innerhalb von 2 Stunden.
               </div>
-              {!formSent ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <input
-                    type="text" placeholder="Ihr Name"
-                    value={formState.name}
-                    onChange={e => setFormState(p => ({ ...p, name: e.target.value }))}
-                    style={{
-                      padding: "12px 14px", borderRadius: 8, fontSize: 14,
-                      border: "1.5px solid #e0e0e0", outline: "none",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    }}
+              {!fs.succeeded ? (
+                <form onSubmit={handleFsSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <input name="name" type="text" placeholder="Ihr Name" required
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   />
-                  <input
-                    type="text" placeholder="Telefon oder E-Mail"
-                    value={formState.contact}
-                    onChange={e => setFormState(p => ({ ...p, contact: e.target.value }))}
-                    style={{
-                      padding: "12px 14px", borderRadius: 8, fontSize: 14,
-                      border: "1.5px solid #e0e0e0", outline: "none",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    }}
+                  <input name="contact" type="text" placeholder="Telefon oder E-Mail" required
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   />
-                  <textarea
-                    placeholder="z.B. 3.5-Zi in Wohlen, 1× pro Woche, ab Mai"
-                    value={formState.desc}
-                    onChange={e => setFormState(p => ({ ...p, desc: e.target.value }))}
-                    rows={3}
-                    style={{
-                      padding: "12px 14px", borderRadius: 8, fontSize: 14,
-                      border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    }}
+                  <textarea name="beschreibung" placeholder="z.B. 3.5-Zi in Wohlen, 1× pro Woche, ab Mai" rows={3}
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   />
-                  <button
-                    onClick={async () => {
-                      if (formState.name && formState.contact) {
-                        await fetch("https://formspree.io/f/xrerozyb", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ name: formState.name, contact: formState.contact, beschreibung: formState.desc, seite: "Unterhaltsreinigung" }),
-                        });
-                        setFormSent(true);
-                      }
-                    }}
-                    style={{
-                      background: "#E87D3E", color: "#fff",
-                      padding: "13px", borderRadius: 8,
-                      fontSize: 14, fontWeight: 700, cursor: "pointer", border: "none",
-                    }}
+                  <input type="hidden" name="seite" value="Unterhaltsreinigung" />
+                  <button type="submit" disabled={fs.submitting}
+                    style={{ background: "#E87D3E", color: "#fff", padding: "13px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", border: "none" }}
                   >
-                    Abo anfragen
+                    {fs.submitting ? "Wird gesendet..." : "Abo anfragen"}
                   </button>
-                </div>
+                </form>
               ) : (
-                <div style={{
-                  background: "#f0f7f2", border: "1px solid #c8e6d0",
-                  borderRadius: 10, padding: "20px", textAlign: "center",
-                }}>
+                <div style={{ background: "#f0f7f2", border: "1px solid #c8e6d0", borderRadius: 10, padding: "20px", textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 8 }}>✓</div>
-                  <div style={{ fontWeight: 700, color: "#3D7B4F", marginBottom: 4 }}>
-                    Merci für Ihre Anfrage!
-                  </div>
-                  <div style={{ fontSize: 13, color: "#6b7280" }}>
-                    Wir melden uns innerhalb von 2 Stunden.
-                  </div>
+                  <div style={{ fontWeight: 700, color: "#3D7B4F", marginBottom: 4 }}>Merci für Ihre Anfrage!</div>
+                  <div style={{ fontSize: 13, color: "#6b7280" }}>Wir melden uns innerhalb von 2 Stunden.</div>
                 </div>
               )}
             </div>
@@ -1963,7 +1883,7 @@ function UnterhaltsreinigungPage({ setPage }) {
 // СТРАНИЦА GARTENPFLEGE
 // ============================================================
 function GartenpflegePage() {
-  const [formSent, setFormSent] = useState(false);
+  const [fs, handleFsSubmit] = useForm("xrerozyb");
   const [formState, setFormState] = useState({ name: "", contact: "", desc: "" });
 
   const pakete = [
@@ -2241,69 +2161,29 @@ function GartenpflegePage() {
               <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 20 }}>
                 Formular — wir antworten innerhalb von 2 Stunden.
               </div>
-              {!formSent ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <input type="text" placeholder="Ihr Name"
-                    value={formState.name}
-                    onChange={e => setFormState(p => ({ ...p, name: e.target.value }))}
-                    style={{
-                      padding: "12px 14px", borderRadius: 8, fontSize: 14,
-                      border: "1.5px solid #e0e0e0", outline: "none",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    }}
+              {!fs.succeeded ? (
+                <form onSubmit={handleFsSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <input name="name" type="text" placeholder="Ihr Name" required
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   />
-                  <input type="text" placeholder="Telefon oder E-Mail"
-                    value={formState.contact}
-                    onChange={e => setFormState(p => ({ ...p, contact: e.target.value }))}
-                    style={{
-                      padding: "12px 14px", borderRadius: 8, fontSize: 14,
-                      border: "1.5px solid #e0e0e0", outline: "none",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    }}
+                  <input name="contact" type="text" placeholder="Telefon oder E-Mail" required
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   />
-                  <textarea
-                    placeholder="z.B. Kleiner Garten in Seengen, Rasen + Hecke, einmalig"
-                    value={formState.desc}
-                    onChange={e => setFormState(p => ({ ...p, desc: e.target.value }))}
-                    rows={3}
-                    style={{
-                      padding: "12px 14px", borderRadius: 8, fontSize: 14,
-                      border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    }}
+                  <textarea name="beschreibung" placeholder="z.B. Kleiner Garten in Seengen, Rasen + Hecke, einmalig" rows={3}
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   />
-                  <button
-                    onClick={async () => {
-                      if (formState.name && formState.contact) {
-                        await fetch("https://formspree.io/f/xrerozyb", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ name: formState.name, contact: formState.contact, beschreibung: formState.desc, seite: "Gartenpflege" }),
-                        });
-                        setFormSent(true);
-                      }
-                    }}
-                    style={{
-                      background: "#E87D3E", color: "#fff",
-                      padding: "13px", borderRadius: 8,
-                      fontSize: 14, fontWeight: 700, cursor: "pointer", border: "none",
-                    }}
+                  <input type="hidden" name="seite" value="Gartenpflege" />
+                  <button type="submit" disabled={fs.submitting}
+                    style={{ background: "#E87D3E", color: "#fff", padding: "13px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", border: "none" }}
                   >
-                    Offerte anfordern
+                    {fs.submitting ? "Wird gesendet..." : "Offerte anfordern"}
                   </button>
-                </div>
+                </form>
               ) : (
-                <div style={{
-                  background: "#f0f7f2", border: "1px solid #c8e6d0",
-                  borderRadius: 10, padding: "20px", textAlign: "center",
-                }}>
+                <div style={{ background: "#f0f7f2", border: "1px solid #c8e6d0", borderRadius: 10, padding: "20px", textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 8 }}>✓</div>
-                  <div style={{ fontWeight: 700, color: "#3D7B4F", marginBottom: 4 }}>
-                    Merci für Ihre Anfrage!
-                  </div>
-                  <div style={{ fontSize: 13, color: "#6b7280" }}>
-                    Wir melden uns innerhalb von 2 Stunden.
-                  </div>
+                  <div style={{ fontWeight: 700, color: "#3D7B4F", marginBottom: 4 }}>Merci für Ihre Anfrage!</div>
+                  <div style={{ fontSize: 13, color: "#6b7280" }}>Wir melden uns innerhalb von 2 Stunden.</div>
                 </div>
               )}
             </div>
@@ -3146,8 +3026,8 @@ function FAQPage() {
 // СТРАНИЦА /kontakt
 // ============================================================
 function KontaktPage() {
+  const [fs, handleFsSubmit] = useForm("xrerozyb");
   const [form, setForm]   = useState({ name: "", contact: "", service: "", desc: "" });
-  const [sent, setSent]   = useState(false);
   const [error, setError] = useState(false);
 
   const services = [
@@ -3155,17 +3035,11 @@ function KontaktPage() {
     "Fensterreinigung", "Baureinigung", "Büroreinigung", "Anderes",
   ];
 
-  const handleSend = async () => {
+  const handleSend = async (e) => {
+    e.preventDefault();
     if (!form.name.trim() || !form.contact.trim()) { setError(true); return; }
     setError(false);
-    await fetch("https://formspree.io/f/xrerozyb", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: form.name, contact: form.contact, leistung: form.service, beschreibung: form.desc, seite: "Kontakt" }),
-    });
-    setSent(true);
-    // TODO: fbq('track','Lead',{content_name:'form_kontakt'})
-    // TODO: gtag('event','form_submit',{page:'kontakt'})
+    handleFsSubmit(e);
   };
 
   const waKontakt = buildWaLink("general");
@@ -3296,150 +3170,76 @@ function KontaktPage() {
             background: "#fff", border: "1px solid #e8e8e8",
             borderRadius: 16, padding: "32px",
           }}>
-            {!sent ? (
-              <>
-                <div style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontWeight: 800, fontSize: 18, color: "#1a1a1a", marginBottom: 4,
-                }}>
+            {!fs.succeeded ? (
+              <form onSubmit={handleSend}>
+                <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 18, color: "#1a1a1a", marginBottom: 4 }}>
                   Formular
                 </div>
                 <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 24 }}>
                   Kein WhatsApp? Wir antworten innerhalb von 2 Stunden.
                 </div>
-
                 {error && (
-                  <div style={{
-                    background: "#fff5f5", border: "1px solid #fca5a5",
-                    borderRadius: 8, padding: "10px 14px",
-                    fontSize: 13, color: "#b91c1c", marginBottom: 16,
-                  }}>
+                  <div style={{ background: "#fff5f5", border: "1px solid #fca5a5", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#b91c1c", marginBottom: 16 }}>
                     Bitte Name und Kontakt (Telefon oder E-Mail) ausfüllen.
                   </div>
                 )}
-
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                  {/* Name */}
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 700, color: "#4A4A4A",
-                      display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                      Name *
-                    </label>
-                    <input type="text" placeholder="Ihr Name"
-                      value={form.name}
-                      onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                      style={{
-                        width: "100%", padding: "11px 14px", borderRadius: 8, fontSize: 14,
-                        border: `1.5px solid ${error && !form.name ? "#fca5a5" : "#e0e0e0"}`,
-                        outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        boxSizing: "border-box",
-                      }}
+                    <label style={{ fontSize: 12, fontWeight: 700, color: "#4A4A4A", display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>Name *</label>
+                    <input type="text" name="name" placeholder="Ihr Name" required
+                      value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                      style={{ width: "100%", padding: "11px 14px", borderRadius: 8, fontSize: 14, border: `1.5px solid ${error && !form.name ? "#fca5a5" : "#e0e0e0"}`, outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box" }}
                     />
                   </div>
-
-                  {/* Kontakt */}
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 700, color: "#4A4A4A",
-                      display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                      Telefon oder E-Mail *
-                    </label>
-                    <input type="text" placeholder="+41 79 ... oder name@mail.ch"
-                      value={form.contact}
-                      onChange={e => setForm(p => ({ ...p, contact: e.target.value }))}
-                      style={{
-                        width: "100%", padding: "11px 14px", borderRadius: 8, fontSize: 14,
-                        border: `1.5px solid ${error && !form.contact ? "#fca5a5" : "#e0e0e0"}`,
-                        outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        boxSizing: "border-box",
-                      }}
+                    <label style={{ fontSize: 12, fontWeight: 700, color: "#4A4A4A", display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>Telefon oder E-Mail *</label>
+                    <input type="text" name="contact" placeholder="+41 79 ... oder name@mail.ch" required
+                      value={form.contact} onChange={e => setForm(p => ({ ...p, contact: e.target.value }))}
+                      style={{ width: "100%", padding: "11px 14px", borderRadius: 8, fontSize: 14, border: `1.5px solid ${error && !form.contact ? "#fca5a5" : "#e0e0e0"}`, outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box" }}
                     />
                   </div>
-
-                  {/* Услуга */}
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 700, color: "#4A4A4A",
-                      display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                      Leistung (optional)
-                    </label>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: "#4A4A4A", display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>Leistung (optional)</label>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       {services.map(s => (
-                        <button key={s}
+                        <button type="button" key={s}
                           onClick={() => setForm(p => ({ ...p, service: p.service === s ? "" : s }))}
-                          style={{
-                            padding: "6px 12px", borderRadius: 20, cursor: "pointer",
-                            border: form.service === s ? "1.5px solid #3D7B4F" : "1.5px solid #e0e0e0",
-                            background: form.service === s ? "#f0f7f2" : "#fff",
-                            color: form.service === s ? "#3D7B4F" : "#4A4A4A",
-                            fontWeight: form.service === s ? 700 : 500,
-                            fontSize: 12, transition: "all 0.15s",
-                          }}
-                        >
-                          {s}
-                        </button>
+                          style={{ padding: "6px 12px", borderRadius: 20, cursor: "pointer", border: form.service === s ? "1.5px solid #3D7B4F" : "1.5px solid #e0e0e0", background: form.service === s ? "#f0f7f2" : "#fff", color: form.service === s ? "#3D7B4F" : "#4A4A4A", fontWeight: form.service === s ? 700 : 500, fontSize: 12 }}
+                        >{s}</button>
                       ))}
                     </div>
+                    <input type="hidden" name="leistung" value={form.service} />
                   </div>
-
-                  {/* Описание */}
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 700, color: "#4A4A4A",
-                      display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                      Kurze Beschreibung
-                    </label>
-                    <textarea
-                      placeholder="z.B. Umzugsreinigung 3.5-Zi in Lenzburg, Termin nächste Woche, Abgabe am 15. Mai"
-                      value={form.desc}
-                      onChange={e => setForm(p => ({ ...p, desc: e.target.value }))}
-                      rows={4}
-                      style={{
-                        width: "100%", padding: "11px 14px", borderRadius: 8, fontSize: 14,
-                        border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical",
-                        fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box",
-                      }}
+                    <label style={{ fontSize: 12, fontWeight: 700, color: "#4A4A4A", display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>Kurze Beschreibung</label>
+                    <textarea name="beschreibung" placeholder="z.B. Umzugsreinigung 3.5-Zi in Lenzburg, Termin nächste Woche, Abgabe am 15. Mai"
+                      value={form.desc} onChange={e => setForm(p => ({ ...p, desc: e.target.value }))} rows={4}
+                      style={{ width: "100%", padding: "11px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box" }}
                     />
                   </div>
-
-                  {/* Кнопки */}
-                  <button onClick={handleSend} style={{
-                    background: "#E87D3E", color: "#fff",
-                    padding: "14px", borderRadius: 10,
-                    fontSize: 15, fontWeight: 700, cursor: "pointer", border: "none",
-                    transition: "opacity 0.15s",
-                  }}
+                  <input type="hidden" name="seite" value="Kontakt" />
+                  <button type="submit" disabled={fs.submitting}
+                    style={{ background: "#E87D3E", color: "#fff", padding: "14px", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer", border: "none" }}
                     onMouseEnter={e => e.currentTarget.style.opacity = "0.9"}
                     onMouseLeave={e => e.currentTarget.style.opacity = "1"}
                   >
-                    Offerte anfordern
+                    {fs.submitting ? "Wird gesendet..." : "Offerte anfordern"}
                   </button>
-
-                  <div style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    color: "#9ca3af", fontSize: 12,
-                  }}>
-                    <div style={{ flex: 1, height: 1, background: "#e8e8e8" }} />
-                    oder
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#9ca3af", fontSize: 12 }}>
+                    <div style={{ flex: 1, height: 1, background: "#e8e8e8" }} />oder
                     <div style={{ flex: 1, height: 1, background: "#e8e8e8" }} />
                   </div>
-
                   <a href={waKontakt} target="_blank" rel="noopener noreferrer"
-                    style={{
-                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                      background: "#f0f7f2", border: "1.5px solid #c8e6d0", color: "#1a8a40",
-                      padding: "12px", borderRadius: 10, textDecoration: "none",
-                      fontSize: 14, fontWeight: 600,
-                    }}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#f0f7f2", border: "1.5px solid #c8e6d0", color: "#1a8a40", padding: "12px", borderRadius: 10, textDecoration: "none", fontSize: 14, fontWeight: 600 }}
                   >
                     <MessageCircle size={15} />
                     Direkt per WhatsApp schreiben
                   </a>
-
                   <div style={{ fontSize: 11, color: "#9ca3af", textAlign: "center", lineHeight: 1.6 }}>
-                    Ihre Daten werden nur zur Bearbeitung Ihrer Anfrage verwendet.<br />
-                    Keine Weitergabe an Dritte.
+                    Ihre Daten werden nur zur Bearbeitung Ihrer Anfrage verwendet.<br />Keine Weitergabe an Dritte.
                   </div>
                 </div>
-              </>
-            ) : (
+              </form>            ) : (
               <div style={{ textAlign: "center", padding: "40px 20px" }}>
                 <div style={{
                   width: 64, height: 64, borderRadius: "50%",
