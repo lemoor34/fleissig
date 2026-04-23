@@ -255,7 +255,7 @@ function Nav({ currentPage, setPage }) {
             </button>
           ))}
           <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0" }}>
-            <a href={buildWaLink("general")} target="_blank" rel="noopener noreferrer"
+            <a href={buildWaLink("general")}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                 background: "#25D366", color: "#fff",
@@ -3034,7 +3034,7 @@ function FAQPage() {
                 background: "#f9f9f9", borderRadius: 12, color: "#6b7280", fontSize: 14,
               }}>
                 Keine Treffer für „{search}". <br />
-                <a href={buildWaLink("general")} target="_blank" rel="noopener noreferrer"
+                <a href={buildWaLink("general")}
                   style={{ color: "#3D7B4F", fontWeight: 600 }}>
                   Direkt per WhatsApp fragen →
                 </a>
