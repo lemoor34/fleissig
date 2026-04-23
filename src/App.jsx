@@ -45,7 +45,7 @@ import {
 // Менять только здесь, везде обновится автоматически
 // ============================================================
 const CONFIG = {
-  WA_NUMBER: "message/C53NKG3GWBGRD1",
+  WA_NUMBER: "41779588526",
   OFFER_END: new Date("2026-06-30T23:59:59"),
   COMPANY_NAME: "Fleissig",
   TAGLINE: "Reinigung & Gartenpflege im Kanton Aargau",
@@ -3410,7 +3410,7 @@ function UeberUnsPage({ setPage }) {
           {/* Фото команды */}
           <div style={{ borderRadius: 16, overflow: "hidden", height: 260 }}>
             <img
-              src="https://i.ibb.co/ZpsLx2sw/395a5e80-4965-41e3-b73f-19f3301ae96b.png"
+              src="https://i.ibb.co/yFpNH4M0/c1a22c8b-b221-4264-bfbe-35d9ab889670.png"
               alt="Fleissig Team — Reinigung Aargau"
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
