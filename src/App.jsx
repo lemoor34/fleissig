@@ -585,7 +585,7 @@ function HomePage({ setPage }) {
       desc: "Inkl. Storen und Rahmen.",
       price: `ab CHF ${formatPrice(PRICES.fenster.pauschal_25zi)} pauschal`,
       service: "fenster",
-      page: "home",
+      page: "fensterreinigung",
     },
     {
       icon: <Wrench size={22} color="#3D7B4F" />,
@@ -593,7 +593,7 @@ function HomePage({ setPage }) {
       desc: "Nach Renovation, gründlich.",
       price: "ab CHF 13/m²",
       service: "general",
-      page: "home",
+      page: "baureinigung",
     },
     {
       icon: <Building size={22} color="#3D7B4F" />,
@@ -601,7 +601,7 @@ function HomePage({ setPage }) {
       desc: "Abends, 2–3× pro Woche.",
       price: "Offerte nach Mass",
       service: "general",
-      page: "home",
+      page: "bueroreinigung",
     },
     {
       icon: <Leaf size={22} color="#3D7B4F" />,
@@ -3757,6 +3757,185 @@ function LegalPage({ type }) {
 }
 
 // ============================================================
+// СТРАНИЦА /fensterreinigung
+// ============================================================
+function FensterreinigungPage() {
+  const preise = [
+    { size: "2.5-Zi", price: 320 },
+    { size: "3.5-Zi", price: 420 },
+    { size: "4.5-Zi", price: 520 },
+    { size: "5.5-Zi", price: 640 },
+    { size: "EFH",    price: "nach Offerte" },
+  ];
+  const faqItems = [
+    { q: "Was ist inbegriffen?", a: "Fenster beidseitig, Storen innen und aussen, Fensterrahmen und Simse. Auf Wunsch auch Rollläden und Velux-Fenster." },
+    { q: "Wie oft sollte man Fenster reinigen?", a: "Empfohlen 2× pro Jahr — Frühjahr und Herbst. Im Abo günstiger." },
+    { q: "Brauche ich Leitern oder Gerüste?", a: "Für normale Wohnungen nein. Bei hohen Fenstern (ab 4. Stock) bitte bei Anfrage erwähnen." },
+    { q: "Kann ich Fensterreinigung mit Umzugsreinigung kombinieren?", a: "Ja — Fensterreinigung ist bereits im Paket Komplett enthalten. Separat buchbar ab den oben genannten Preisen." },
+  ];
+  return (
+    <div>
+      <div style={{ background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)", padding: "56px 20px 64px", borderBottom: "1px solid #e8f2eb" }}>
+        <Container>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", lineHeight: 1.15, maxWidth: 620, marginBottom: 16 }}>
+            Fensterreinigung im Aargau —{" "}
+            <span style={{ color: "#3D7B4F" }}>inkl. Storen und Rahmen.</span>
+          </h1>
+          <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, maxWidth: 500, marginBottom: 28 }}>
+            Pauschalpreise je nach Wohnungsgrösse. Kein Aufmass, kein Besichtigungstermin — schicken Sie uns Fotos.
+          </p>
+          <WhatsAppButton service="fenster" label="Offerte per WhatsApp" />
+        </Container>
+      </div>
+      <Container style={{ padding: "56px 20px" }}>
+        <SectionTitle sub="Festpreise inkl. Storen, Rahmen und Simse.">Preise Fensterreinigung</SectionTitle>
+        <div style={{ maxWidth: 500 }}>
+          {preise.map((p, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "14px 20px", background: i % 2 === 0 ? "#f9fdf9" : "#fff", borderRadius: 8, marginBottom: 4, fontSize: 14 }}>
+              <span style={{ fontWeight: 600 }}>{p.size}</span>
+              <span style={{ fontWeight: 700, color: "#3D7B4F" }}>{typeof p.price === "number" ? `CHF ${p.price} pauschal` : p.price}</span>
+            </div>
+          ))}
+          <div style={{ marginTop: 12, fontSize: 12, color: "#6b7280", padding: "0 4px" }}>
+            Inkl. Fenster beidseitig · Storen innen/aussen · Rahmen und Simse
+          </div>
+        </div>
+        <div style={{ marginTop: 48 }}>
+          <SectionTitle sub="Häufige Fragen zur Fensterreinigung.">Häufige Fragen</SectionTitle>
+          <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
+        </div>
+        <div style={{ marginTop: 48, background: "#f9fdf9", borderRadius: 14, padding: "32px", display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 800, fontSize: 18, color: "#1a1a1a", marginBottom: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Jetzt Offerte anfragen</div>
+            <div style={{ fontSize: 14, color: "#6b7280" }}>3 Fotos Ihrer Fenster — Offerte innerhalb von 2 Stunden.</div>
+          </div>
+          <WhatsAppButton service="fenster" label="Offerte per WhatsApp" />
+        </div>
+      </Container>
+    </div>
+  );
+}
+
+// ============================================================
+// СТРАНИЦА /baureinigung
+// ============================================================
+function BaureinigungPage() {
+  const faqItems = [
+    { q: "Was ist Baureinigung?", a: "Reinigung nach Renovation oder Neubau — Baustaub, Klebereste, Farbtupfer auf Böden und Fenstern, Mörtelreste. Intensiver als eine normale Reinigung." },
+    { q: "Wie läuft die Preisfindung ab?", a: "Schicken Sie uns Fotos und die Fläche in m². Wir berechnen ab CHF 13/m² je nach Verschmutzungsgrad und machen Ihnen eine verbindliche Offerte." },
+    { q: "Wie schnell können Sie?", a: "Meistens 3–7 Tage. Bei dringenden Abnahmeterminen bitte direkt fragen." },
+    { q: "Kommen Sie auch zu grösseren Objekten?", a: "Ja — Mehrfamilienhäuser und Gewerbebauten auf Anfrage. Offerte nach Besichtigung oder Fotos." },
+  ];
+  return (
+    <div>
+      <div style={{ background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)", padding: "56px 20px 64px", borderBottom: "1px solid #e8f2eb" }}>
+        <Container>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", lineHeight: 1.15, maxWidth: 620, marginBottom: 16 }}>
+            Baureinigung im Aargau —{" "}
+            <span style={{ color: "#3D7B4F" }}>nach Renovation sauber.</span>
+          </h1>
+          <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, maxWidth: 500, marginBottom: 28 }}>
+            Baustaub, Klebereste, Farbtupfer — wir machen das Objekt abnahmebereit.
+            Ab CHF 13/m², Offerte nach Fotos.
+          </p>
+          <WhatsAppButton service="general" label="Fotos senden & Offerte erhalten" />
+        </Container>
+      </div>
+      <Container style={{ padding: "56px 20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 48 }}>
+          {[
+            { icon: "🏗", title: "Nach Renovation", text: "Baustaub von allen Oberflächen, Böden, Decken, Fenstern." },
+            { icon: "🪟", title: "Fenster & Rahmen", text: "Klebereste von Folien, Farbtupfer, Mörtelreste auf Glas." },
+            { icon: "🧹", title: "Böden & Fliesen", text: "Grober Schmutz, Mörtelreste, Baustaub aus allen Ritzen." },
+            { icon: "📋", title: "Abnahmebereit", text: "Wir bereiten das Objekt für Abnahme oder Einzug vor." },
+          ].map((item, i) => (
+            <div key={i} style={{ padding: "24px", background: "#f9fdf9", borderRadius: 12, border: "1px solid #e8f2eb" }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>{item.icon}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{item.title}</div>
+              <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.6 }}>{item.text}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ background: "#fff9f0", border: "1px solid #f5d9c0", borderRadius: 12, padding: "20px 24px", marginBottom: 48, fontSize: 14, color: "#92400e" }}>
+          <strong>Preisindikation:</strong> ab CHF 13/m² je nach Verschmutzungsgrad. Starke Verschmutzung oder Sonderarbeiten werden separat offertiert.
+        </div>
+        <SectionTitle sub="Häufige Fragen zur Baureinigung.">Häufige Fragen</SectionTitle>
+        <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
+        <div style={{ marginTop: 48, background: "#f9fdf9", borderRadius: 14, padding: "32px", display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 800, fontSize: 18, color: "#1a1a1a", marginBottom: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Offerte anfragen</div>
+            <div style={{ fontSize: 14, color: "#6b7280" }}>Fotos + m² Angabe genügen für eine verbindliche Offerte.</div>
+          </div>
+          <WhatsAppButton service="general" label="Fotos senden per WhatsApp" />
+        </div>
+      </Container>
+    </div>
+  );
+}
+
+// ============================================================
+// СТРАНИЦА /bueroreinigung
+// ============================================================
+function BueroreinigungPage() {
+  const faqItems = [
+    { q: "Wann kommen Sie?", a: "Abends ab 18 Uhr oder am Wochenende — damit Ihr Betrieb nicht gestört wird." },
+    { q: "Wie oft?", a: "2–3× pro Woche ist Standard. Auch 1× wöchentlich oder täglich möglich." },
+    { q: "Was wird gereinigt?", a: "Böden, Oberflächen, Küche/Kaffeeecke, WC, Eingangsbereich. Umfang nach Absprache." },
+    { q: "Brauchen wir einen langen Vertrag?", a: "Nein — monatlich kündbar. Wir starten mit einer Probezeit von 4 Wochen." },
+    { q: "Wie gross muss das Büro sein?", a: "Wir reinigen Büros ab 5 Mitarbeitern. Kleinstbüros auf Anfrage." },
+  ];
+  return (
+    <div>
+      <div style={{ background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)", padding: "56px 20px 64px", borderBottom: "1px solid #e8f2eb" }}>
+        <Container>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", lineHeight: 1.15, maxWidth: 620, marginBottom: 16 }}>
+            Büroreinigung im Aargau —{" "}
+            <span style={{ color: "#3D7B4F" }}>abends, zuverlässig, legal.</span>
+          </h1>
+          <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, maxWidth: 500, marginBottom: 28 }}>
+            2–3× pro Woche, abends nach Büroschluss. Offizielle Rechnung, versichert, angemeldete Mitarbeiter. Offerte nach Mass.
+          </p>
+          <WhatsAppButton service="general" label="Offerte anfragen per WhatsApp" />
+          <div style={{ marginTop: 16, fontSize: 12, color: "#8a95a0", display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <span>✓ Monatlich kündbar</span>
+            <span>✓ Offizielle Rechnung</span>
+            <span>✓ Angemeldete Mitarbeiter</span>
+          </div>
+        </Container>
+      </div>
+      <Container style={{ padding: "56px 20px" }}>
+        <SectionTitle sub="Was wir für Ihr Büro tun.">Leistungen</SectionTitle>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, marginBottom: 48 }}>
+          {[
+            "Böden saugen und wischen",
+            "Schreibtische und Oberflächen",
+            "Küche / Kaffeeecke",
+            "WC und Sanitäranlagen",
+            "Eingangsbereich und Empfang",
+            "Mülleimer leeren",
+            "Fenster innen (auf Wunsch)",
+            "Treppenhäuser",
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 14px", background: "#f9fdf9", borderRadius: 8, border: "1px solid #e8f2eb", fontSize: 13 }}>
+              <Check size={13} color="#3D7B4F" style={{ flexShrink: 0 }} />{item}
+            </div>
+          ))}
+        </div>
+        <SectionTitle sub="Häufige Fragen zur Büroreinigung.">Häufige Fragen</SectionTitle>
+        <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
+        <div style={{ marginTop: 48, background: "#1a1a1a", borderRadius: 14, padding: "32px", display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 800, fontSize: 18, color: "#fff", marginBottom: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Offerte für Ihr Büro</div>
+            <div style={{ fontSize: 14, color: "#9ca3af" }}>Fläche in m², Anzahl Mitarbeiter, gewünschte Häufigkeit — das reicht für eine Offerte.</div>
+          </div>
+          <WhatsAppButton service="general" label="Offerte anfragen" />
+        </div>
+      </Container>
+    </div>
+  );
+}
+
+// ============================================================
 // РОУТЕР — переключение страниц
 // ============================================================
 export default function App() {
@@ -3775,7 +3954,9 @@ export default function App() {
       case "unterhaltsreinigung":return <UnterhaltsreinigungPage setPage={setPage} />;
       case "gartenpflege":       return <GartenpflegePage />;
       case "preise":             return <PreisePage setPage={setPage} />;
-      case "pakete":             return <PreisePage setPage={setPage} />;
+      case "fensterreinigung":   return <FensterreinigungPage />;
+      case "baureinigung":       return <BaureinigungPage />;
+      case "bueroreinigung":     return <BueroreinigungPage />;
       case "faq":                return <FAQPage />;
       case "kontakt":            return <KontaktPage />;
       case "über-uns":           return <UeberUnsPage setPage={setPage} />;
