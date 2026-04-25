@@ -44,7 +44,7 @@ import {
 // КОНФИГ — единый источник цен и настроек
 // Менять только здесь, везде обновится автоматически
 // ============================================================
-const CONFIG = {
+export const CONFIG = {
   WA_NUMBER: "41779588526",
   OFFER_END: new Date("2026-06-30T23:59:59"),
   COMPANY_NAME: "Fleissig",
@@ -55,7 +55,7 @@ const CONFIG = {
   UID: "CHE-461.009.759",
 };
 
-const PRICES = {
+export const PRICES = {
   endreinigung: {
     "2.5": { basic: 690,  komplett: 890  },
     "3.5": { basic: 890,  komplett: 1090 },
@@ -80,7 +80,7 @@ const PRICES = {
   fenster: { pauschal_25zi: 320 },
 };
 
-const PAKETE = [
+export const PAKETE = [
   {
     name: "Umzug komplett 3.5-Zi",
     items: "Endreinigung Komplett + Entsorgung",
@@ -106,15 +106,15 @@ const PAKETE = [
 // ============================================================
 // ХЕЛПЕРЫ
 // ============================================================
-const formatPrice = (val) =>
+export const formatPrice = (val) =>
   val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
 
-const isOfferActive = () => new Date() < CONFIG.OFFER_END;
+export const isOfferActive = () => new Date() < CONFIG.OFFER_END;
 
-const getOfferDiscount = (roomSize) =>
+export const getOfferDiscount = (roomSize) =>
   isOfferActive() ? (roomSize === "2.5" ? 50 : 100) : 0;
 
-const buildWaLink = (service) => {
+export const buildWaLink = (service) => {
   const texts = {
     general:      "Grüezi Fleissig, ich interessiere mich für Ihre Dienstleistungen. Kurz zu mir: ",
     endreinigung: "Grüezi, ich brauche eine Umzugsreinigung. Wohnung: X-Zimmer, ca. Y m². Ich schicke Ihnen 3 Fotos.",
@@ -129,7 +129,7 @@ const buildWaLink = (service) => {
 // ============================================================
 // НАВИГАЦИЯ
 // ============================================================
-const PAGES = [
+export const PAGES = [
   { id: "home",              label: "Start"           },
   { id: "umzugsreinigung",   label: "Umzugsreinigung" },
   { id: "unterhaltsreinigung",label: "Unterhalt"      },
@@ -139,7 +139,7 @@ const PAGES = [
   { id: "kontakt",           label: "Kontakt"         },
 ];
 
-function Nav({ currentPage, setPage }) {
+export function Nav({ currentPage, setPage }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -220,6 +220,7 @@ function Nav({ currentPage, setPage }) {
           </a>
           <button
             onClick={() => setOpen(!open)}
+            data-testid="burger-btn"
             style={{
               background: "none", border: "1px solid #e0e0e0",
               borderRadius: 6, padding: "6px 8px", cursor: "pointer",
@@ -931,7 +932,7 @@ function FloatingWA() {
 // СТРАНИЦА UMZUGSREINIGUNG — главная посадочная для FB Ads
 // ============================================================
 
-function Calculator() {
+export function Calculator() {
   const rooms = [
     { id: "2.5", label: "2.5-Zi", sub: "~55 m²" },
     { id: "3.5", label: "3.5-Zi", sub: "~75 m²" },
@@ -1166,7 +1167,7 @@ function Calculator() {
   );
 }
 
-function FAQAccordion({ items }) {
+export function FAQAccordion({ items }) {
   const [open, setOpen] = useState(null);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
