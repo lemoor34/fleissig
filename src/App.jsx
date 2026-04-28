@@ -57,49 +57,49 @@ const CONFIG = {
 
 const PRICES = {
   endreinigung: {
-    "2.5": { basic: 690,  komplett: 890  },
-    "3.5": { basic: 890,  komplett: 1090 },
-    "4.5": { basic: 1090, komplett: 1390 },
-    "5.5": { basic: 1390, komplett: 1690 },
-    "EFH": { basic: 1690, komplett: 2090 },
+    "2.5": { basic: 409,  komplett: 529  },
+    "3.5": { basic: 529,  komplett: 649  },
+    "4.5": { basic: 649,  komplett: 829  },
+    "5.5": { basic: 829,  komplett: 1009 },
+    "EFH": { basic: 1009, komplett: 1249 },
   },
-  extras: { entsorgung: 120, teppich: 180 },
+  extras: { entsorgung: 69, teppich: 109 },
   unterhalt: {
-    einmalig: 75,   // CHF/Std
-    basis:   396,   // CHF/Monat
-    komfort: 780,
-    premium: 1530,
+    einmalig: 49,   // CHF/Std
+    basis:   239,   // CHF/Monat
+    komfort: 469,
+    premium: 919,
   },
   garten: {
-    stunde_abo: 65,
-    stunde_einmalig: 80,
-    fruehling: 490,
-    herbst: 390,
-    abo_monat: 390,
+    stunde_abo: 39,
+    stunde_einmalig: 49,
+    fruehling: 289,
+    herbst: 229,
+    abo_monat: 229,
   },
-  fenster: { pauschal_25zi: 320 },
+  fenster: { pauschal_25zi: 189 },
 };
 
 const PAKETE = [
   {
     name: "Umzug komplett 3.5-Zi",
     items: "Endreinigung Komplett + Entsorgung",
-    einzeln: 1210, paket: 1090,
+    einzeln: 729, paket: 649,
   },
   {
     name: "Umzug komplett 4.5-Zi",
     items: "Endreinigung Komplett + Entsorgung",
-    einzeln: 1510, paket: 1350,
+    einzeln: 909, paket: 809,
   },
   {
     name: "Frühjahrsputz 3.5-Zi",
     items: "Grundreinigung + Fenster",
-    einzeln: 850, paket: 690,
+    einzeln: 509, paket: 409,
   },
   {
     name: "Frühjahrsputz 4.5-Zi",
     items: "Grundreinigung + Fenster",
-    einzeln: 1090, paket: 890,
+    einzeln: 649, paket: 529,
   },
 ];
 
@@ -591,7 +591,7 @@ function HomePage({ setPage }) {
       icon: <Wrench size={22} color="#3D7B4F" />,
       title: "Baureinigung",
       desc: "Nach Renovation, gründlich.",
-      price: "ab CHF 13/m²",
+      price: "ab CHF 9/m²",
       service: "general",
       page: "baureinigung",
     },
@@ -1759,7 +1759,7 @@ function UnterhaltsreinigungPage({ setPage }) {
               color: "#fff", fontSize: 22, fontWeight: 800,
               marginBottom: 10, letterSpacing: "-0.3px",
             }}>
-              Alles aus einer Hand — CHF 890/Monat
+              Alles aus einer Hand — CHF 529/Monat
             </h3>
             <p style={{ color: "#9ca3af", fontSize: 14, lineHeight: 1.7, marginBottom: 0 }}>
               Wöchentliche Reinigung + Fensterreinigung 2× pro Jahr +
@@ -1991,7 +1991,7 @@ function GartenpflegePage() {
           }}>
             Gärtner im Aargau kosten{" "}
             <span style={{ textDecoration: "line-through", color: "#9ca3af" }}>80–120</span>{" "}
-            <span style={{ color: "#3D7B4F" }}>65 CHF/Std.</span> im Abo.
+            <span style={{ color: "#3D7B4F" }}>39 CHF/Std.</span> im Abo.
           </h1>
           <p style={{
             fontSize: 16, color: "#5a6472", lineHeight: 1.65,
