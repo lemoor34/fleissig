@@ -3948,6 +3948,23 @@ const VALID_PAGES = new Set([
   "faq","kontakt","über-uns","impressum","datenschutz","agb",
 ]);
 
+const PAGE_TITLES = {
+  home:               "Fleissig — Reinigung & Gartenpflege im Kanton Aargau",
+  umzugsreinigung:    "Umzugsreinigung Aargau | Festpreis & Abgabegarantie — Fleissig",
+  unterhaltsreinigung:"Unterhaltsreinigung Aargau | Wöchentlich & Monatlich — Fleissig",
+  gartenpflege:       "Gartenpflege Aargau | Saisonpflege & Abo — Fleissig",
+  preise:             "Preise & Pakete | Reinigung Aargau — Fleissig",
+  fensterreinigung:   "Fensterreinigung Aargau | Festpreis — Fleissig",
+  baureinigung:       "Baureinigung Aargau | Nach Renovation — Fleissig",
+  bueroreinigung:     "Büroreinigung Aargau | Gewerbliche Reinigung — Fleissig",
+  faq:                "FAQ | Häufige Fragen zur Reinigung — Fleissig",
+  kontakt:            "Kontakt per WhatsApp | Fleissig Reinigung Aargau",
+  "über-uns":         "Über uns | Fleissig Reinigung Aargau",
+  impressum:          "Impressum — Fleissig",
+  datenschutz:        "Datenschutz — Fleissig",
+  agb:                "AGB — Fleissig",
+};
+
 export default function App() {
   const [page, setPage] = useState(() => {
     const hash = window.location.hash.slice(1);
@@ -3959,6 +3976,7 @@ export default function App() {
     if (window.location.hash !== hash) {
       window.history.pushState(null, "", hash || window.location.pathname);
     }
+    document.title = PAGE_TITLES[page] || PAGE_TITLES.home;
     window.scrollTo({ top: 0, behavior: "smooth" });
     // TODO: gtag('event','page_view', {page_path: page})
     // TODO: fbq('track','PageView')
