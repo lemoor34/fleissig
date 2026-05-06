@@ -184,10 +184,11 @@ function Nav({ currentPage, setPage }) {
         {/* Desktop nav */}
         <div style={{ display: "flex", gap: 4, alignItems: "center" }} className="desktop-nav">
           {PAGES.slice(1, 6).map(p => (
-            <button key={p.id}
-              onClick={() => setPage(p.id)}
+            <a key={p.id}
+              href={`#${p.id}`}
+              onClick={(e) => { e.preventDefault(); setPage(p.id); }}
               style={{
-                background: "none", border: "none", cursor: "pointer",
+                textDecoration: "none", cursor: "pointer",
                 padding: "6px 12px", borderRadius: 6,
                 fontSize: 14, fontWeight: 500,
                 color: currentPage === p.id ? "#3D7B4F" : "#4A4A4A",
@@ -196,7 +197,7 @@ function Nav({ currentPage, setPage }) {
               }}
             >
               {p.label}
-            </button>
+            </a>
           ))}
         </div>
 
@@ -239,12 +240,13 @@ function Nav({ currentPage, setPage }) {
           padding: "12px 20px 20px",
         }}>
           {PAGES.map(p => (
-            <button key={p.id}
-              onClick={() => { setPage(p.id); setOpen(false); }}
+            <a key={p.id}
+              href={`#${p.id}`}
+              onClick={(e) => { e.preventDefault(); setPage(p.id); setOpen(false); }}
               style={{
                 display: "block", width: "100%", textAlign: "left",
                 background: currentPage === p.id ? "#f0f7f2" : "none",
-                border: "none", cursor: "pointer",
+                textDecoration: "none", cursor: "pointer",
                 padding: "10px 12px", borderRadius: 6,
                 fontSize: 15, fontWeight: currentPage === p.id ? 600 : 400,
                 color: currentPage === p.id ? "#3D7B4F" : "#4A4A4A",
@@ -252,7 +254,7 @@ function Nav({ currentPage, setPage }) {
               }}
             >
               {p.label}
-            </button>
+            </a>
           ))}
           <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0" }}>
             <a href={buildWaLink("general")}
@@ -450,19 +452,20 @@ function Footer({ setPage }) {
               ["gartenpflege", "Gartenpflege"],
               ["preise", "Preise & Pakete"],
             ].map(([id, label]) => (
-              <button key={id}
-                onClick={() => setPage(id)}
+              <a key={id}
+                href={`#${id}`}
+                onClick={(e) => { e.preventDefault(); setPage(id); }}
                 style={{
-                  display: "block", background: "none", border: "none",
+                  display: "block", textDecoration: "none",
                   cursor: "pointer", color: "#9ca3af", fontSize: 13,
-                  padding: "3px 0", textAlign: "left",
+                  padding: "3px 0",
                   transition: "color 0.15s",
                 }}
                 onMouseEnter={e => e.currentTarget.style.color = "#fff"}
                 onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}
               >
                 {label}
-              </button>
+              </a>
             ))}
           </div>
 
@@ -477,19 +480,20 @@ function Footer({ setPage }) {
               ["faq", "FAQ"],
               ["über-uns", "Über uns"],
             ].map(([id, label]) => (
-              <button key={id}
-                onClick={() => setPage(id)}
+              <a key={id}
+                href={`#${id}`}
+                onClick={(e) => { e.preventDefault(); setPage(id); }}
                 style={{
-                  display: "block", background: "none", border: "none",
+                  display: "block", textDecoration: "none",
                   cursor: "pointer", color: "#9ca3af", fontSize: 13,
-                  padding: "3px 0", textAlign: "left",
+                  padding: "3px 0",
                   transition: "color 0.15s",
                 }}
                 onMouseEnter={e => e.currentTarget.style.color = "#fff"}
                 onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}
               >
                 {label}
-              </button>
+              </a>
             ))}
           </div>
 
@@ -620,7 +624,7 @@ function HomePage({ setPage }) {
   ];
 
   return (
-    <div>
+    <div id="start">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 60%)",
@@ -710,7 +714,7 @@ function HomePage({ setPage }) {
       <style>{`@media(min-width:900px){.hero-img{display:block !important;}}`}</style>
 
       {/* 3 ШАГА */}
-      <Container style={{ padding: "60px 20px" }}>
+      <Container id="wie-es-funktioniert" style={{ padding: "60px 20px" }}>
         <SectionTitle sub="So einfach funktioniert es — ohne Termine, ohne Anrufe.">
           Drei Schritte zur sauberen Wohnung
         </SectionTitle>
@@ -754,7 +758,7 @@ function HomePage({ setPage }) {
       </Container>
 
       {/* УСЛУГИ */}
-      <div style={{ background: "#f9fdf9", padding: "60px 0" }}>
+      <div id="leistungen" style={{ background: "#f9fdf9", padding: "60px 0" }}>
         <Container>
           <SectionTitle sub="Festpreise — keine versteckten Kosten.">
             Unsere Dienstleistungen
@@ -814,7 +818,7 @@ function HomePage({ setPage }) {
       </div>
 
       {/* ПАКЕТЫ */}
-      <Container style={{ padding: "60px 20px" }}>
+      <Container id="pakete" style={{ padding: "60px 20px" }}>
         <SectionTitle sub="Kombinierte Leistungen mit echten Ersparnissen.">
           Sparen mit Paketen
         </SectionTitle>
@@ -1220,7 +1224,7 @@ function UmzugsreinigungPage({ setPage }) {
   ];
 
   return (
-    <div>
+    <div id="umzugsreinigung">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 50%)",
@@ -1522,7 +1526,7 @@ function UnterhaltsreinigungPage({ setPage }) {
   ];
 
   return (
-    <div>
+    <div id="unterhaltsreinigung">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -1965,7 +1969,7 @@ function GartenpflegePage() {
   ];
 
   return (
-    <div>
+    <div id="gartenpflege">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -2292,7 +2296,7 @@ function PreisePage({ setPage }) {
   );
 
   return (
-    <div>
+    <div id="preise">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -2882,7 +2886,7 @@ function FAQPage() {
   const totalQ = categories.reduce((s, c) => s + c.items.length, 0);
 
   return (
-    <div>
+    <div id="faq">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -3071,7 +3075,7 @@ function KontaktPage() {
   const waKontakt = buildWaLink("general");
 
   return (
-    <div>
+    <div id="kontakt">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -3938,14 +3942,36 @@ function BueroreinigungPage() {
 // ============================================================
 // РОУТЕР — переключение страниц
 // ============================================================
+const VALID_PAGES = new Set([
+  "home","umzugsreinigung","unterhaltsreinigung","gartenpflege",
+  "preise","fensterreinigung","baureinigung","bueroreinigung",
+  "faq","kontakt","über-uns","impressum","datenschutz","agb",
+]);
+
 export default function App() {
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(() => {
+    const hash = window.location.hash.slice(1);
+    return VALID_PAGES.has(hash) ? hash : "home";
+  });
 
   useEffect(() => {
+    const hash = page === "home" ? "" : `#${page}`;
+    if (window.location.hash !== hash) {
+      window.history.pushState(null, "", hash || window.location.pathname);
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
     // TODO: gtag('event','page_view', {page_path: page})
     // TODO: fbq('track','PageView')
   }, [page]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      const hash = window.location.hash.slice(1);
+      setPage(VALID_PAGES.has(hash) ? hash : "home");
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   const renderPage = () => {
     switch (page) {
