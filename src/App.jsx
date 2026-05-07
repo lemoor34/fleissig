@@ -634,9 +634,6 @@ function HomePage({ setPage }) {
         <Container>
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>
             <div>
-          {isOfferActive() && (
-          )}
-
           <h1 style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: "clamp(28px, 5vw, 52px)",
