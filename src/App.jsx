@@ -111,8 +111,6 @@ const formatPrice = (val) =>
 
 const isOfferActive = () => new Date() < CONFIG.OFFER_END;
 
-const getOfferDiscount = (roomSize) =>
-  isOfferActive() ? (roomSize === "2.5" ? 50 : 100) : 0;
 
 const buildWaLink = (service) => {
   const texts = {
@@ -943,8 +941,7 @@ function Calculator() {
   const base     = PRICES.endreinigung[roomSize][variant];
   const extraSum = (extras.entsorgung ? PRICES.extras.entsorgung : 0)
                  + (extras.teppich    ? PRICES.extras.teppich    : 0);
-  const discount = getOfferDiscount(roomSize);
-  const total    = base + extraSum - discount;
+  const total    = base + extraSum;
 
   const waText = () => {
     const lines = [
@@ -952,7 +949,7 @@ function Calculator() {
       `Wohnung: ${roomSize}-Zimmer, Paket: ${variant === "basic" ? "Basic" : "Komplett"}.`,
       extras.entsorgung ? "+ Grüngutentsorgung" : "",
       extras.teppich    ? "+ Teppichreinigung"  : "",
-      `Preis laut Kalkulator: CHF ${formatPrice(total)}${discount > 0 ? ` (inkl. Eröffnungsrabatt CHF ${discount})` : ""}.`,
+      `Preis laut Kalkulator: CHF ${formatPrice(total)}.`,
       `Ich schicke 3 Fotos.`,
     ].filter(Boolean).join(" ");
     return `https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(lines)}`;
@@ -1099,12 +1096,7 @@ function Calculator() {
             <span>+CHF {PRICES.extras.teppich}</span>
           </div>
         )}
-        {discount > 0 && (
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 14, color: "#3D7B4F", fontWeight: 600 }}>
-            <span>🎉 Eröffnungsrabatt</span>
-            <span>−CHF {discount}</span>
-          </div>
-        )}
+
         <div style={{
           borderTop: "1px solid #c8e6d0", marginTop: 10, paddingTop: 10,
           display: "flex", justifyContent: "space-between", alignItems: "baseline",
@@ -2240,8 +2232,7 @@ function PreisePage({ setPage }) {
       const base = PRICES.endreinigung[roomSize][variant];
       const ex   = (extras.entsorgung ? PRICES.extras.entsorgung : 0)
                  + (extras.teppich    ? PRICES.extras.teppich    : 0);
-      const disc = getOfferDiscount(roomSize);
-      return { base, ex, disc, total: base + ex - disc };
+      return { base, ex, disc: 0, total: base + ex };
     }
     if (activeService === "unterhalt") {
       const base = PRICES.unterhalt[aboType];
@@ -2322,7 +2313,6 @@ function PreisePage({ setPage }) {
                 Eröffnungsangebot — bis 30. Juni 2026
               </div>
               <div style={{ color: "#fff", fontSize: 14, lineHeight: 1.7 }}>
-                CHF 100 Rabatt auf alle Umzugsreinigungen (2.5-Zi: CHF 50) ·
                 CHF 50 Rabatt auf Gartenpakete ·
                 10% Rabatt auf das erste Unterhalt-Abo
               </div>
