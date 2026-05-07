@@ -330,7 +330,7 @@ function OfferBanner() {
       padding: "10px 20px", fontSize: 13, fontWeight: 500,
     }}>
       🎉 <strong>Eröffnungsangebot bis 30. Juni 2026:</strong>{" "}
-      CHF 100 Rabatt auf Ihre erste Umzugsreinigung · CHF 50 auf Gartenpakete · 10% auf das erste Abo
+      CHF 50 auf Gartenpakete · 10% auf das erste Abo
     </div>
   );
 }
@@ -635,14 +635,6 @@ function HomePage({ setPage }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>
             <div>
           {isOfferActive() && (
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              background: "#fff9f0", border: "1px solid #f5d9c0",
-              color: "#c2611a", padding: "5px 12px", borderRadius: 20,
-              fontSize: 12, fontWeight: 600, marginBottom: 20,
-            }}>
-              🎉 Eröffnungsangebot: CHF 100 Rabatt auf die erste Umzugsreinigung
-            </div>
           )}
 
           <h1 style={{
@@ -661,15 +653,17 @@ function HomePage({ setPage }) {
             fontSize: "clamp(15px, 2vw, 18px)", color: "#5a6472",
             maxWidth: 480, lineHeight: 1.65, marginBottom: 28,
           }}>
-            Senden Sie uns 3 Fotos per WhatsApp.<br />
-            Sie bekommen eine verbindliche Offerte innerhalb von 2 Stunden.
+            Schreiben Sie uns einfach auf WhatsApp — wir fragen alles Nötige selbst ab. Offerte innerhalb von 2 Stunden.
           </p>
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             <a
               href={buildWaLink("general")}
               target="_blank" rel="noopener noreferrer"
-              // TODO: onClick → fbq('track','Lead',{content_name:'whatsapp_hero'})
+              onClick={() => {
+                gtag('event', 'whatsapp_click', { event_category: 'lead', event_label: 'hero_button' });
+                fbq('track', 'Lead');
+              }}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 background: "#E87D3E", color: "#fff",
