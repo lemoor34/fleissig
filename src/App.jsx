@@ -115,9 +115,9 @@ const isOfferActive = () => new Date() < CONFIG.OFFER_END;
 const buildWaLink = (service) => {
   const texts = {
     general:      "Grüezi! Ich interessiere mich für Ihre Reinigung oder Gartenpflege und möchte eine Offerte anfragen.",
-    endreinigung: "Grüezi! Ich brauche eine Umzugsreinigung und möchte eine Offerte. Ich schicke Ihnen gleich ein paar Fotos.",
+    endreinigung: "Grüezi! Ich brauche eine Umzugsreinigung und möchte eine Offerte. Ich schicke Ihnen die Fotos später.",
     unterhalt:    "Grüezi! Ich interessiere mich für eine regelmässige Reinigung und möchte mehr erfahren.",
-    garten:       "Grüezi! Ich brauche Hilfe im Garten und möchte eine Offerte anfragen. Ich schicke Fotos.",
+    garten:       "Grüezi! Ich brauche Hilfe im Garten und möchte eine Offerte anfragen. Ich schicke die Fotos später.",
     fenster:      "Grüezi! Ich möchte meine Fenster reinigen lassen und bitte um eine Offerte.",
   };
   const text = encodeURIComponent(texts[service] || texts.general);
