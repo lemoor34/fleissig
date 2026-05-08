@@ -114,11 +114,11 @@ const isOfferActive = () => new Date() < CONFIG.OFFER_END;
 
 const buildWaLink = (service) => {
   const texts = {
-    general:      "Grüezi Fleissig, ich interessiere mich für Ihre Dienstleistungen. Kurz zu mir: ",
-    endreinigung: "Grüezi, ich brauche eine Umzugsreinigung. Wohnung: X-Zimmer, ca. Y m². Ich schicke Ihnen 3 Fotos.",
-    unterhalt:    "Grüezi, ich interessiere mich für regelmässige Reinigung. Ich schicke Details.",
-    garten:       "Grüezi, ich brauche Gartenpflege. Kurz zum Garten: ",
-    fenster:      "Grüezi, ich möchte die Fenster reinigen lassen. Wohnung X-Zimmer, mit/ohne Storen.",
+    general:      "Grüezi! Ich interessiere mich für Ihre Reinigung oder Gartenpflege und möchte eine Offerte anfragen.",
+    endreinigung: "Grüezi! Ich brauche eine Umzugsreinigung und möchte eine Offerte. Ich schicke Ihnen gleich ein paar Fotos.",
+    unterhalt:    "Grüezi! Ich interessiere mich für eine regelmässige Reinigung und möchte mehr erfahren.",
+    garten:       "Grüezi! Ich brauche Hilfe im Garten und möchte eine Offerte anfragen. Ich schicke Fotos.",
+    fenster:      "Grüezi! Ich möchte meine Fenster reinigen lassen und bitte um eine Offerte.",
   };
   const text = encodeURIComponent(texts[service] || texts.general);
   return `https://wa.me/${CONFIG.WA_NUMBER}?text=${text}`;
