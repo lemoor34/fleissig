@@ -746,6 +746,45 @@ function HomePage({ setPage }) {
         </div>
       </Container>
 
+      {/* ДО / ПОСЛЕ */}
+      <div style={{ background: "#f9fdf9", padding: "60px 0", borderTop: "1px solid #e8f2eb" }}>
+        <Container>
+          <SectionTitle sub="Echte Ergebnisse aus dem Kanton Aargau.">
+            Wir machen sauber — nicht irgendwie, sondern richtig.
+          </SectionTitle>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: 20,
+          }}>
+            {[
+              { src: "/before-after-1.jpg", label: "Bad · Duschkabine" },
+              { src: "/before-after-2.jpg", label: "Küche · Kochfeld" },
+            ].map((item, i) => (
+              <div key={i} style={{
+                borderRadius: 16, overflow: "hidden",
+                boxShadow: "0 2px 24px rgba(0,0,0,0.10)",
+                position: "relative",
+              }}>
+                <img
+                  src={item.src}
+                  alt={item.label}
+                  style={{ width: "100%", display: "block" }}
+                />
+                <div style={{
+                  position: "absolute", bottom: 14, left: 14,
+                  background: "rgba(61,123,79,0.92)",
+                  color: "#fff", padding: "5px 12px", borderRadius: 8,
+                  fontSize: 12, fontWeight: 700, letterSpacing: "0.3px",
+                }}>
+                  {item.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </div>
+
       {/* УСЛУГИ */}
       <div id="leistungen" style={{ background: "#f9fdf9", padding: "60px 0" }}>
         <Container>
@@ -787,19 +826,16 @@ function HomePage({ setPage }) {
                 }}>
                   {s.price}
                 </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <button
-                    onClick={() => setPage(s.page)}
-                    style={{
-                      flex: 1, background: "none", border: "1px solid #d0d8e0",
-                      borderRadius: 7, padding: "7px 12px", cursor: "pointer",
-                      fontSize: 12, fontWeight: 600, color: "#4A4A4A",
-                    }}
-                  >
-                    Mehr erfahren
-                  </button>
-                  <WhatsAppButton service={s.service} label="WhatsApp" size="small" />
-                </div>
+                <button
+                  onClick={() => setPage(s.page)}
+                  style={{
+                    width: "100%", background: "none", border: "1px solid #d0d8e0",
+                    borderRadius: 7, padding: "8px 12px", cursor: "pointer",
+                    fontSize: 12, fontWeight: 600, color: "#4A4A4A",
+                  }}
+                >
+                  Mehr erfahren →
+                </button>
               </div>
             ))}
           </div>
