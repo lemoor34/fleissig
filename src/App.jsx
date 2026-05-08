@@ -201,22 +201,6 @@ function Nav({ currentPage, setPage }) {
 
         {/* CTA + burger */}
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <a
-            href={buildWaLink("general")}
-            target="_blank" rel="noopener noreferrer"
-            style={{
-              display: "flex", alignItems: "center", gap: 6,
-              background: "#25D366", color: "#fff",
-              padding: "8px 16px", borderRadius: 8,
-              fontSize: 13, fontWeight: 600,
-              textDecoration: "none",
-              // GA4 + Pixel event — добавить onClick:
-              // onClick={() => fbq('track','Lead',{content_name:'whatsapp_nav'})
-            }}
-          >
-            <MessageCircle size={14} />
-            WhatsApp
-          </a>
           <button
             onClick={() => setOpen(!open)}
             style={{
@@ -758,27 +742,18 @@ function HomePage({ setPage }) {
             gap: 20,
           }}>
             {[
-              { src: "/photo_2026-05-08_11-04-40.jpg",     label: "Bad · Duschkabine" },
-              { src: "/photo_2026-05-08_11-04-40 (2).jpg", label: "Küche · Kochfeld" },
+              { src: "/photo_2026-05-08_11-04-40.jpg",     alt: "Duschkabine vorher und nachher" },
+              { src: "/photo_2026-05-08_11-04-40 (2).jpg", alt: "Kochfeld vorher und nachher" },
             ].map((item, i) => (
               <div key={i} style={{
                 borderRadius: 16, overflow: "hidden",
                 boxShadow: "0 2px 24px rgba(0,0,0,0.10)",
-                position: "relative",
               }}>
                 <img
                   src={item.src}
-                  alt={item.label}
+                  alt={item.alt}
                   style={{ width: "100%", display: "block" }}
                 />
-                <div style={{
-                  position: "absolute", bottom: 14, left: 14,
-                  background: "rgba(61,123,79,0.92)",
-                  color: "#fff", padding: "5px 12px", borderRadius: 8,
-                  fontSize: 12, fontWeight: 700, letterSpacing: "0.3px",
-                }}>
-                  {item.label}
-                </div>
               </div>
             ))}
           </div>
