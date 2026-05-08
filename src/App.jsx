@@ -758,8 +758,8 @@ function HomePage({ setPage }) {
             gap: 20,
           }}>
             {[
-              { src: "/before-after-1.jpg", label: "Bad · Duschkabine" },
-              { src: "/before-after-2.jpg", label: "Küche · Kochfeld" },
+              { src: "/photo_2026-05-08_11-04-40.jpg",     label: "Bad · Duschkabine" },
+              { src: "/photo_2026-05-08_11-04-40 (2).jpg", label: "Küche · Kochfeld" },
             ].map((item, i) => (
               <div key={i} style={{
                 borderRadius: 16, overflow: "hidden",
