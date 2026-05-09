@@ -296,7 +296,10 @@ function WhatsAppButton({ service = "general", label = "Offerte per WhatsApp", s
     <a
       href={buildWaLink(service)}
       target="_blank" rel="noopener noreferrer"
-      // TODO: onClick → fbq('track','Lead',{content_name:`whatsapp_${service}`})
+      onClick={() => {
+        if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+        if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: `whatsapp_${service}` });
+      }}
       style={{
         display: "inline-flex", alignItems: "center", gap: small ? 6 : 8,
         background: "#25D366", color: "#fff",
@@ -666,7 +669,10 @@ function HomePage({ setPage }) {
             <a
               href={buildWaLink("general")}
               target="_blank" rel="noopener noreferrer"
-              // TODO: onClick → fbq('track','Lead',{content_name:'whatsapp_hero'})
+              onClick={() => {
+                if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+                if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'whatsapp_hero' });
+              }}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 background: "#E87D3E", color: "#fff",
@@ -908,7 +914,10 @@ function FloatingWA() {
     <a
       href={buildWaLink("general")}
       target="_blank" rel="noopener noreferrer"
-      // TODO: onClick → fbq('track','Lead',{content_name:'whatsapp_floating'})
+      onClick={() => {
+        if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+        if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'whatsapp_floating' });
+      }}
       style={{
         position: "fixed", bottom: 20, right: 20, zIndex: 999,
         width: 56, height: 56, borderRadius: "50%",
@@ -1132,8 +1141,8 @@ export function Calculator() {
           target="_blank" rel="noopener noreferrer"
           onClick={() => {
             setSubmitted(true);
-            // TODO: fbq('track','Lead',{content_name:'calculator_whatsapp',value:total})
-            // TODO: gtag('event','calculator_complete',{value:total})
+            if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+            if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'calculator_whatsapp', value: total });
             setTimeout(() => setSubmitted(false), 5000);
           }}
           style={{
@@ -3061,6 +3070,13 @@ function KontaktPage() {
     "Umzugsreinigung", "Unterhaltsreinigung", "Gartenpflege",
     "Fensterreinigung", "Baureinigung", "Büroreinigung", "Anderes",
   ];
+
+  useEffect(() => {
+    if (fs.succeeded) {
+      if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+      if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'form_submit' });
+    }
+  }, [fs.succeeded]);
 
   const handleSend = async (e) => {
     e.preventDefault();
