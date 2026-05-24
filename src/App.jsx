@@ -33,6 +33,7 @@
 // ============================================================
 
 import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "@formspree/react";
 import {
   Menu, X, MessageCircle, ChevronDown, ChevronRight,
@@ -44,7 +45,7 @@ import {
 // КОНФИГ — единый источник цен и настроек
 // Менять только здесь, везде обновится автоматически
 // ============================================================
-const CONFIG = {
+export const CONFIG = {
   WA_NUMBER: "41779588526",
   OFFER_END: new Date("2026-06-30T23:59:59"),
   COMPANY_NAME: "Fleissig",
@@ -55,7 +56,7 @@ const CONFIG = {
   UID: "CHE-461.009.759",
 };
 
-const PRICES = {
+export const PRICES = {
   endreinigung: {
     "2.5": { basic: 409,  komplett: 529  },
     "3.5": { basic: 529,  komplett: 649  },
@@ -80,7 +81,7 @@ const PRICES = {
   fenster: { pauschal_25zi: 189 },
 };
 
-const PAKETE = [
+export const PAKETE = [
   {
     name: "Umzug komplett 3.5-Zi",
     items: "Endreinigung Komplett + Entsorgung",
@@ -106,13 +107,15 @@ const PAKETE = [
 // ============================================================
 // ХЕЛПЕРЫ
 // ============================================================
-const formatPrice = (val) =>
+export const formatPrice = (val) =>
   val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
 
-const isOfferActive = () => new Date() < CONFIG.OFFER_END;
+export const isOfferActive = () => new Date() < CONFIG.OFFER_END;
 
+export const getOfferDiscount = (roomSize) =>
+  isOfferActive() ? (roomSize === "2.5" ? 50 : 100) : 0;
 
-const buildWaLink = (service) => {
+export const buildWaLink = (service) => {
   const texts = {
     general:      "Grüezi! Ich interessiere mich für Ihre Reinigung oder Gartenpflege und möchte eine Offerte anfragen.",
     endreinigung: "Grüezi! Ich brauche eine Umzugsreinigung und möchte eine Offerte. Ich schicke Ihnen die Fotos später.",
@@ -127,7 +130,7 @@ const buildWaLink = (service) => {
 // ============================================================
 // НАВИГАЦИЯ
 // ============================================================
-const PAGES = [
+export const PAGES = [
   { id: "home",              label: "Start"           },
   { id: "umzugsreinigung",   label: "Umzugsreinigung" },
   { id: "unterhaltsreinigung",label: "Unterhalt"      },
@@ -137,7 +140,7 @@ const PAGES = [
   { id: "kontakt",           label: "Kontakt"         },
 ];
 
-function Nav({ currentPage, setPage }) {
+export function Nav({ currentPage, setPage }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -203,6 +206,7 @@ function Nav({ currentPage, setPage }) {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <button
             onClick={() => setOpen(!open)}
+            data-testid="burger-btn"
             style={{
               background: "none", border: "1px solid #e0e0e0",
               borderRadius: 6, padding: "6px 8px", cursor: "pointer",
@@ -279,7 +283,10 @@ function WhatsAppButton({ service = "general", label = "Offerte per WhatsApp", s
     <a
       href={buildWaLink(service)}
       target="_blank" rel="noopener noreferrer"
-      // TODO: onClick → fbq('track','Lead',{content_name:`whatsapp_${service}`})
+      onClick={() => {
+        if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+        if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: `whatsapp_${service}` });
+      }}
       style={{
         display: "inline-flex", alignItems: "center", gap: small ? 6 : 8,
         background: "#25D366", color: "#fff",
@@ -640,8 +647,8 @@ function HomePage({ setPage }) {
               href={buildWaLink("general")}
               target="_blank" rel="noopener noreferrer"
               onClick={() => {
-                gtag('event', 'whatsapp_click', { event_category: 'lead', event_label: 'hero_button' });
-                fbq('track', 'Lead');
+                if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+                if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'whatsapp_hero' });
               }}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
@@ -911,7 +918,10 @@ function FloatingWA() {
     <a
       href={buildWaLink("general")}
       target="_blank" rel="noopener noreferrer"
-      // TODO: onClick → fbq('track','Lead',{content_name:'whatsapp_floating'})
+      onClick={() => {
+        if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+        if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'whatsapp_floating' });
+      }}
       style={{
         position: "fixed", bottom: 20, right: 20, zIndex: 999,
         width: 56, height: 56, borderRadius: "50%",
@@ -935,7 +945,7 @@ function FloatingWA() {
 // СТРАНИЦА UMZUGSREINIGUNG — главная посадочная для FB Ads
 // ============================================================
 
-function Calculator() {
+export function Calculator() {
   const rooms = [
     { id: "2.5", label: "2.5-Zi", sub: "~55 m²" },
     { id: "3.5", label: "3.5-Zi", sub: "~75 m²" },
@@ -1129,8 +1139,8 @@ function Calculator() {
           target="_blank" rel="noopener noreferrer"
           onClick={() => {
             setSubmitted(true);
-            // TODO: fbq('track','Lead',{content_name:'calculator_whatsapp',value:total})
-            // TODO: gtag('event','calculator_complete',{value:total})
+            if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+            if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'calculator_whatsapp', value: total });
             setTimeout(() => setSubmitted(false), 5000);
           }}
           style={{
@@ -1164,7 +1174,7 @@ function Calculator() {
   );
 }
 
-function FAQAccordion({ items }) {
+export function FAQAccordion({ items }) {
   const [open, setOpen] = useState(null);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -3057,6 +3067,13 @@ function KontaktPage() {
     "Fensterreinigung", "Baureinigung", "Büroreinigung", "Anderes",
   ];
 
+  useEffect(() => {
+    if (fs.succeeded) {
+      if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+      if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'form_submit' });
+    }
+  }, [fs.succeeded]);
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.contact.trim()) { setError(true); return; }
@@ -3934,12 +3951,6 @@ function BueroreinigungPage() {
 // ============================================================
 // РОУТЕР — переключение страниц
 // ============================================================
-const VALID_PAGES = new Set([
-  "home","umzugsreinigung","unterhaltsreinigung","gartenpflege",
-  "preise","fensterreinigung","baureinigung","bueroreinigung",
-  "faq","kontakt","über-uns","impressum","datenschutz","agb",
-]);
-
 const PAGE_TITLES = {
   home:               "Fleissig — Reinigung & Gartenpflege im Kanton Aargau",
   umzugsreinigung:    "Umzugsreinigung Aargau | Festpreis & Abgabegarantie — Fleissig",
@@ -3957,59 +3968,53 @@ const PAGE_TITLES = {
   agb:                "AGB — Fleissig",
 };
 
-export default function App() {
-  const [page, setPage] = useState(() => {
-    const hash = window.location.hash.slice(1);
-    return VALID_PAGES.has(hash) ? hash : "home";
-  });
+function AppLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const currentPage = location.pathname === "/" ? "home" : location.pathname.slice(1);
+  const setPage = (pageId) => navigate(pageId === "home" ? "/" : `/${pageId}`);
 
   useEffect(() => {
-    const hash = page === "home" ? "" : `#${page}`;
-    if (window.location.hash !== hash) {
-      window.history.pushState(null, "", hash || window.location.pathname);
-    }
-    document.title = PAGE_TITLES[page] || PAGE_TITLES.home;
+    document.title = PAGE_TITLES[currentPage] || PAGE_TITLES.home;
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // TODO: gtag('event','page_view', {page_path: page})
-    // TODO: fbq('track','PageView')
-  }, [page]);
-
-  useEffect(() => {
-    const onPopState = () => {
-      const hash = window.location.hash.slice(1);
-      setPage(VALID_PAGES.has(hash) ? hash : "home");
-    };
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, []);
-
-  const renderPage = () => {
-    switch (page) {
-      case "home":               return <HomePage setPage={setPage} />;
-      case "umzugsreinigung":    return <UmzugsreinigungPage setPage={setPage} />;
-      case "unterhaltsreinigung":return <UnterhaltsreinigungPage setPage={setPage} />;
-      case "gartenpflege":       return <GartenpflegePage />;
-      case "preise":             return <PreisePage setPage={setPage} />;
-      case "fensterreinigung":   return <FensterreinigungPage />;
-      case "baureinigung":       return <BaureinigungPage />;
-      case "bueroreinigung":     return <BueroreinigungPage />;
-      case "faq":                return <FAQPage />;
-      case "kontakt":            return <KontaktPage />;
-      case "über-uns":           return <UeberUnsPage setPage={setPage} />;
-      case "impressum":          return <LegalPage type="impressum" />;
-      case "datenschutz":        return <LegalPage type="datenschutz" />;
-      case "agb":                return <LegalPage type="agb" />;
-      default:                   return <HomePage setPage={setPage} />;
-    }
-  };
+    if (typeof gtag === "function") gtag("event", "page_view", { page_path: location.pathname });
+    if (typeof fbq === "function") fbq("track", "PageView");
+  }, [location.pathname]);
 
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff", minHeight: "100vh" }}>
       <OfferBanner />
-      <Nav currentPage={page} setPage={setPage} />
-      <main>{renderPage()}</main>
+      <Nav currentPage={currentPage} setPage={setPage} />
+      <main>
+        <Routes>
+          <Route path="/"                   element={<HomePage setPage={setPage} />} />
+          <Route path="/umzugsreinigung"    element={<UmzugsreinigungPage setPage={setPage} />} />
+          <Route path="/unterhaltsreinigung"element={<UnterhaltsreinigungPage setPage={setPage} />} />
+          <Route path="/gartenpflege"       element={<GartenpflegePage />} />
+          <Route path="/preise"             element={<PreisePage setPage={setPage} />} />
+          <Route path="/fensterreinigung"   element={<FensterreinigungPage />} />
+          <Route path="/baureinigung"       element={<BaureinigungPage />} />
+          <Route path="/bueroreinigung"     element={<BueroreinigungPage />} />
+          <Route path="/faq"                element={<FAQPage />} />
+          <Route path="/kontakt"            element={<KontaktPage />} />
+          <Route path="/über-uns"           element={<UeberUnsPage setPage={setPage} />} />
+          <Route path="/impressum"          element={<LegalPage type="impressum" />} />
+          <Route path="/datenschutz"        element={<LegalPage type="datenschutz" />} />
+          <Route path="/agb"                element={<LegalPage type="agb" />} />
+          <Route path="*"                   element={<HomePage setPage={setPage} />} />
+        </Routes>
+      </main>
       <Footer setPage={setPage} />
       <FloatingWA />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppLayout />
+    </BrowserRouter>
   );
 }
