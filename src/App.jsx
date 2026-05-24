@@ -33,6 +33,7 @@
 // ============================================================
 
 import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "@formspree/react";
 import {
   Menu, X, MessageCircle, ChevronDown, ChevronRight,
@@ -3955,42 +3956,52 @@ function BueroreinigungPage() {
 // ============================================================
 // РОУТЕР — переключение страниц
 // ============================================================
-export default function App() {
-  const [page, setPage] = useState("home");
+function AppLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const currentPage = location.pathname === "/" ? "home" : location.pathname.slice(1);
+  const setPage = (pageId) => navigate(pageId === "home" ? "/" : `/${pageId}`);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // TODO: gtag('event','page_view', {page_path: page})
-    // TODO: fbq('track','PageView')
-  }, [page]);
-
-  const renderPage = () => {
-    switch (page) {
-      case "home":               return <HomePage setPage={setPage} />;
-      case "umzugsreinigung":    return <UmzugsreinigungPage setPage={setPage} />;
-      case "unterhaltsreinigung":return <UnterhaltsreinigungPage setPage={setPage} />;
-      case "gartenpflege":       return <GartenpflegePage />;
-      case "preise":             return <PreisePage setPage={setPage} />;
-      case "fensterreinigung":   return <FensterreinigungPage />;
-      case "baureinigung":       return <BaureinigungPage />;
-      case "bueroreinigung":     return <BueroreinigungPage />;
-      case "faq":                return <FAQPage />;
-      case "kontakt":            return <KontaktPage />;
-      case "über-uns":           return <UeberUnsPage setPage={setPage} />;
-      case "impressum":          return <LegalPage type="impressum" />;
-      case "datenschutz":        return <LegalPage type="datenschutz" />;
-      case "agb":                return <LegalPage type="agb" />;
-      default:                   return <HomePage setPage={setPage} />;
-    }
-  };
+    if (typeof gtag === "function") gtag("event", "page_view", { page_path: location.pathname });
+    if (typeof fbq === "function") fbq("track", "PageView");
+  }, [location.pathname]);
 
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff", minHeight: "100vh" }}>
       <OfferBanner />
-      <Nav currentPage={page} setPage={setPage} />
-      <main>{renderPage()}</main>
+      <Nav currentPage={currentPage} setPage={setPage} />
+      <main>
+        <Routes>
+          <Route path="/"                   element={<HomePage setPage={setPage} />} />
+          <Route path="/umzugsreinigung"    element={<UmzugsreinigungPage setPage={setPage} />} />
+          <Route path="/unterhaltsreinigung"element={<UnterhaltsreinigungPage setPage={setPage} />} />
+          <Route path="/gartenpflege"       element={<GartenpflegePage />} />
+          <Route path="/preise"             element={<PreisePage setPage={setPage} />} />
+          <Route path="/fensterreinigung"   element={<FensterreinigungPage />} />
+          <Route path="/baureinigung"       element={<BaureinigungPage />} />
+          <Route path="/bueroreinigung"     element={<BueroreinigungPage />} />
+          <Route path="/faq"                element={<FAQPage />} />
+          <Route path="/kontakt"            element={<KontaktPage />} />
+          <Route path="/über-uns"           element={<UeberUnsPage setPage={setPage} />} />
+          <Route path="/impressum"          element={<LegalPage type="impressum" />} />
+          <Route path="/datenschutz"        element={<LegalPage type="datenschutz" />} />
+          <Route path="/agb"                element={<LegalPage type="agb" />} />
+          <Route path="*"                   element={<HomePage setPage={setPage} />} />
+        </Routes>
+      </main>
       <Footer setPage={setPage} />
       <FloatingWA />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppLayout />
+    </BrowserRouter>
   );
 }
