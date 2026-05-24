@@ -58,49 +58,49 @@ export const CONFIG = {
 
 export const PRICES = {
   endreinigung: {
-    "2.5": { basic: 690,  komplett: 890  },
-    "3.5": { basic: 890,  komplett: 1090 },
-    "4.5": { basic: 1090, komplett: 1390 },
-    "5.5": { basic: 1390, komplett: 1690 },
-    "EFH": { basic: 1690, komplett: 2090 },
+    "2.5": { basic: 409,  komplett: 529  },
+    "3.5": { basic: 529,  komplett: 649  },
+    "4.5": { basic: 649,  komplett: 829  },
+    "5.5": { basic: 829,  komplett: 1009 },
+    "EFH": { basic: 1009, komplett: 1249 },
   },
-  extras: { entsorgung: 120, teppich: 180 },
+  extras: { entsorgung: 69, teppich: 109 },
   unterhalt: {
-    einmalig: 75,   // CHF/Std
-    basis:   396,   // CHF/Monat
-    komfort: 780,
-    premium: 1530,
+    einmalig: 49,   // CHF/Std
+    basis:   239,   // CHF/Monat
+    komfort: 469,
+    premium: 919,
   },
   garten: {
-    stunde_abo: 65,
-    stunde_einmalig: 80,
-    fruehling: 490,
-    herbst: 390,
-    abo_monat: 390,
+    stunde_abo: 39,
+    stunde_einmalig: 49,
+    fruehling: 289,
+    herbst: 229,
+    abo_monat: 229,
   },
-  fenster: { pauschal_25zi: 320 },
+  fenster: { pauschal_25zi: 189 },
 };
 
 export const PAKETE = [
   {
     name: "Umzug komplett 3.5-Zi",
     items: "Endreinigung Komplett + Entsorgung",
-    einzeln: 1210, paket: 1090,
+    einzeln: 729, paket: 649,
   },
   {
     name: "Umzug komplett 4.5-Zi",
     items: "Endreinigung Komplett + Entsorgung",
-    einzeln: 1510, paket: 1350,
+    einzeln: 909, paket: 809,
   },
   {
     name: "Frühjahrsputz 3.5-Zi",
     items: "Grundreinigung + Fenster",
-    einzeln: 850, paket: 690,
+    einzeln: 509, paket: 409,
   },
   {
     name: "Frühjahrsputz 4.5-Zi",
     items: "Grundreinigung + Fenster",
-    einzeln: 1090, paket: 890,
+    einzeln: 649, paket: 529,
   },
 ];
 
@@ -117,11 +117,11 @@ export const getOfferDiscount = (roomSize) =>
 
 export const buildWaLink = (service) => {
   const texts = {
-    general:      "Grüezi Fleissig, ich interessiere mich für Ihre Dienstleistungen. Kurz zu mir: ",
-    endreinigung: "Grüezi, ich brauche eine Umzugsreinigung. Wohnung: X-Zimmer, ca. Y m². Ich schicke Ihnen 3 Fotos.",
-    unterhalt:    "Grüezi, ich interessiere mich für regelmässige Reinigung. Ich schicke Details.",
-    garten:       "Grüezi, ich brauche Gartenpflege. Kurz zum Garten: ",
-    fenster:      "Grüezi, ich möchte die Fenster reinigen lassen. Wohnung X-Zimmer, mit/ohne Storen.",
+    general:      "Grüezi! Ich interessiere mich für Ihre Reinigung oder Gartenpflege und möchte eine Offerte anfragen.",
+    endreinigung: "Grüezi! Ich brauche eine Umzugsreinigung und möchte eine Offerte. Ich schicke Ihnen die Fotos später.",
+    unterhalt:    "Grüezi! Ich interessiere mich für eine regelmässige Reinigung und möchte mehr erfahren.",
+    garten:       "Grüezi! Ich brauche Hilfe im Garten und möchte eine Offerte anfragen. Ich schicke die Fotos später.",
+    fenster:      "Grüezi! Ich möchte meine Fenster reinigen lassen und bitte um eine Offerte.",
   };
   const text = encodeURIComponent(texts[service] || texts.general);
   return `https://wa.me/${CONFIG.WA_NUMBER}?text=${text}`;
@@ -185,10 +185,11 @@ export function Nav({ currentPage, setPage }) {
         {/* Desktop nav */}
         <div style={{ display: "flex", gap: 4, alignItems: "center" }} className="desktop-nav">
           {PAGES.slice(1, 6).map(p => (
-            <button key={p.id}
-              onClick={() => setPage(p.id)}
+            <a key={p.id}
+              href={`#${p.id}`}
+              onClick={(e) => { e.preventDefault(); setPage(p.id); }}
               style={{
-                background: "none", border: "none", cursor: "pointer",
+                textDecoration: "none", cursor: "pointer",
                 padding: "6px 12px", borderRadius: 6,
                 fontSize: 14, fontWeight: 500,
                 color: currentPage === p.id ? "#3D7B4F" : "#4A4A4A",
@@ -197,28 +198,12 @@ export function Nav({ currentPage, setPage }) {
               }}
             >
               {p.label}
-            </button>
+            </a>
           ))}
         </div>
 
         {/* CTA + burger */}
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <a
-            href={buildWaLink("general")}
-            target="_blank" rel="noopener noreferrer"
-            style={{
-              display: "flex", alignItems: "center", gap: 6,
-              background: "#25D366", color: "#fff",
-              padding: "8px 16px", borderRadius: 8,
-              fontSize: 13, fontWeight: 600,
-              textDecoration: "none",
-              // GA4 + Pixel event — добавить onClick:
-              // onClick={() => fbq('track','Lead',{content_name:'whatsapp_nav'})
-            }}
-          >
-            <MessageCircle size={14} />
-            WhatsApp
-          </a>
           <button
             onClick={() => setOpen(!open)}
             data-testid="burger-btn"
@@ -241,12 +226,13 @@ export function Nav({ currentPage, setPage }) {
           padding: "12px 20px 20px",
         }}>
           {PAGES.map(p => (
-            <button key={p.id}
-              onClick={() => { setPage(p.id); setOpen(false); }}
+            <a key={p.id}
+              href={`#${p.id}`}
+              onClick={(e) => { e.preventDefault(); setPage(p.id); setOpen(false); }}
               style={{
                 display: "block", width: "100%", textAlign: "left",
                 background: currentPage === p.id ? "#f0f7f2" : "none",
-                border: "none", cursor: "pointer",
+                textDecoration: "none", cursor: "pointer",
                 padding: "10px 12px", borderRadius: 6,
                 fontSize: 15, fontWeight: currentPage === p.id ? 600 : 400,
                 color: currentPage === p.id ? "#3D7B4F" : "#4A4A4A",
@@ -254,7 +240,7 @@ export function Nav({ currentPage, setPage }) {
               }}
             >
               {p.label}
-            </button>
+            </a>
           ))}
           <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0" }}>
             <a href={buildWaLink("general")}
@@ -333,7 +319,7 @@ function OfferBanner() {
       padding: "10px 20px", fontSize: 13, fontWeight: 500,
     }}>
       🎉 <strong>Eröffnungsangebot bis 30. Juni 2026:</strong>{" "}
-      CHF 100 Rabatt auf Ihre erste Umzugsreinigung · CHF 50 auf Gartenpakete · 10% auf das erste Abo
+      CHF 50 auf Gartenpakete · 10% auf das erste Abo
     </div>
   );
 }
@@ -455,19 +441,20 @@ function Footer({ setPage }) {
               ["gartenpflege", "Gartenpflege"],
               ["preise", "Preise & Pakete"],
             ].map(([id, label]) => (
-              <button key={id}
-                onClick={() => setPage(id)}
+              <a key={id}
+                href={`#${id}`}
+                onClick={(e) => { e.preventDefault(); setPage(id); }}
                 style={{
-                  display: "block", background: "none", border: "none",
+                  display: "block", textDecoration: "none",
                   cursor: "pointer", color: "#9ca3af", fontSize: 13,
-                  padding: "3px 0", textAlign: "left",
+                  padding: "3px 0",
                   transition: "color 0.15s",
                 }}
                 onMouseEnter={e => e.currentTarget.style.color = "#fff"}
                 onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}
               >
                 {label}
-              </button>
+              </a>
             ))}
           </div>
 
@@ -482,19 +469,20 @@ function Footer({ setPage }) {
               ["faq", "FAQ"],
               ["über-uns", "Über uns"],
             ].map(([id, label]) => (
-              <button key={id}
-                onClick={() => setPage(id)}
+              <a key={id}
+                href={`#${id}`}
+                onClick={(e) => { e.preventDefault(); setPage(id); }}
                 style={{
-                  display: "block", background: "none", border: "none",
+                  display: "block", textDecoration: "none",
                   cursor: "pointer", color: "#9ca3af", fontSize: 13,
-                  padding: "3px 0", textAlign: "left",
+                  padding: "3px 0",
                   transition: "color 0.15s",
                 }}
                 onMouseEnter={e => e.currentTarget.style.color = "#fff"}
                 onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}
               >
                 {label}
-              </button>
+              </a>
             ))}
           </div>
 
@@ -596,7 +584,7 @@ function HomePage({ setPage }) {
       icon: <Wrench size={22} color="#3D7B4F" />,
       title: "Baureinigung",
       desc: "Nach Renovation, gründlich.",
-      price: "ab CHF 13/m²",
+      price: "ab CHF 9/m²",
       service: "general",
       page: "baureinigung",
     },
@@ -625,7 +613,7 @@ function HomePage({ setPage }) {
   ];
 
   return (
-    <div>
+    <div id="start">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 60%)",
@@ -635,17 +623,6 @@ function HomePage({ setPage }) {
         <Container>
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>
             <div>
-          {isOfferActive() && (
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              background: "#fff9f0", border: "1px solid #f5d9c0",
-              color: "#c2611a", padding: "5px 12px", borderRadius: 20,
-              fontSize: 12, fontWeight: 600, marginBottom: 20,
-            }}>
-              🎉 Eröffnungsangebot: CHF 100 Rabatt auf die erste Umzugsreinigung
-            </div>
-          )}
-
           <h1 style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: "clamp(28px, 5vw, 52px)",
@@ -662,8 +639,7 @@ function HomePage({ setPage }) {
             fontSize: "clamp(15px, 2vw, 18px)", color: "#5a6472",
             maxWidth: 480, lineHeight: 1.65, marginBottom: 28,
           }}>
-            Senden Sie uns 3 Fotos per WhatsApp.<br />
-            Sie bekommen eine verbindliche Offerte innerhalb von 2 Stunden.
+            Schreiben Sie uns einfach auf WhatsApp — wir fragen alles Nötige selbst ab. Offerte innerhalb von 2 Stunden.
           </p>
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
@@ -718,7 +694,7 @@ function HomePage({ setPage }) {
       <style>{`@media(min-width:900px){.hero-img{display:block !important;}}`}</style>
 
       {/* 3 ШАГА */}
-      <Container style={{ padding: "60px 20px" }}>
+      <Container id="wie-es-funktioniert" style={{ padding: "60px 20px" }}>
         <SectionTitle sub="So einfach funktioniert es — ohne Termine, ohne Anrufe.">
           Drei Schritte zur sauberen Wohnung
         </SectionTitle>
@@ -761,8 +737,38 @@ function HomePage({ setPage }) {
         </div>
       </Container>
 
+      {/* ДО / ПОСЛЕ */}
+      <div style={{ background: "#f9fdf9", padding: "60px 0", borderTop: "1px solid #e8f2eb" }}>
+        <Container>
+          <SectionTitle sub="Echte Ergebnisse aus dem Kanton Aargau.">
+            Wir machen sauber — nicht irgendwie, sondern richtig.
+          </SectionTitle>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: 20,
+          }}>
+            {[
+              { src: "/photo_2026-05-08_11-04-40.jpg",     alt: "Duschkabine vorher und nachher" },
+              { src: "/photo_2026-05-08_11-04-40 (2).jpg", alt: "Kochfeld vorher und nachher" },
+            ].map((item, i) => (
+              <div key={i} style={{
+                borderRadius: 16, overflow: "hidden",
+                boxShadow: "0 2px 24px rgba(0,0,0,0.10)",
+              }}>
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  style={{ width: "100%", display: "block" }}
+                />
+              </div>
+            ))}
+          </div>
+        </Container>
+      </div>
+
       {/* УСЛУГИ */}
-      <div style={{ background: "#f9fdf9", padding: "60px 0" }}>
+      <div id="leistungen" style={{ background: "#f9fdf9", padding: "60px 0" }}>
         <Container>
           <SectionTitle sub="Festpreise — keine versteckten Kosten.">
             Unsere Dienstleistungen
@@ -802,19 +808,16 @@ function HomePage({ setPage }) {
                 }}>
                   {s.price}
                 </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <button
-                    onClick={() => setPage(s.page)}
-                    style={{
-                      flex: 1, background: "none", border: "1px solid #d0d8e0",
-                      borderRadius: 7, padding: "7px 12px", cursor: "pointer",
-                      fontSize: 12, fontWeight: 600, color: "#4A4A4A",
-                    }}
-                  >
-                    Mehr erfahren
-                  </button>
-                  <WhatsAppButton service={s.service} label="WhatsApp" size="small" />
-                </div>
+                <button
+                  onClick={() => setPage(s.page)}
+                  style={{
+                    width: "100%", background: "none", border: "1px solid #d0d8e0",
+                    borderRadius: 7, padding: "8px 12px", cursor: "pointer",
+                    fontSize: 12, fontWeight: 600, color: "#4A4A4A",
+                  }}
+                >
+                  Mehr erfahren →
+                </button>
               </div>
             ))}
           </div>
@@ -822,7 +825,7 @@ function HomePage({ setPage }) {
       </div>
 
       {/* ПАКЕТЫ */}
-      <Container style={{ padding: "60px 20px" }}>
+      <Container id="pakete" style={{ padding: "60px 20px" }}>
         <SectionTitle sub="Kombinierte Leistungen mit echten Ersparnissen.">
           Sparen mit Paketen
         </SectionTitle>
@@ -959,8 +962,7 @@ export function Calculator() {
   const base     = PRICES.endreinigung[roomSize][variant];
   const extraSum = (extras.entsorgung ? PRICES.extras.entsorgung : 0)
                  + (extras.teppich    ? PRICES.extras.teppich    : 0);
-  const discount = getOfferDiscount(roomSize);
-  const total    = base + extraSum - discount;
+  const total    = base + extraSum;
 
   const waText = () => {
     const lines = [
@@ -968,7 +970,7 @@ export function Calculator() {
       `Wohnung: ${roomSize}-Zimmer, Paket: ${variant === "basic" ? "Basic" : "Komplett"}.`,
       extras.entsorgung ? "+ Grüngutentsorgung" : "",
       extras.teppich    ? "+ Teppichreinigung"  : "",
-      `Preis laut Kalkulator: CHF ${formatPrice(total)}${discount > 0 ? ` (inkl. Eröffnungsrabatt CHF ${discount})` : ""}.`,
+      `Preis laut Kalkulator: CHF ${formatPrice(total)}.`,
       `Ich schicke 3 Fotos.`,
     ].filter(Boolean).join(" ");
     return `https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(lines)}`;
@@ -1115,12 +1117,7 @@ export function Calculator() {
             <span>+CHF {PRICES.extras.teppich}</span>
           </div>
         )}
-        {discount > 0 && (
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 14, color: "#3D7B4F", fontWeight: 600 }}>
-            <span>🎉 Eröffnungsrabatt</span>
-            <span>−CHF {discount}</span>
-          </div>
-        )}
+
         <div style={{
           borderTop: "1px solid #c8e6d0", marginTop: 10, paddingTop: 10,
           display: "flex", justifyContent: "space-between", alignItems: "baseline",
@@ -1231,7 +1228,7 @@ function UmzugsreinigungPage({ setPage }) {
   ];
 
   return (
-    <div>
+    <div id="umzugsreinigung">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 50%)",
@@ -1533,7 +1530,7 @@ function UnterhaltsreinigungPage({ setPage }) {
   ];
 
   return (
-    <div>
+    <div id="unterhaltsreinigung">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -1770,7 +1767,7 @@ function UnterhaltsreinigungPage({ setPage }) {
               color: "#fff", fontSize: 22, fontWeight: 800,
               marginBottom: 10, letterSpacing: "-0.3px",
             }}>
-              Alles aus einer Hand — CHF 890/Monat
+              Alles aus einer Hand — CHF 529/Monat
             </h3>
             <p style={{ color: "#9ca3af", fontSize: 14, lineHeight: 1.7, marginBottom: 0 }}>
               Wöchentliche Reinigung + Fensterreinigung 2× pro Jahr +
@@ -1976,7 +1973,7 @@ function GartenpflegePage() {
   ];
 
   return (
-    <div>
+    <div id="gartenpflege">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -2002,7 +1999,7 @@ function GartenpflegePage() {
           }}>
             Gärtner im Aargau kosten{" "}
             <span style={{ textDecoration: "line-through", color: "#9ca3af" }}>80–120</span>{" "}
-            <span style={{ color: "#3D7B4F" }}>65 CHF/Std.</span> im Abo.
+            <span style={{ color: "#3D7B4F" }}>39 CHF/Std.</span> im Abo.
           </h1>
           <p style={{
             fontSize: 16, color: "#5a6472", lineHeight: 1.65,
@@ -2256,8 +2253,7 @@ function PreisePage({ setPage }) {
       const base = PRICES.endreinigung[roomSize][variant];
       const ex   = (extras.entsorgung ? PRICES.extras.entsorgung : 0)
                  + (extras.teppich    ? PRICES.extras.teppich    : 0);
-      const disc = getOfferDiscount(roomSize);
-      return { base, ex, disc, total: base + ex - disc };
+      return { base, ex, disc: 0, total: base + ex };
     }
     if (activeService === "unterhalt") {
       const base = PRICES.unterhalt[aboType];
@@ -2303,7 +2299,7 @@ function PreisePage({ setPage }) {
   );
 
   return (
-    <div>
+    <div id="preise">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -2338,7 +2334,6 @@ function PreisePage({ setPage }) {
                 Eröffnungsangebot — bis 30. Juni 2026
               </div>
               <div style={{ color: "#fff", fontSize: 14, lineHeight: 1.7 }}>
-                CHF 100 Rabatt auf alle Umzugsreinigungen (2.5-Zi: CHF 50) ·
                 CHF 50 Rabatt auf Gartenpakete ·
                 10% Rabatt auf das erste Unterhalt-Abo
               </div>
@@ -2893,7 +2888,7 @@ function FAQPage() {
   const totalQ = categories.reduce((s, c) => s + c.items.length, 0);
 
   return (
-    <div>
+    <div id="faq">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -3089,7 +3084,7 @@ function KontaktPage() {
   const waKontakt = buildWaLink("general");
 
   return (
-    <div>
+    <div id="kontakt">
       {/* HERO */}
       <div style={{
         background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)",
@@ -3956,6 +3951,23 @@ function BueroreinigungPage() {
 // ============================================================
 // РОУТЕР — переключение страниц
 // ============================================================
+const PAGE_TITLES = {
+  home:               "Fleissig — Reinigung & Gartenpflege im Kanton Aargau",
+  umzugsreinigung:    "Umzugsreinigung Aargau | Festpreis & Abgabegarantie — Fleissig",
+  unterhaltsreinigung:"Unterhaltsreinigung Aargau | Wöchentlich & Monatlich — Fleissig",
+  gartenpflege:       "Gartenpflege Aargau | Saisonpflege & Abo — Fleissig",
+  preise:             "Preise & Pakete | Reinigung Aargau — Fleissig",
+  fensterreinigung:   "Fensterreinigung Aargau | Festpreis — Fleissig",
+  baureinigung:       "Baureinigung Aargau | Nach Renovation — Fleissig",
+  bueroreinigung:     "Büroreinigung Aargau | Gewerbliche Reinigung — Fleissig",
+  faq:                "FAQ | Häufige Fragen zur Reinigung — Fleissig",
+  kontakt:            "Kontakt per WhatsApp | Fleissig Reinigung Aargau",
+  "über-uns":         "Über uns | Fleissig Reinigung Aargau",
+  impressum:          "Impressum — Fleissig",
+  datenschutz:        "Datenschutz — Fleissig",
+  agb:                "AGB — Fleissig",
+};
+
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -3964,6 +3976,7 @@ function AppLayout() {
   const setPage = (pageId) => navigate(pageId === "home" ? "/" : `/${pageId}`);
 
   useEffect(() => {
+    document.title = PAGE_TITLES[currentPage] || PAGE_TITLES.home;
     window.scrollTo({ top: 0, behavior: "smooth" });
     if (typeof gtag === "function") gtag("event", "page_view", { page_path: location.pathname });
     if (typeof fbq === "function") fbq("track", "PageView");

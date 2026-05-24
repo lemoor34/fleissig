@@ -1,0 +1,16 @@
+{
+  "name": "Fleissig — Reinigung & Gartenpflege Aargau",
+  "short_name": "Fleissig",
+  "description": "Professionelle Reinigung und Gartenpflege im Kanton Aargau. Festpreise, Abgabegarantie, Offerte per WhatsApp.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3D7B4F",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

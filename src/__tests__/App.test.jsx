@@ -12,6 +12,12 @@ beforeEach(() => {
 
 const getNav = () => document.querySelector('nav')
 
+const clickNavLink = (label) => {
+  const link = within(getNav()).getAllByRole('link').find(l => l.textContent === label)
+  if (link) fireEvent.click(link)
+  return link
+}
+
 describe('App router', () => {
   it('renders the home page by default', () => {
     render(<App />)
@@ -30,19 +36,19 @@ describe('App router', () => {
 
   it('calls window.scrollTo when the page changes', () => {
     render(<App />)
-    fireEvent.click(within(getNav()).getByRole('button', { name: 'Preise' }))
+    clickNavLink('Preise')
     expect(window.scrollTo).toHaveBeenCalled()
   })
 
   it('navigates to FAQ page via desktop nav', () => {
     render(<App />)
-    fireEvent.click(within(getNav()).getByRole('button', { name: 'FAQ' }))
+    clickNavLink('FAQ')
     expect(screen.getByText(/Häufige Fragen/i)).toBeInTheDocument()
   })
 
   it('navigates to Umzugsreinigung page via desktop nav', () => {
     render(<App />)
-    fireEvent.click(within(getNav()).getByRole('button', { name: 'Umzugsreinigung' }))
+    clickNavLink('Umzugsreinigung')
     expect(screen.getAllByText(/Umzugsreinigung/i).length).toBeGreaterThan(0)
   })
 
@@ -55,9 +61,9 @@ describe('App router', () => {
 
   it('navigates back to home when logo is clicked', () => {
     render(<App />)
-    fireEvent.click(within(getNav()).getByRole('button', { name: 'FAQ' }))
+    clickNavLink('FAQ')
     fireEvent.click(within(getNav()).getByRole('button', { name: /Fleissig/i }))
-    // initial render + FAQ click + home click = 3
+    // initial render + FAQ + home = 3 scrollTo calls
     expect(window.scrollTo).toHaveBeenCalledTimes(3)
   })
 })
