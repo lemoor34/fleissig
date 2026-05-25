@@ -166,7 +166,7 @@ export function Nav({ currentPage, setPage }) {
           }}
         >
           <img
-            src="/IMG_4047.png"
+            src="/ChatGPT Image May 25, 2026, 01_06_53 PM.png"
             alt="Fleissig Reinigung"
             style={{ height: 44, width: "auto", display: "block" }}
           />
@@ -404,7 +404,7 @@ function Footer({ setPage }) {
           <div>
             <div style={{ marginBottom: 12 }}>
               <img
-                src="/IMG_4047.png"
+                src="/ChatGPT Image May 25, 2026, 01_06_53 PM.png"
                 alt="Fleissig Reinigung"
                 style={{ height: 40, width: "auto", filter: "brightness(0) invert(1)" }}
               />
