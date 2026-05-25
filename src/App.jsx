@@ -161,25 +161,15 @@ export function Nav({ currentPage, setPage }) {
         <button
           onClick={() => { setPage("home"); setOpen(false); }}
           style={{
-            display: "flex", alignItems: "center", gap: 8,
             background: "none", border: "none", cursor: "pointer",
-            padding: 0,
+            padding: 0, display: "flex", alignItems: "center",
           }}
         >
-          <div style={{
-            width: 32, height: 32, borderRadius: 8,
-            background: "#3D7B4F",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <span style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>F</span>
-          </div>
-          <span style={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontWeight: 700, fontSize: 18, color: "#1a1a1a",
-            letterSpacing: "-0.3px",
-          }}>
-            Fleissig
-          </span>
+          <img
+            src="/IMG_4047.png"
+            alt="Fleissig Reinigung"
+            style={{ height: 44, width: "auto", display: "block" }}
+          />
         </button>
 
         {/* Desktop nav */}
@@ -412,18 +402,12 @@ function Footer({ setPage }) {
           gap: 32, marginBottom: 32,
         }}>
           <div>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 8,
-              marginBottom: 12,
-            }}>
-              <div style={{
-                width: 28, height: 28, borderRadius: 6,
-                background: "#3D7B4F",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <span style={{ color: "#fff", fontWeight: 800, fontSize: 12 }}>F</span>
-              </div>
-              <span style={{ color: "#fff", fontWeight: 700, fontSize: 16 }}>Fleissig</span>
+            <div style={{ marginBottom: 12 }}>
+              <img
+                src="/IMG_4047.png"
+                alt="Fleissig Reinigung"
+                style={{ height: 40, width: "auto", filter: "brightness(0) invert(1)" }}
+              />
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.7 }}>
               Reinigung und Gartenpflege<br />im Kanton Aargau.<br />

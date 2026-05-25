@@ -21,7 +21,7 @@ const clickNavLink = (label) => {
 describe('App router', () => {
   it('renders the home page by default', () => {
     render(<App />)
-    expect(screen.getAllByText('Fleissig').length).toBeGreaterThan(0)
+    expect(screen.getAllByAltText('Fleissig Reinigung').length).toBeGreaterThan(0)
   })
 
   it('renders the Nav on all pages', () => {
