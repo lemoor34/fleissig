@@ -16,12 +16,16 @@
     <meta property="og:site_name" content="Fleissig" />
     <meta property="og:title" content="Fleissig — Reinigung & Gartenpflege im Kanton Aargau" />
     <meta property="og:description" content="Festpreise, Abgabegarantie, MwSt-Rechnung. Schreiben Sie uns auf WhatsApp — Offerte in 2 Stunden." />
-    <!-- TODO: og:image — 1200×630 px Bild unter /og-image.png hinzufügen für WhatsApp-Vorschau -->
+    <meta property="og:image" content="https://fleissig-reinigung.ch/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Fleissig — Reinigung & Gartenpflege im Kanton Aargau" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Fleissig — Reinigung & Gartenpflege im Kanton Aargau" />
     <meta name="twitter:description" content="Festpreise, Abgabegarantie, MwSt-Rechnung. Schreiben Sie uns auf WhatsApp — Offerte in 2 Stunden." />
+    <meta name="twitter:image" content="https://fleissig-reinigung.ch/og-image.png" />
 
     <!-- PWA -->
     <meta name="theme-color" content="#3D7B4F" />
@@ -32,21 +36,29 @@
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
+      "@id": "https://fleissig-reinigung.ch",
       "name": "Fleissig",
       "description": "Professionelle Reinigung und Gartenpflege im Kanton Aargau. Festpreise, Abgabegarantie, MwSt-Rechnung. Offerte per WhatsApp in 2 Stunden.",
       "url": "https://fleissig-reinigung.ch",
+      "telephone": "+41779588526",
       "email": "fleissig.reinigungen@gmail.com",
+      "vatID": "CHE-461.009.759",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Seengen",
         "addressRegion": "Aargau",
         "addressCountry": "CH"
       },
-      "areaServed": {
-        "@type": "AdministrativeArea",
-        "name": "Kanton Aargau"
-      },
-      "priceRange": "$$",
+      "areaServed": [
+        { "@type": "City", "name": "Aarau" },
+        { "@type": "City", "name": "Lenzburg" },
+        { "@type": "City", "name": "Baden" },
+        { "@type": "City", "name": "Wohlen" },
+        { "@type": "City", "name": "Brugg" },
+        { "@type": "City", "name": "Zofingen" },
+        { "@type": "AdministrativeArea", "name": "Kanton Aargau" }
+      ],
+      "priceRange": "CHF 39 – CHF 1249",
       "openingHoursSpecification": [
         {
           "@type": "OpeningHoursSpecification",
@@ -75,7 +87,7 @@
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Umzugsreinigung",
+              "name": "Umzugsreinigung / Endreinigung",
               "description": "Professionelle Umzugsreinigung mit Abgabegarantie. Festpreis ab CHF 409."
             }
           },
@@ -101,6 +113,22 @@
               "@type": "Service",
               "name": "Fensterreinigung",
               "description": "Fensterreinigung inkl. Storen und Rahmen. Pauschalpreis ab CHF 189."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Baureinigung",
+              "description": "Bauendreinigung nach Renovationen und Neubauten im Kanton Aargau."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Büroreinigung",
+              "description": "Regelmässige Reinigung für Büros und Gewerbe."
             }
           }
         ]
@@ -150,95 +178,6 @@
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "@id": "https://fleissig-reinigung.ch",
-      "name": "Fleissig",
-      "description": "Professionelle Reinigung und Gartenpflege im Kanton Aargau. Festpreise, Abgabegarantie, MwSt-Rechnung.",
-      "url": "https://fleissig-reinigung.ch",
-      "telephone": "+41779588526",
-      "email": "fleissig.reinigungen@gmail.com",
-      "vatID": "CHE-461.009.759",
-      "priceRange": "CHF 65 – CHF 2090",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Seengen",
-        "addressRegion": "Aargau",
-        "addressCountry": "CH"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Aarau" },
-        { "@type": "City", "name": "Lenzburg" },
-        { "@type": "City", "name": "Baden" },
-        { "@type": "City", "name": "Wohlen" },
-        { "@type": "City", "name": "Brugg" },
-        { "@type": "City", "name": "Zofingen" },
-        { "@type": "AdministrativeArea", "name": "Kanton Aargau" }
-      ],
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-        "opens": "08:00",
-        "closes": "18:00"
-      },
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Reinigungsdienstleistungen",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Umzugsreinigung / Endreinigung",
-              "description": "Professionelle Wohnungsreinigung für die Übergabe, mit Abgabegarantie. Ab CHF 690."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Unterhaltsreinigung",
-              "description": "Regelmässige Reinigung für Privat und Büro. Ab CHF 396/Monat."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Gartenpflege",
-              "description": "Saisonale Gartenpflege im Kanton Aargau. Ab CHF 65/Stunde im Abo."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Fensterreinigung",
-              "description": "Fenster- und Storenreinigung für Privathaushalte."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Baureinigung",
-              "description": "Bauendreinigung nach Renovationen und Neubauten."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Büroreinigung",
-              "description": "Regelmässige Reinigung für Büros und Gewerbe."
-            }
-          }
-        ]
-      }
-    }
-    </script>
 </head>
   <body>
     <!-- Google Tag Manager (noscript) -->

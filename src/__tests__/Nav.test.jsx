@@ -3,9 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { Nav } from '../App.jsx'
 
 describe('Nav', () => {
-  it('renders the Fleissig brand name', () => {
+  it('renders the Fleissig logo image', () => {
     render(<Nav currentPage="home" setPage={vi.fn()} />)
-    expect(screen.getByText('Fleissig')).toBeInTheDocument()
+    expect(screen.getByAltText('Fleissig Reinigung')).toBeInTheDocument()
   })
 
   it('calls setPage("home") when the logo is clicked', () => {
