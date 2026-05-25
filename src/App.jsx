@@ -1167,7 +1167,7 @@ export function FAQAccordion({ items }) {
 }
 
 function UmzugsreinigungPage({ setPage }) {
-  const [fs, handleFsSubmit] = useForm("xrerozyb");
+  const [fs, handleFsSubmit] = useForm("mkoevlva");
   const [formState, setFormState] = useState({ name: "", contact: "", desc: "" });
 
   const faqItems = [
@@ -1412,7 +1412,7 @@ function UmzugsreinigungPage({ setPage }) {
 // СТРАНИЦА UNTERHALTSREINIGUNG — абонементы и разовые уборки
 // ============================================================
 function UnterhaltsreinigungPage({ setPage }) {
-  const [fs, handleFsSubmit] = useForm("xrerozyb");
+  const [fs, handleFsSubmit] = useForm("mkoevlva");
   const [formState, setFormState] = useState({ name: "", contact: "", desc: "" });
 
   const abos = [
@@ -1853,7 +1853,7 @@ function UnterhaltsreinigungPage({ setPage }) {
 // СТРАНИЦА GARTENPFLEGE
 // ============================================================
 function GartenpflegePage() {
-  const [fs, handleFsSubmit] = useForm("xrerozyb");
+  const [fs, handleFsSubmit] = useForm("mkoevlva");
   const [formState, setFormState] = useState({ name: "", contact: "", desc: "" });
 
   const pakete = [
@@ -3005,7 +3005,7 @@ function FAQPage() {
 // СТРАНИЦА /kontakt
 // ============================================================
 function KontaktPage() {
-  const [fs, handleFsSubmit] = useForm("xrerozyb");
+  const [fs, handleFsSubmit] = useForm("mkoevlva");
   const [form, setForm]   = useState({ name: "", contact: "", service: "", desc: "" });
   const [error, setError] = useState(false);
 
