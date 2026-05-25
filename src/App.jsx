@@ -3764,13 +3764,6 @@ function FensterreinigungPage() {
           <SectionTitle sub="Häufige Fragen zur Fensterreinigung.">Häufige Fragen</SectionTitle>
           <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
         </div>
-        <div style={{ marginTop: 48, background: "#f9fdf9", borderRadius: 14, padding: "32px", display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 800, fontSize: 18, color: "#1a1a1a", marginBottom: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Jetzt Offerte anfragen</div>
-            <div style={{ fontSize: 14, color: "#6b7280" }}>3 Fotos Ihrer Fenster — Offerte innerhalb von 2 Stunden.</div>
-          </div>
-          <WhatsAppButton service="fenster" label="Offerte per WhatsApp" />
-        </div>
       </Container>
     </div>
   );
@@ -3821,13 +3814,6 @@ function BaureinigungPage() {
         </div>
         <SectionTitle sub="Häufige Fragen zur Baureinigung.">Häufige Fragen</SectionTitle>
         <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
-        <div style={{ marginTop: 48, background: "#f9fdf9", borderRadius: 14, padding: "32px", display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 800, fontSize: 18, color: "#1a1a1a", marginBottom: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Offerte anfragen</div>
-            <div style={{ fontSize: 14, color: "#6b7280" }}>Fotos + m² Angabe genügen für eine verbindliche Offerte.</div>
-          </div>
-          <WhatsAppButton service="general" label="Fotos senden per WhatsApp" />
-        </div>
       </Container>
     </div>
   );
@@ -3883,13 +3869,6 @@ function BueroreinigungPage() {
         </div>
         <SectionTitle sub="Häufige Fragen zur Büroreinigung.">Häufige Fragen</SectionTitle>
         <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
-        <div style={{ marginTop: 48, background: "#1a1a1a", borderRadius: 14, padding: "32px", display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 800, fontSize: 18, color: "#fff", marginBottom: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Offerte für Ihr Büro</div>
-            <div style={{ fontSize: 14, color: "#9ca3af" }}>Fläche in m², Anzahl Mitarbeiter, gewünschte Häufigkeit — das reicht für eine Offerte.</div>
-          </div>
-          <WhatsAppButton service="general" label="Offerte anfragen" />
-        </div>
       </Container>
     </div>
   );
