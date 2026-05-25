@@ -526,10 +526,10 @@ function PagePlaceholder({ title, nextPage }) {
           {title}
         </h2>
         <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 24 }}>
-          Эта страница разрабатывается в следующей итерации.<br />
-          Структура и навигация уже работают.
+          Diese Seite ist in Kürze verfügbar.<br />
+          Kontaktieren Sie uns direkt per WhatsApp.
         </p>
-        <WhatsAppButton service="general" label="WhatsApp — пока прямая связь" size="small" />
+        <WhatsAppButton service="general" label="Offerte per WhatsApp" size="small" />
       </div>
     </Container>
   );
@@ -894,36 +894,6 @@ function HomePage({ setPage }) {
   );
 }
 
-// ============================================================
-// ФИКСИРОВАННАЯ КНОПКА WhatsApp (мобильная)
-// ============================================================
-function FloatingWA() {
-  return (
-    <a
-      href={buildWaLink("general")}
-      target="_blank" rel="noopener noreferrer"
-      onClick={() => {
-        if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
-        if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'whatsapp_floating' });
-      }}
-      style={{
-        position: "fixed", bottom: 20, right: 20, zIndex: 999,
-        width: 56, height: 56, borderRadius: "50%",
-        background: "#25D366", color: "#fff",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        boxShadow: "0 4px 20px rgba(37,211,102,0.45)",
-        textDecoration: "none",
-      }}
-      className="floating-wa"
-    >
-      <MessageCircle size={24} />
-      <style>{`
-        .floating-wa { display: none !important; }
-        @media (max-width: 768px) { .floating-wa { display: flex !important; } }
-      `}</style>
-    </a>
-  );
-}
 
 // ============================================================
 // СТРАНИЦА UMZUGSREINIGUNG — главная посадочная для FB Ads
@@ -1702,11 +1672,6 @@ function UnterhaltsreinigungPage({ setPage }) {
                   )}
                 </div>
 
-                <WhatsAppButton
-                  service="unterhalt"
-                  label={`${abo.label} anfragen`}
-                  size={abo.badge ? "normal" : "small"}
-                />
               </div>
             ))}
           </div>
@@ -1724,7 +1689,6 @@ function UnterhaltsreinigungPage({ setPage }) {
                 Ohne Abo · CHF {PRICES.unterhalt.einmalig}/Std. · Termin nach Absprache
               </span>
             </div>
-            <WhatsAppButton service="unterhalt" label="Einmalig anfragen" size="small" />
           </div>
         </Container>
       </div>
@@ -2088,7 +2052,6 @@ function GartenpflegePage() {
                   </div>
                 ))}
               </div>
-              <WhatsAppButton service="garten" label="Offerte anfragen" size="small" />
             </div>
           ))}
         </div>
@@ -3990,7 +3953,6 @@ function AppLayout() {
         </Routes>
       </main>
       <Footer setPage={setPage} />
-      <FloatingWA />
     </div>
   );
 }
