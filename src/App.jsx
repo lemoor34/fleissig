@@ -64,7 +64,6 @@ export const PRICES = {
     "5.5": { basic: 1290, komplett: 1560 },
     "EFH": { basic: 1560, komplett: 1940 },
   },
-  extras: { entsorgung: 110, teppich: 170 },
   unterhalt: {
     einmalig: 55,   // CHF/Std
     basis:   370,   // CHF/Monat
@@ -84,13 +83,13 @@ export const PRICES = {
 export const PAKETE = [
   {
     name: "Umzug komplett 3.5-Zi",
-    items: "Endreinigung Komplett + Entsorgung",
-    einzeln: 1120, paket: 1010,
+    items: "Endreinigung Komplett inkl. Fenster & Balkon",
+    einzeln: 930, paket: 820,
   },
   {
     name: "Umzug komplett 4.5-Zi",
-    items: "Endreinigung Komplett + Entsorgung",
-    einzeln: 1400, paket: 1290,
+    items: "Endreinigung Komplett inkl. Fenster & Balkon",
+    einzeln: 1180, paket: 1010,
   },
   {
     name: "Frühjahrsputz 3.5-Zi",
@@ -910,23 +909,18 @@ export function Calculator() {
 
   const [roomSize, setRoomSize] = useState("3.5");
   const [variant, setVariant]   = useState("komplett");
-  const [extras, setExtras]     = useState({ entsorgung: false, teppich: false });
   const [submitted, setSubmitted] = useState(false);
 
-  const base     = PRICES.endreinigung[roomSize][variant];
-  const extraSum = (extras.entsorgung ? PRICES.extras.entsorgung : 0)
-                 + (extras.teppich    ? PRICES.extras.teppich    : 0);
-  const total    = base + extraSum;
+  const base  = PRICES.endreinigung[roomSize][variant];
+  const total = base;
 
   const waText = () => {
     const lines = [
       `Grüezi, ich brauche eine Umzugsreinigung.`,
       `Wohnung: ${roomSize}-Zimmer, Paket: ${variant === "basic" ? "Basic" : "Komplett"}.`,
-      extras.entsorgung ? "+ Grüngutentsorgung" : "",
-      extras.teppich    ? "+ Teppichreinigung"  : "",
       `Preis laut Kalkulator: CHF ${formatPrice(total)}.`,
       `Ich schicke 3 Fotos.`,
-    ].filter(Boolean).join(" ");
+    ].join(" ");
     return `https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(lines)}`;
   };
 
@@ -1013,34 +1007,8 @@ export function Calculator() {
         </div>
       </div>
 
-      {/* Доп. услуги */}
+      {/* Hinweis Verschmutzung */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#4A4A4A", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-          Zusatzleistungen (optional)
-        </div>
-        {[
-          { key: "entsorgung", label: "Grüngutentsorgung / Müllentsorgung", price: PRICES.extras.entsorgung },
-          { key: "teppich",    label: "Teppichreinigung",                    price: PRICES.extras.teppich    },
-        ].map(e => (
-          <label key={e.key} style={{
-            display: "flex", alignItems: "center", gap: 10,
-            padding: "10px 14px", borderRadius: 8, cursor: "pointer",
-            background: extras[e.key] ? "#f0f7f2" : "#f9f9f9",
-            border: `1px solid ${extras[e.key] ? "#c8e6d0" : "#e8e8e8"}`,
-            marginBottom: 8, transition: "all 0.15s",
-          }}>
-            <input
-              type="checkbox"
-              checked={extras[e.key]}
-              onChange={ev => setExtras(prev => ({ ...prev, [e.key]: ev.target.checked }))}
-              style={{ accentColor: "#3D7B4F", width: 16, height: 16, cursor: "pointer" }}
-            />
-            <span style={{ flex: 1, fontSize: 13, fontWeight: 500 }}>{e.label}</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#4A4A4A" }}>
-              +CHF {e.price}
-            </span>
-          </label>
-        ))}
         <div style={{
           padding: "10px 14px", borderRadius: 8,
           background: "#fff8f5", border: "1px solid #f5d9c0",
@@ -1059,19 +1027,6 @@ export function Calculator() {
           <span>Basispreis ({roomSize}-Zi, {variant === "basic" ? "Basic" : "Komplett"})</span>
           <span>CHF {formatPrice(base)}</span>
         </div>
-        {extras.entsorgung && (
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 14, color: "#6b7280" }}>
-            <span>Grüngutentsorgung</span>
-            <span>+CHF {PRICES.extras.entsorgung}</span>
-          </div>
-        )}
-        {extras.teppich && (
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 14, color: "#6b7280" }}>
-            <span>Teppichreinigung</span>
-            <span>+CHF {PRICES.extras.teppich}</span>
-          </div>
-        )}
-
         <div style={{
           borderTop: "1px solid #c8e6d0", marginTop: 10, paddingTop: 10,
           display: "flex", justifyContent: "space-between", alignItems: "baseline",
@@ -2182,7 +2137,6 @@ function PreisePage({ setPage }) {
   const [activeService, setActiveService] = useState("endreinigung");
   const [roomSize, setRoomSize]   = useState("3.5");
   const [variant, setVariant]     = useState("komplett");
-  const [extras, setExtras]       = useState({ entsorgung: false, teppich: false });
   const [aboType, setAboType]     = useState("komfort");
   const [gartenType, setGartenType] = useState("fruehling");
   const [calcDone, setCalcDone]   = useState(false);
@@ -2198,9 +2152,7 @@ function PreisePage({ setPage }) {
   const calcTotal = () => {
     if (activeService === "endreinigung") {
       const base = PRICES.endreinigung[roomSize][variant];
-      const ex   = (extras.entsorgung ? PRICES.extras.entsorgung : 0)
-                 + (extras.teppich    ? PRICES.extras.teppich    : 0);
-      return { base, ex, disc: 0, total: base + ex };
+      return { base, ex: 0, disc: 0, total: base };
     }
     if (activeService === "unterhalt") {
       const base = PRICES.unterhalt[aboType];
@@ -2226,7 +2178,7 @@ function PreisePage({ setPage }) {
     const svc = services.find(s => s.id === activeService)?.label;
     let detail = "";
     if (activeService === "endreinigung")
-      detail = `${roomSize}-Zi, ${variant === "basic" ? "Basic" : "Komplett"}${extras.entsorgung ? " + Entsorgung" : ""}${extras.teppich ? " + Teppich" : ""}`;
+      detail = `${roomSize}-Zi, ${variant === "basic" ? "Basic" : "Komplett"}`;
     if (activeService === "unterhalt")
       detail = `Abo ${aboType.charAt(0).toUpperCase() + aboType.slice(1)}`;
     if (activeService === "garten")
@@ -2366,25 +2318,6 @@ function PreisePage({ setPage }) {
                         </button>
                       ))}
                     </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>Extras (optional)</div>
-                    {[["entsorgung","Grüngutentsorgung",PRICES.extras.entsorgung],["teppich","Teppichreinigung",PRICES.extras.teppich]].map(([key, label, price]) => (
-                      <label key={key} style={{
-                        display: "flex", alignItems: "center", gap: 10,
-                        padding: "9px 12px", borderRadius: 8, cursor: "pointer",
-                        background: extras[key] ? "#f0f7f2" : "#fff",
-                        border: `1px solid ${extras[key] ? "#c8e6d0" : "#e8e8e8"}`,
-                        marginBottom: 8, fontSize: 13,
-                      }}>
-                        <input type="checkbox" checked={extras[key]}
-                          onChange={e => setExtras(p => ({ ...p, [key]: e.target.checked }))}
-                          style={{ accentColor: "#3D7B4F", width: 15, height: 15 }}
-                        />
-                        <span style={{ flex: 1 }}>{label}</span>
-                        <span style={{ fontWeight: 700 }}>+CHF {price}</span>
-                      </label>
-                    ))}
                   </div>
                 </div>
               )}
@@ -2713,10 +2646,8 @@ function PreisePage({ setPage }) {
                 ],
               },
               {
-                title: "Extras & Zuschläge",
+                title: "Zuschläge",
                 rows: [
-                  ["Grüngutentsorgung", `+CHF ${PRICES.extras.entsorgung}`],
-                  ["Teppichreinigung", `+CHF ${PRICES.extras.teppich}`],
                   ["Notfall <24h", "+25%"],
                   ["Anfahrt >20 km", "nach Offerte"],
                   ["Bio-Reinigungsmittel", "+Aufpreis"],

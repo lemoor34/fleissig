@@ -41,39 +41,6 @@ describe('Calculator', () => {
     expectPrice(expected)
   })
 
-  it('adds entsorgung extra to total when checked', () => {
-    render(<Calculator />)
-    fireEvent.click(screen.getByRole('checkbox', { name: /Grüngutentsorgung/i }))
-    const expected = PRICES.endreinigung['3.5'].komplett + PRICES.extras.entsorgung
-    expectPrice(expected)
-  })
-
-  it('adds teppich extra to total when checked', () => {
-    render(<Calculator />)
-    fireEvent.click(screen.getByRole('checkbox', { name: /Teppichreinigung/i }))
-    const expected = PRICES.endreinigung['3.5'].komplett + PRICES.extras.teppich
-    expectPrice(expected)
-  })
-
-  it('adds both extras correctly', () => {
-    render(<Calculator />)
-    fireEvent.click(screen.getByRole('checkbox', { name: /Grüngutentsorgung/i }))
-    fireEvent.click(screen.getByRole('checkbox', { name: /Teppichreinigung/i }))
-    const expected =
-      PRICES.endreinigung['3.5'].komplett +
-      PRICES.extras.entsorgung +
-      PRICES.extras.teppich
-    expectPrice(expected)
-  })
-
-  it('removes extra from total when checkbox is unchecked', () => {
-    render(<Calculator />)
-    const checkbox = screen.getByRole('checkbox', { name: /Grüngutentsorgung/i })
-    fireEvent.click(checkbox)
-    fireEvent.click(checkbox)
-    const expected = PRICES.endreinigung['3.5'].komplett
-    expectPrice(expected)
-  })
 
   it('renders the WhatsApp CTA link pointing to wa.me', () => {
     render(<Calculator />)

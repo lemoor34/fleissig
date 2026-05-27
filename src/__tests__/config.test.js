@@ -53,15 +53,6 @@ describe('PRICES.endreinigung', () => {
   })
 })
 
-describe('PRICES.extras', () => {
-  it('entsorgung has a positive price', () => {
-    expect(PRICES.extras.entsorgung).toBeGreaterThan(0)
-  })
-
-  it('teppich has a positive price', () => {
-    expect(PRICES.extras.teppich).toBeGreaterThan(0)
-  })
-})
 
 describe('PRICES.unterhalt', () => {
   it('has all four tiers', () => {
