@@ -58,25 +58,25 @@ export const CONFIG = {
 
 export const PRICES = {
   endreinigung: {
-    "2.5": { basic: 409,  komplett: 529  },
-    "3.5": { basic: 529,  komplett: 649  },
-    "4.5": { basic: 649,  komplett: 829  },
-    "5.5": { basic: 829,  komplett: 1009 },
-    "EFH": { basic: 1009, komplett: 1249 },
+    "2.5": { basic: 630,  komplett: 820  },
+    "3.5": { basic: 820,  komplett: 1010 },
+    "4.5": { basic: 1010, komplett: 1290 },
+    "5.5": { basic: 1290, komplett: 1560 },
+    "EFH": { basic: 1560, komplett: 1940 },
   },
-  extras: { entsorgung: 69, teppich: 109 },
+  extras: { entsorgung: 110, teppich: 170 },
   unterhalt: {
-    einmalig: 49,   // CHF/Std
-    basis:   239,   // CHF/Monat
-    komfort: 469,
-    premium: 919,
+    einmalig: 55,   // CHF/Std
+    basis:   370,   // CHF/Monat
+    komfort: 730,
+    premium: 1420,
   },
   garten: {
-    stunde_abo: 39,
-    stunde_einmalig: 49,
-    fruehling: 289,
-    herbst: 229,
-    abo_monat: 229,
+    stunde_abo: 55,
+    stunde_einmalig: 65,
+    fruehling: 450,
+    herbst: 360,
+    abo_monat: 360,
   },
   fenster: { pauschal_25zi: 189 },
 };
@@ -85,22 +85,22 @@ export const PAKETE = [
   {
     name: "Umzug komplett 3.5-Zi",
     items: "Endreinigung Komplett + Entsorgung",
-    einzeln: 729, paket: 649,
+    einzeln: 1120, paket: 1010,
   },
   {
     name: "Umzug komplett 4.5-Zi",
     items: "Endreinigung Komplett + Entsorgung",
-    einzeln: 909, paket: 809,
+    einzeln: 1400, paket: 1290,
   },
   {
     name: "Frühjahrsputz 3.5-Zi",
     items: "Grundreinigung + Fenster",
-    einzeln: 509, paket: 409,
+    einzeln: 790, paket: 630,
   },
   {
     name: "Frühjahrsputz 4.5-Zi",
     items: "Grundreinigung + Fenster",
-    einzeln: 649, paket: 529,
+    einzeln: 1010, paket: 820,
   },
 ];
 
@@ -1715,11 +1715,11 @@ function UnterhaltsreinigungPage({ setPage }) {
               color: "#fff", fontSize: 22, fontWeight: 800,
               marginBottom: 10, letterSpacing: "-0.3px",
             }}>
-              Alles aus einer Hand — CHF 529/Monat
+              Alles aus einer Hand — CHF 820/Monat
             </h3>
             <p style={{ color: "#9ca3af", fontSize: 14, lineHeight: 1.7, marginBottom: 0 }}>
               Wöchentliche Reinigung + Fensterreinigung 2× pro Jahr +
-              Frühjahrsputz inklusive. Sie sparen 18% gegenüber Einzelbuchungen.
+              Frühjahrsputz inklusive. Günstiger als Einzelbuchungen.
             </p>
           </div>
           <div style={{ flexShrink: 0 }}>
