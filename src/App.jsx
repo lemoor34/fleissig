@@ -38,7 +38,7 @@ import { useForm } from "@formspree/react";
 import {
   Menu, X, MessageCircle, ChevronDown, ChevronRight,
   MapPin, Shield, Star, Clock, Check, Phone, Mail,
-  Scissors, Leaf
+  Scissors, Home, Leaf, Building, Wrench, Eye
 } from "lucide-react";
 
 // ============================================================
@@ -57,6 +57,14 @@ export const CONFIG = {
 };
 
 export const PRICES = {
+  endreinigung: {
+    "2.5": { basic: 630,  komplett: 820  },
+    "3.5": { basic: 820,  komplett: 1010 },
+    "4.5": { basic: 1010, komplett: 1290 },
+    "5.5": { basic: 1290, komplett: 1560 },
+    "EFH": { basic: 1560, komplett: 1940 },
+  },
+  extras: { entsorgung: 110, teppich: 170 },
   unterhalt: {
     einmalig: 55,   // CHF/Std
     basis:   370,   // CHF/Monat
@@ -70,9 +78,31 @@ export const PRICES = {
     herbst: 360,
     abo_monat: 360,
   },
+  fenster: { pauschal_25zi: 189 },
 };
 
-export const PAKETE = [];
+export const PAKETE = [
+  {
+    name: "Umzug komplett 3.5-Zi",
+    items: "Endreinigung Komplett + Entsorgung",
+    einzeln: 1120, paket: 1010,
+  },
+  {
+    name: "Umzug komplett 4.5-Zi",
+    items: "Endreinigung Komplett + Entsorgung",
+    einzeln: 1400, paket: 1290,
+  },
+  {
+    name: "Frühjahrsputz 3.5-Zi",
+    items: "Grundreinigung + Fenster",
+    einzeln: 790, paket: 630,
+  },
+  {
+    name: "Frühjahrsputz 4.5-Zi",
+    items: "Grundreinigung + Fenster",
+    einzeln: 1010, paket: 820,
+  },
+];
 
 // ============================================================
 // ХЕЛПЕРЫ
@@ -88,8 +118,10 @@ export const getOfferDiscount = (roomSize) =>
 export const buildWaLink = (service) => {
   const texts = {
     general:      "Grüezi! Ich interessiere mich für Ihre Reinigung oder Gartenpflege und möchte eine Offerte anfragen.",
+    endreinigung: "Grüezi! Ich brauche eine Umzugsreinigung und möchte eine Offerte. Ich schicke Ihnen die Fotos später.",
     unterhalt:    "Grüezi! Ich interessiere mich für eine regelmässige Reinigung und möchte mehr erfahren.",
     garten:       "Grüezi! Ich brauche Hilfe im Garten und möchte eine Offerte anfragen. Ich schicke die Fotos später.",
+    fenster:      "Grüezi! Ich möchte meine Fenster reinigen lassen und bitte um eine Offerte.",
   };
   const text = encodeURIComponent(texts[service] || texts.general);
   return `https://wa.me/${CONFIG.WA_NUMBER}?text=${text}`;
@@ -100,6 +132,7 @@ export const buildWaLink = (service) => {
 // ============================================================
 export const PAGES = [
   { id: "home",              label: "Start"           },
+  { id: "umzugsreinigung",   label: "Umzugsreinigung" },
   { id: "unterhaltsreinigung",label: "Unterhalt"      },
   { id: "gartenpflege",      label: "Garten"          },
   { id: "preise",            label: "Preise"          },
@@ -387,6 +420,7 @@ function Footer({ setPage }) {
               DIENSTLEISTUNGEN
             </div>
             {[
+              ["umzugsreinigung", "Umzugsreinigung"],
               ["unterhaltsreinigung", "Unterhaltsreinigung"],
               ["gartenpflege", "Gartenpflege"],
               ["preise", "Preise & Pakete"],
@@ -507,12 +541,44 @@ function PagePlaceholder({ title, nextPage }) {
 function HomePage({ setPage }) {
   const services = [
     {
+      icon: <Home size={22} color="#3D7B4F" />,
+      title: "Umzugsreinigung",
+      desc: "Mit 100% Abgabegarantie. Festpreis.",
+      price: `ab CHF ${formatPrice(PRICES.endreinigung["2.5"].basic)}`,
+      service: "endreinigung",
+      page: "umzugsreinigung",
+    },
+    {
       icon: <Scissors size={22} color="#3D7B4F" />,
       title: "Unterhaltsreinigung",
       desc: "Regelmässig oder einmalig.",
       price: `Abo ab CHF ${formatPrice(PRICES.unterhalt.basis)}/Mt.`,
       service: "unterhalt",
       page: "unterhaltsreinigung",
+    },
+    {
+      icon: <Eye size={22} color="#3D7B4F" />,
+      title: "Fensterreinigung",
+      desc: "Inkl. Storen und Rahmen.",
+      price: `ab CHF ${formatPrice(PRICES.fenster.pauschal_25zi)} pauschal`,
+      service: "fenster",
+      page: "fensterreinigung",
+    },
+    {
+      icon: <Wrench size={22} color="#3D7B4F" />,
+      title: "Baureinigung",
+      desc: "Nach Renovation, gründlich.",
+      price: "ab CHF 9/m²",
+      service: "general",
+      page: "baureinigung",
+    },
+    {
+      icon: <Building size={22} color="#3D7B4F" />,
+      title: "Büroreinigung",
+      desc: "Abends, 2–3× pro Woche.",
+      price: "Offerte nach Mass",
+      service: "general",
+      page: "bueroreinigung",
     },
     {
       icon: <Leaf size={22} color="#3D7B4F" />,
@@ -830,8 +896,237 @@ function HomePage({ setPage }) {
 
 
 // ============================================================
-// FAQAccordion
+// СТРАНИЦА UMZUGSREINIGUNG — главная посадочная для FB Ads
 // ============================================================
+
+export function Calculator() {
+  const rooms = [
+    { id: "2.5", label: "2.5-Zi", sub: "~55 m²" },
+    { id: "3.5", label: "3.5-Zi", sub: "~75 m²" },
+    { id: "4.5", label: "4.5-Zi", sub: "~95 m²" },
+    { id: "5.5", label: "5.5-Zi", sub: "~120 m²" },
+    { id: "EFH", label: "EFH",    sub: "~160 m²" },
+  ];
+
+  const [roomSize, setRoomSize] = useState("3.5");
+  const [variant, setVariant]   = useState("komplett");
+  const [extras, setExtras]     = useState({ entsorgung: false, teppich: false });
+  const [submitted, setSubmitted] = useState(false);
+
+  const base     = PRICES.endreinigung[roomSize][variant];
+  const extraSum = (extras.entsorgung ? PRICES.extras.entsorgung : 0)
+                 + (extras.teppich    ? PRICES.extras.teppich    : 0);
+  const total    = base + extraSum;
+
+  const waText = () => {
+    const lines = [
+      `Grüezi, ich brauche eine Umzugsreinigung.`,
+      `Wohnung: ${roomSize}-Zimmer, Paket: ${variant === "basic" ? "Basic" : "Komplett"}.`,
+      extras.entsorgung ? "+ Grüngutentsorgung" : "",
+      extras.teppich    ? "+ Teppichreinigung"  : "",
+      `Preis laut Kalkulator: CHF ${formatPrice(total)}.`,
+      `Ich schicke 3 Fotos.`,
+    ].filter(Boolean).join(" ");
+    return `https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(lines)}`;
+  };
+
+  return (
+    <div style={{
+      background: "#fff", border: "2px solid #3D7B4F",
+      borderRadius: 16, padding: "32px",
+      boxShadow: "0 8px 40px rgba(61,123,79,0.12)",
+    }}>
+      <div style={{
+        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        fontWeight: 800, fontSize: 18, color: "#1a1a1a", marginBottom: 24,
+      }}>
+        🧮 Preis berechnen
+      </div>
+
+      {/* Размер квартиры */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#4A4A4A", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          Wohnungsgrösse
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {rooms.map(r => (
+            <button key={r.id}
+              onClick={() => setRoomSize(r.id)}
+              style={{
+                padding: "10px 16px", borderRadius: 10, cursor: "pointer",
+                border: roomSize === r.id ? "2px solid #3D7B4F" : "2px solid #e8e8e8",
+                background: roomSize === r.id ? "#f0f7f2" : "#fff",
+                color: roomSize === r.id ? "#3D7B4F" : "#4A4A4A",
+                fontWeight: roomSize === r.id ? 700 : 500,
+                fontSize: 13, transition: "all 0.15s",
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+              }}
+            >
+              <span style={{ fontWeight: 700 }}>{r.label}</span>
+              <span style={{ fontSize: 11, opacity: 0.7 }}>{r.sub}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Вариант */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#4A4A4A", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          Paket
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {[
+            { id: "basic",    label: "Basic",    sub: "Küche, Bad, Zimmer" },
+            { id: "komplett", label: "Komplett", sub: "+ Fenster, Balkon, Keller", badge: "Empfohlen" },
+          ].map(v => (
+            <button key={v.id}
+              onClick={() => setVariant(v.id)}
+              style={{
+                padding: "14px 16px", borderRadius: 10, cursor: "pointer",
+                border: variant === v.id ? "2px solid #3D7B4F" : "2px solid #e8e8e8",
+                background: variant === v.id ? "#f0f7f2" : "#fff",
+                textAlign: "left", transition: "all 0.15s",
+                position: "relative",
+              }}
+            >
+              {v.badge && (
+                <span style={{
+                  position: "absolute", top: -8, right: 10,
+                  background: "#E87D3E", color: "#fff",
+                  fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 6,
+                }}>
+                  {v.badge}
+                </span>
+              )}
+              <div style={{
+                fontWeight: 700, fontSize: 14,
+                color: variant === v.id ? "#3D7B4F" : "#1a1a1a", marginBottom: 3,
+              }}>
+                {v.label}
+              </div>
+              <div style={{ fontSize: 12, color: "#6b7280" }}>{v.sub}</div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: "#3D7B4F", marginTop: 6 }}>
+                CHF {formatPrice(PRICES.endreinigung[roomSize][v.id])}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Доп. услуги */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#4A4A4A", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          Zusatzleistungen (optional)
+        </div>
+        {[
+          { key: "entsorgung", label: "Grüngutentsorgung / Müllentsorgung", price: PRICES.extras.entsorgung },
+          { key: "teppich",    label: "Teppichreinigung",                    price: PRICES.extras.teppich    },
+        ].map(e => (
+          <label key={e.key} style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "10px 14px", borderRadius: 8, cursor: "pointer",
+            background: extras[e.key] ? "#f0f7f2" : "#f9f9f9",
+            border: `1px solid ${extras[e.key] ? "#c8e6d0" : "#e8e8e8"}`,
+            marginBottom: 8, transition: "all 0.15s",
+          }}>
+            <input
+              type="checkbox"
+              checked={extras[e.key]}
+              onChange={ev => setExtras(prev => ({ ...prev, [e.key]: ev.target.checked }))}
+              style={{ accentColor: "#3D7B4F", width: 16, height: 16, cursor: "pointer" }}
+            />
+            <span style={{ flex: 1, fontSize: 13, fontWeight: 500 }}>{e.label}</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#4A4A4A" }}>
+              +CHF {e.price}
+            </span>
+          </label>
+        ))}
+        <div style={{
+          padding: "10px 14px", borderRadius: 8,
+          background: "#fff8f5", border: "1px solid #f5d9c0",
+          fontSize: 12, color: "#c2611a",
+        }}>
+          ⚠️ Starke Verschmutzung — wir melden uns nach Fotoprüfung mit einer separaten Offerte.
+        </div>
+      </div>
+
+      {/* Итог */}
+      <div style={{
+        background: "#f0f7f2", borderRadius: 12,
+        padding: "20px 24px", marginBottom: 20,
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 14, color: "#6b7280" }}>
+          <span>Basispreis ({roomSize}-Zi, {variant === "basic" ? "Basic" : "Komplett"})</span>
+          <span>CHF {formatPrice(base)}</span>
+        </div>
+        {extras.entsorgung && (
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 14, color: "#6b7280" }}>
+            <span>Grüngutentsorgung</span>
+            <span>+CHF {PRICES.extras.entsorgung}</span>
+          </div>
+        )}
+        {extras.teppich && (
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 14, color: "#6b7280" }}>
+            <span>Teppichreinigung</span>
+            <span>+CHF {PRICES.extras.teppich}</span>
+          </div>
+        )}
+
+        <div style={{
+          borderTop: "1px solid #c8e6d0", marginTop: 10, paddingTop: 10,
+          display: "flex", justifyContent: "space-between", alignItems: "baseline",
+        }}>
+          <span style={{ fontWeight: 800, fontSize: 15, color: "#1a1a1a" }}>Ihr Festpreis</span>
+          <span style={{ fontWeight: 900, fontSize: 28, color: "#3D7B4F", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            CHF {formatPrice(total)}
+          </span>
+        </div>
+        <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4 }}>
+          Keine versteckten Kosten · Verbindliche Offerte nach Fotoprüfung
+        </div>
+      </div>
+
+      {/* CTA */}
+      {!submitted ? (
+        <a
+          href={waText()}
+          target="_blank" rel="noopener noreferrer"
+          onClick={() => {
+            setSubmitted(true);
+            if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+            if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'calculator_whatsapp', value: total });
+            setTimeout(() => setSubmitted(false), 5000);
+          }}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+            background: "#25D366", color: "#fff",
+            padding: "16px", borderRadius: 10, textDecoration: "none",
+            fontSize: 16, fontWeight: 700,
+            boxShadow: "0 4px 16px rgba(37,211,102,0.35)",
+            transition: "transform 0.15s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
+          onMouseLeave={e => e.currentTarget.style.transform = ""}
+        >
+          <MessageCircle size={18} />
+          Offerte per WhatsApp bestätigen — CHF {formatPrice(total)}
+        </a>
+      ) : (
+        <div style={{
+          background: "#f0f7f2", border: "1px solid #c8e6d0",
+          borderRadius: 10, padding: "16px", textAlign: "center",
+          fontSize: 14, color: "#3D7B4F", fontWeight: 600,
+        }}>
+          ✓ WhatsApp geöffnet — wir antworten innerhalb von 15 Minuten!
+        </div>
+      )}
+
+      <div style={{ marginTop: 12, fontSize: 11, color: "#9ca3af", textAlign: "center" }}>
+        Kein Konto nötig · Werktags 8:00–18:00 · Antwort ≤15 Min.
+      </div>
+    </div>
+  );
+}
 
 export function FAQAccordion({ items }) {
   const [open, setOpen] = useState(null);
@@ -871,6 +1166,247 @@ export function FAQAccordion({ items }) {
   );
 }
 
+function UmzugsreinigungPage({ setPage }) {
+  const [fs, handleFsSubmit] = useForm("mkoevlva");
+  const [formState, setFormState] = useState({ name: "", contact: "", desc: "" });
+
+  const faqItems = [
+    { q: "Muss ich zuhause sein?", a: "Nein. Schlüsselübergabe ist möglich — wir besprechen das bei der Offerte." },
+    { q: "Was wenn die Verwaltung etwas beanstandet?", a: "Wir kommen kostenlos zurück — innerhalb von 48 Stunden. Das ist Teil unserer Abgabegarantie, schriftlich festgehalten." },
+    { q: "Wie schnell können Sie kommen?", a: "Meistens 3–7 Tage Vorlauf. In dringenden Fällen auch 24h — bitte direkt per WhatsApp fragen." },
+    { q: "Was ist bei starker Verschmutzung?", a: "Wir besichtigen vor Ort oder prüfen anhand von Fotos. Danach erhalten Sie eine separate Offerte." },
+    { q: "Kann ich per Rechnung zahlen?", a: "Ja. Sie erhalten immer eine offizielle Rechnung. Zahlung auch per TWINT möglich." },
+    { q: "Kommen Sie nach [Ort] im Aargau?", a: "Wir arbeiten im gesamten Kanton Aargau: Lenzburg, Aarau, Wohlen, Baden, Brugg, Zofingen und weitere. Einfach fragen." },
+    { q: "Was ist der Unterschied zwischen Basic und Komplett?", a: "Basic umfasst Küche, Bad und Wohnräume nach Checkliste. Komplett beinhaltet zusätzlich Fenster und Storen beidseitig, Balkon/Terrasse, Keller/Estrich und Backofen-Tiefenreinigung." },
+    { q: "Bezahle ich vor oder nach der Abgabe?", a: "Nach der erfolgreichen Abgabe. Sie zahlen erst, wenn die Wohnungsübergabe geklappt hat." },
+  ];
+
+  return (
+    <div id="umzugsreinigung">
+      {/* HERO */}
+      <div style={{
+        background: "linear-gradient(160deg, #f0f7f2 0%, #fff 50%)",
+        padding: "56px 20px 64px",
+        borderBottom: "1px solid #e8f2eb",
+      }}>
+        <Container>
+          <div style={{ display: "flex", gap: 48, alignItems: "flex-start", flexWrap: "wrap" }}>
+            {/* Левая колонка */}
+            <div style={{ flex: "1 1 340px" }}>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "#f0f7f2", border: "1px solid #c8e6d0",
+                color: "#3D7B4F", padding: "5px 12px", borderRadius: 20,
+                fontSize: 12, fontWeight: 600, marginBottom: 18,
+              }}>
+                ✓ 100% Abgabegarantie
+              </div>
+              <h1 style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: "clamp(26px, 4vw, 44px)",
+                fontWeight: 800, color: "#1a1a1a",
+                letterSpacing: "-0.8px", lineHeight: 1.15, marginBottom: 16,
+              }}>
+                Umzugsreinigung im Aargau —{" "}
+                <span style={{ color: "#3D7B4F" }}>Festpreis, keine Überraschungen.</span>
+              </h1>
+              <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, marginBottom: 24 }}>
+                Sie sind bei der Abgabe nicht allein. Wir reinigen nach Checkliste,
+                sind bei der Wohnungsübergabe dabei und kommen kostenlos zurück,
+                falls die Verwaltung etwas beanstandet.
+              </p>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
+                <WhatsAppButton service="endreinigung" label="Offerte in 2 Stunden" />
+              </div>
+              <div style={{ fontSize: 12, color: "#8a95a0", display: "flex", flexDirection: "column", gap: 5 }}>
+                <span>✓ Zahlung erst nach erfolgreicher Abgabe</span>
+                <span>✓ Kostenlose Nachreinigung in 48h — schriftlich garantiert</span>
+                <span>✓ Offizielle Rechnung · Versichert bis CHF 5 Mio.</span>
+              </div>
+            </div>
+            {/* Калькулятор */}
+            <div style={{ flex: "1 1 340px" }}>
+              <Calculator />
+            </div>
+          </div>
+        </Container>
+      </div>
+
+      {/* ABGABEGARANTIE */}
+      <Container style={{ padding: "60px 20px" }}>
+        <SectionTitle sub="So läuft Ihre Umzugsreinigung ab — Schritt für Schritt.">
+          Abgabegarantie — so funktioniert sie
+        </SectionTitle>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 16,
+        }}>
+          {[
+            { n: "1", title: "Reinigung nach Checkliste", text: "Wir arbeiten systematisch — jeder Punkt wird abgehakt. Küche, Bad, Zimmer, Böden, Armaturen." },
+            { n: "2", title: "Teamleiter ist dabei", text: "Bei der Wohnungsabgabe ist unser Teamleiter anwesend. Sie müssen das nicht alleine durchstehen." },
+            { n: "3", title: "Beanstandung? Wir kommen zurück", text: "Falls die Verwaltung etwas moniert, kommen wir innerhalb von 48 Stunden kostenlos zurück." },
+            { n: "4", title: "Zahlung nach Abgabe", text: "Sie zahlen erst, wenn die Abgabe geklappt hat. Kein Risiko für Sie." },
+          ].map((s, i) => (
+            <div key={i} style={{
+              padding: "24px", borderRadius: 14,
+              background: i === 3 ? "#f0f7f2" : "#fff",
+              border: `1px solid ${i === 3 ? "#c8e6d0" : "#e8e8e8"}`,
+              position: "relative",
+            }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: 8,
+                background: "#3D7B4F", color: "#fff",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontWeight: 800, fontSize: 14, marginBottom: 12,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+              }}>
+                {s.n}
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: "#1a1a1a", marginBottom: 6 }}>{s.title}</div>
+              <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.6 }}>{s.text}</div>
+            </div>
+          ))}
+        </div>
+      </Container>
+
+      {/* ЧЕКЛИСТ */}
+      <div style={{ background: "#f9fdf9", padding: "60px 0" }}>
+        <Container>
+          <SectionTitle sub="Diese Liste erhalten Sie mit der Offerte und bei der Wohnungsabnahme.">
+            Unsere Abgabe-Checkliste
+          </SectionTitle>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: 16,
+          }}>
+            {[
+              {
+                title: "🍳 Küche",
+                items: ["Backofen innen und Backbleche", "Kühlschrank abtauen, innen/aussen", "Dampfabzug inkl. Filter", "Armaturen entkalkt"],
+              },
+              {
+                title: "🚿 Bad / Toilette",
+                items: ["Dusche, Wanne, WC entkalkt", "Armaturen, Spiegel, Fliesen", "Kalkentfernung gründlich"],
+              },
+              {
+                title: "🛋 Wohnräume",
+                items: ["Böden gesaugt und nass gewischt", "Heizkörper, Lichtschalter", "Türen und Rahmen"],
+              },
+              {
+                title: "🪟 Fenster & Storen (Komplett)",
+                items: ["Fenster beidseitig", "Storen innen und aussen", "Fensterrahmen und Simse"],
+              },
+              {
+                title: "✅ Abschluss (Komplett)",
+                items: ["Balkon / Terrasse", "Keller / Estrich", "Kontrolle gemeinsam mit Kunden"],
+              },
+            ].map((cat, i) => (
+              <div key={i} style={{
+                background: "#fff", borderRadius: 12,
+                border: "1px solid #e8f2eb", padding: "20px",
+              }}>
+                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>{cat.title}</div>
+                {cat.items.map((item, j) => (
+                  <div key={j} style={{
+                    display: "flex", gap: 8, alignItems: "flex-start",
+                    fontSize: 13, color: "#4A4A4A", marginBottom: 6,
+                  }}>
+                    <Check size={13} color="#3D7B4F" style={{ flexShrink: 0, marginTop: 2 }} />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+          {/* До/после фото */}
+          <div style={{ marginTop: 32, borderRadius: 16, overflow: "hidden", maxHeight: 360 }}>
+            <img
+              src="https://i.ibb.co/84GQ71m8/a122fcea-22e5-4670-bf48-183b9f5bc805.png"
+              alt="Küche Vorher Nachher — Umzugsreinigung Aargau"
+              style={{ width: "100%", objectFit: "cover", display: "block" }}
+            />
+          </div>
+        </Container>
+      </div>
+
+      {/* FAQ */}
+      <Container style={{ padding: "60px 20px" }}>
+        <SectionTitle sub="Die häufigsten Fragen zur Umzugsreinigung.">
+          Häufige Fragen
+        </SectionTitle>
+        <div style={{ maxWidth: 700 }}>
+          <FAQAccordion items={faqItems} />
+        </div>
+      </Container>
+
+      {/* ФИНАЛЬНЫЙ CTA + Формa */}
+      <div style={{ background: "#f9fdf9", padding: "60px 0" }}>
+        <Container>
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: 32, alignItems: "start",
+          }}>
+            {/* CTA */}
+            <div>
+              <SectionTitle sub="Senden Sie uns 3 Fotos — in 2 Stunden haben Sie die Offerte.">
+                Jetzt Offerte anfragen
+              </SectionTitle>
+              <WhatsAppButton service="endreinigung" label="Offerte per WhatsApp anfordern" />
+              <div style={{ marginTop: 16, fontSize: 12, color: "#8a95a0", lineHeight: 1.8 }}>
+                <div>📸 Küche · Bad · ein Wohnraum</div>
+                <div>⏱ Antwort innerhalb von 15 Minuten</div>
+                <div>📅 Werktags 8:00–18:00</div>
+              </div>
+            </div>
+
+            {/* Форма fallback */}
+            <div style={{
+              background: "#fff", borderRadius: 14,
+              border: "1px solid #e8e8e8", padding: "28px",
+            }}>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: "#1a1a1a" }}>
+                Kein WhatsApp?
+              </div>
+              <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 20 }}>
+                Formular ausfüllen — wir melden uns innerhalb von 2 Stunden.
+              </div>
+              {!fs.succeeded ? (
+                <form onSubmit={handleFsSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <input name="name" type="text" placeholder="Ihr Name" required
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  />
+                  <input name="contact" type="text" placeholder="Telefon oder E-Mail" required
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  />
+                  <textarea name="beschreibung" placeholder="z.B. Umzugsreinigung 3.5-Zi in Lenzburg, Termin nächste Woche" rows={3}
+                    style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  />
+                  <input type="hidden" name="seite" value="Umzugsreinigung" />
+                  <button type="submit" disabled={fs.submitting}
+                    style={{ background: "#E87D3E", color: "#fff", padding: "13px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", border: "none" }}
+                  >
+                    {fs.submitting ? "Wird gesendet..." : "Offerte anfordern"}
+                  </button>
+                  <div style={{ fontSize: 11, color: "#9ca3af", textAlign: "center" }}>
+                    Keine Anrufe — wir schreiben Ihnen zurück.
+                  </div>
+                </form>
+              ) : (
+                <div style={{ background: "#f0f7f2", border: "1px solid #c8e6d0", borderRadius: 10, padding: "20px", textAlign: "center" }}>
+                  <div style={{ fontSize: 28, marginBottom: 8 }}>✓</div>
+                  <div style={{ fontWeight: 700, color: "#3D7B4F", marginBottom: 4 }}>Merci für Ihre Anfrage!</div>
+                  <div style={{ fontSize: 13, color: "#6b7280" }}>Wir melden uns innerhalb von 2 Stunden.</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </Container>
+      </div>
+    </div>
+  );
+}
 
 // ============================================================
 // СТРАНИЦА UNTERHALTSREINIGUNG — абонементы и разовые уборки
@@ -1643,18 +2179,29 @@ function GartenpflegePage() {
 // СТРАНИЦА /preise — полный прайс + расширенный калькулятор
 // ============================================================
 function PreisePage({ setPage }) {
-  const [activeService, setActiveService] = useState("unterhalt");
+  const [activeService, setActiveService] = useState("endreinigung");
+  const [roomSize, setRoomSize]   = useState("3.5");
+  const [variant, setVariant]     = useState("komplett");
+  const [extras, setExtras]       = useState({ entsorgung: false, teppich: false });
   const [aboType, setAboType]     = useState("komfort");
   const [gartenType, setGartenType] = useState("fruehling");
   const [calcDone, setCalcDone]   = useState(false);
 
   const services = [
+    { id: "endreinigung",  label: "Umzugsreinigung" },
     { id: "unterhalt",     label: "Unterhaltsreinigung" },
     { id: "garten",        label: "Gartenpflege" },
+    { id: "fenster",       label: "Fensterreinigung" },
   ];
 
   // Расчёт итога по активной услуге
   const calcTotal = () => {
+    if (activeService === "endreinigung") {
+      const base = PRICES.endreinigung[roomSize][variant];
+      const ex   = (extras.entsorgung ? PRICES.extras.entsorgung : 0)
+                 + (extras.teppich    ? PRICES.extras.teppich    : 0);
+      return { base, ex, disc: 0, total: base + ex };
+    }
     if (activeService === "unterhalt") {
       const base = PRICES.unterhalt[aboType];
       const disc = isOfferActive() ? Math.round(base * 0.1) : 0;
@@ -1667,6 +2214,9 @@ function PreisePage({ setPage }) {
       const disc = isOfferActive() && gartenType !== "abo" ? 50 : 0;
       return { base, ex: 0, disc, total: base - disc };
     }
+    if (activeService === "fenster") {
+      return { base: PRICES.fenster.pauschal_25zi, ex: 0, disc: 0, total: PRICES.fenster.pauschal_25zi, note: "2.5-Zi pauschal" };
+    }
     return { base: 0, ex: 0, disc: 0, total: 0 };
   };
 
@@ -1675,13 +2225,25 @@ function PreisePage({ setPage }) {
   const waTextFull = () => {
     const svc = services.find(s => s.id === activeService)?.label;
     let detail = "";
+    if (activeService === "endreinigung")
+      detail = `${roomSize}-Zi, ${variant === "basic" ? "Basic" : "Komplett"}${extras.entsorgung ? " + Entsorgung" : ""}${extras.teppich ? " + Teppich" : ""}`;
     if (activeService === "unterhalt")
       detail = `Abo ${aboType.charAt(0).toUpperCase() + aboType.slice(1)}`;
     if (activeService === "garten")
       detail = gartenType === "abo" ? "Saison-Abo" : gartenType === "fruehling" ? "Frühjahrspaket" : "Herbstpaket";
+    if (activeService === "fenster")
+      detail = "Fensterreinigung";
     const msg = `Grüezi, ich habe den Kalkulator auf fleissig.ch genutzt. Leistung: ${svc} (${detail}), Preis laut Kalkulator: CHF ${formatPrice(result.total)}. Ich bitte um eine verbindliche Offerte.`;
     return `https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`;
   };
+
+  const endrRow = (label, basic, komplett) => (
+    <tr key={label} style={{ borderBottom: "1px solid #f0f0f0" }}>
+      <td style={{ padding: "12px 16px", fontSize: 14, color: "#4A4A4A", fontWeight: 500 }}>{label}</td>
+      <td style={{ padding: "12px 16px", fontSize: 14, textAlign: "center", fontWeight: 600 }}>CHF {formatPrice(basic)}</td>
+      <td style={{ padding: "12px 16px", fontSize: 14, textAlign: "center", fontWeight: 600, color: "#3D7B4F" }}>CHF {formatPrice(komplett)}</td>
+    </tr>
+  );
 
   return (
     <div id="preise">
@@ -1766,6 +2328,67 @@ function PreisePage({ setPage }) {
               background: "#f9fdf9", borderRadius: 14,
               border: "1px solid #e8f2eb", padding: "28px",
             }}>
+              {/* UMZUGSREINIGUNG */}
+              {activeService === "endreinigung" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>Grösse</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      {[["2.5","~55 m²"],["3.5","~75 m²"],["4.5","~95 m²"],["5.5","~120 m²"],["EFH","~160 m²"]].map(([id, sub]) => (
+                        <button key={id} onClick={() => setRoomSize(id)} style={{
+                          padding: "8px 12px", borderRadius: 8, cursor: "pointer",
+                          border: roomSize === id ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
+                          background: roomSize === id ? "#f0f7f2" : "#fff",
+                          color: roomSize === id ? "#3D7B4F" : "#4A4A4A",
+                          fontWeight: roomSize === id ? 700 : 500, fontSize: 12,
+                          display: "flex", flexDirection: "column", alignItems: "center", gap: 1,
+                        }}>
+                          <span style={{ fontWeight: 700 }}>{id}</span>
+                          <span style={{ fontSize: 10, opacity: 0.7 }}>{sub}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>Paket</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {[["basic","Basic","Küche, Bad, Zimmer"],["komplett","Komplett","+ Fenster, Balkon, Keller"]].map(([id, label, sub]) => (
+                        <button key={id} onClick={() => setVariant(id)} style={{
+                          padding: "12px", borderRadius: 8, cursor: "pointer", textAlign: "left",
+                          border: variant === id ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
+                          background: variant === id ? "#f0f7f2" : "#fff",
+                        }}>
+                          <div style={{ fontWeight: 700, fontSize: 13, color: variant === id ? "#3D7B4F" : "#1a1a1a" }}>{label}</div>
+                          <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{sub}</div>
+                          <div style={{ fontWeight: 800, fontSize: 14, color: "#3D7B4F", marginTop: 6 }}>
+                            CHF {formatPrice(PRICES.endreinigung[roomSize][id])}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>Extras (optional)</div>
+                    {[["entsorgung","Grüngutentsorgung",PRICES.extras.entsorgung],["teppich","Teppichreinigung",PRICES.extras.teppich]].map(([key, label, price]) => (
+                      <label key={key} style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "9px 12px", borderRadius: 8, cursor: "pointer",
+                        background: extras[key] ? "#f0f7f2" : "#fff",
+                        border: `1px solid ${extras[key] ? "#c8e6d0" : "#e8e8e8"}`,
+                        marginBottom: 8, fontSize: 13,
+                      }}>
+                        <input type="checkbox" checked={extras[key]}
+                          onChange={e => setExtras(p => ({ ...p, [key]: e.target.checked }))}
+                          style={{ accentColor: "#3D7B4F", width: 15, height: 15 }}
+                        />
+                        <span style={{ flex: 1 }}>{label}</span>
+                        <span style={{ fontWeight: 700 }}>+CHF {price}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* UNTERHALT */}
               {activeService === "unterhalt" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -1821,6 +2444,27 @@ function PreisePage({ setPage }) {
                 </div>
               )}
 
+              {/* FENSTER */}
+              {activeService === "fenster" && (
+                <div style={{ fontSize: 14, color: "#4A4A4A", lineHeight: 1.8 }}>
+                  <div style={{ fontWeight: 700, fontSize: 16, color: "#1a1a1a", marginBottom: 12 }}>Fensterreinigung</div>
+                  <div>Pauschalpreis je nach Wohnungsgrösse:</div>
+                  {[
+                    ["2.5-Zi", 320], ["3.5-Zi", 420], ["4.5-Zi", 520],
+                  ].map(([size, price]) => (
+                    <div key={size} style={{
+                      display: "flex", justifyContent: "space-between",
+                      padding: "8px 0", borderBottom: "1px solid #f0f0f0",
+                    }}>
+                      <span>{size}</span>
+                      <span style={{ fontWeight: 700 }}>CHF {price}</span>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: 12, fontSize: 12, color: "#6b7280" }}>
+                    Inkl. Storen innen/aussen und Fensterrahmen. Offerte nach Fotoprüfung.
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Правая: итог */}
@@ -1924,6 +2568,111 @@ function PreisePage({ setPage }) {
           </div>
         </div>
 
+        {/* ТАБЛИЦА ENDREINIGUNG */}
+        <div style={{ marginBottom: 56 }}>
+          <SectionTitle sub="Festpreise für alle Wohnungsgrössen — Basic und Komplett.">
+            Umzugsreinigung — Preistabelle
+          </SectionTitle>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{
+              width: "100%", borderCollapse: "collapse",
+              border: "1px solid #e8e8e8", borderRadius: 12, overflow: "hidden",
+              fontSize: 14,
+            }}>
+              <thead>
+                <tr style={{ background: "#f0f7f2" }}>
+                  <th style={{ padding: "14px 16px", textAlign: "left", fontWeight: 700, color: "#1a1a1a" }}>Wohnung</th>
+                  <th style={{ padding: "14px 16px", textAlign: "center", fontWeight: 700, color: "#4A4A4A" }}>Basic</th>
+                  <th style={{ padding: "14px 16px", textAlign: "center", fontWeight: 700, color: "#3D7B4F" }}>Komplett ✓</th>
+                </tr>
+              </thead>
+              <tbody>
+                {endrRow("2.5-Zi (~55 m²)", PRICES.endreinigung["2.5"].basic, PRICES.endreinigung["2.5"].komplett)}
+                {endrRow("3.5-Zi (~75 m²)", PRICES.endreinigung["3.5"].basic, PRICES.endreinigung["3.5"].komplett)}
+                {endrRow("4.5-Zi (~95 m²)", PRICES.endreinigung["4.5"].basic, PRICES.endreinigung["4.5"].komplett)}
+                {endrRow("5.5-Zi (~120 m²)", PRICES.endreinigung["5.5"].basic, PRICES.endreinigung["5.5"].komplett)}
+                {endrRow("EFH 5.5-Zi (~160 m²)", PRICES.endreinigung["EFH"].basic, PRICES.endreinigung["EFH"].komplett)}
+              </tbody>
+            </table>
+          </div>
+          <div style={{
+            marginTop: 16, display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12,
+          }}>
+            {[
+              { label: "Basic beinhaltet", items: ["Küche, Bad, Wohnräume nach Checkliste", "Böden, Oberflächen, Armaturen", "Abgabegarantie mit kostenloser Nachreinigung"] },
+              { label: "Komplett beinhaltet zusätzlich", items: ["Fenster und Storen beidseitig", "Balkon / Terrasse · Keller / Estrich", "Backofen-Tiefenreinigung · Kalkentfernung", "Teamleiter bei der Wohnungsabnahme"] },
+            ].map((col, i) => (
+              <div key={i} style={{
+                padding: "16px 20px", borderRadius: 10,
+                background: i === 1 ? "#f0f7f2" : "#f9f9f9",
+                border: `1px solid ${i === 1 ? "#c8e6d0" : "#e8e8e8"}`,
+              }}>
+                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10, color: i === 1 ? "#3D7B4F" : "#1a1a1a" }}>
+                  {col.label}
+                </div>
+                {col.items.map((item, j) => (
+                  <div key={j} style={{ display: "flex", gap: 8, fontSize: 13, color: "#4A4A4A", marginBottom: 5 }}>
+                    <Check size={12} color="#3D7B4F" style={{ flexShrink: 0, marginTop: 2 }} />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* COMBO ПАКЕТЫ */}
+        <div style={{ marginBottom: 56 }}>
+          <SectionTitle sub="Kombinierte Leistungen — echte Ersparnis.">
+            Kombipakete
+          </SectionTitle>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{
+              width: "100%", borderCollapse: "collapse",
+              border: "1px solid #e8e8e8", borderRadius: 12, overflow: "hidden",
+            }}>
+              <thead>
+                <tr style={{ background: "#f9f9f9" }}>
+                  {["Paket", "Leistungen", "Einzeln", "Paketpreis", "Ersparnis"].map(h => (
+                    <th key={h} style={{
+                      padding: "12px 16px", textAlign: h === "Paket" || h === "Leistungen" ? "left" : "center",
+                      fontWeight: 700, fontSize: 13, color: "#4A4A4A",
+                      whiteSpace: "nowrap",
+                    }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {PAKETE.map((p, i) => {
+                  const save = p.einzeln - p.paket;
+                  const pct  = Math.round(save / p.einzeln * 100);
+                  return (
+                    <tr key={i} style={{ borderBottom: "1px solid #f0f0f0" }}>
+                      <td style={{ padding: "12px 16px", fontWeight: 600, fontSize: 13 }}>{p.name}</td>
+                      <td style={{ padding: "12px 16px", fontSize: 12, color: "#6b7280" }}>{p.items}</td>
+                      <td style={{ padding: "12px 16px", textAlign: "center", fontSize: 13, color: "#9ca3af", textDecoration: "line-through" }}>
+                        CHF {formatPrice(p.einzeln)}
+                      </td>
+                      <td style={{ padding: "12px 16px", textAlign: "center", fontWeight: 700, fontSize: 14, color: "#3D7B4F" }}>
+                        CHF {formatPrice(p.paket)}
+                      </td>
+                      <td style={{ padding: "12px 16px", textAlign: "center" }}>
+                        <span style={{
+                          background: "#f0f7f2", color: "#3D7B4F",
+                          fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 6,
+                        }}>
+                          −{pct}%
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* ПРОЧИЕ УСЛУГИ */}
         <div>
           <SectionTitle sub="Überblick aller weiteren Leistungen.">
@@ -1952,6 +2701,25 @@ function PreisePage({ setPage }) {
                   ["Frühjahrspaket", `ab CHF ${formatPrice(PRICES.garten.fruehling)}`],
                   ["Herbstpaket", `ab CHF ${formatPrice(PRICES.garten.herbst)}`],
                   ["Saison-Abo", `ab CHF ${formatPrice(PRICES.garten.abo_monat)}/Mt.`],
+                ],
+              },
+              {
+                title: "Fensterreinigung",
+                rows: [
+                  ["2.5-Zi", "CHF 320 pauschal"],
+                  ["3.5-Zi", "CHF 420 pauschal"],
+                  ["4.5-Zi", "CHF 520 pauschal"],
+                  ["Inkl.", "Storen, Rahmen, Simse"],
+                ],
+              },
+              {
+                title: "Extras & Zuschläge",
+                rows: [
+                  ["Grüngutentsorgung", `+CHF ${PRICES.extras.entsorgung}`],
+                  ["Teppichreinigung", `+CHF ${PRICES.extras.teppich}`],
+                  ["Notfall <24h", "+25%"],
+                  ["Anfahrt >20 km", "nach Offerte"],
+                  ["Bio-Reinigungsmittel", "+Aufpreis"],
                 ],
               },
             ].map((card, i) => (
@@ -2948,13 +3716,176 @@ function LegalPage({ type }) {
   );
 }
 
+// ============================================================
+// СТРАНИЦА /fensterreinigung
+// ============================================================
+function FensterreinigungPage() {
+  const preise = [
+    { size: "2.5-Zi", price: 320 },
+    { size: "3.5-Zi", price: 420 },
+    { size: "4.5-Zi", price: 520 },
+    { size: "5.5-Zi", price: 640 },
+    { size: "EFH",    price: "nach Offerte" },
+  ];
+  const faqItems = [
+    { q: "Was ist inbegriffen?", a: "Fenster beidseitig, Storen innen und aussen, Fensterrahmen und Simse. Auf Wunsch auch Rollläden und Velux-Fenster." },
+    { q: "Wie oft sollte man Fenster reinigen?", a: "Empfohlen 2× pro Jahr — Frühjahr und Herbst. Im Abo günstiger." },
+    { q: "Brauche ich Leitern oder Gerüste?", a: "Für normale Wohnungen nein. Bei hohen Fenstern (ab 4. Stock) bitte bei Anfrage erwähnen." },
+    { q: "Kann ich Fensterreinigung mit Umzugsreinigung kombinieren?", a: "Ja — Fensterreinigung ist bereits im Paket Komplett enthalten. Separat buchbar ab den oben genannten Preisen." },
+  ];
+  return (
+    <div>
+      <div style={{ background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)", padding: "56px 20px 64px", borderBottom: "1px solid #e8f2eb" }}>
+        <Container>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", lineHeight: 1.15, maxWidth: 620, marginBottom: 16 }}>
+            Fensterreinigung im Aargau —{" "}
+            <span style={{ color: "#3D7B4F" }}>inkl. Storen und Rahmen.</span>
+          </h1>
+          <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, maxWidth: 500, marginBottom: 28 }}>
+            Pauschalpreise je nach Wohnungsgrösse. Kein Aufmass, kein Besichtigungstermin — schicken Sie uns Fotos.
+          </p>
+          <WhatsAppButton service="fenster" label="Offerte per WhatsApp" />
+        </Container>
+      </div>
+      <Container style={{ padding: "56px 20px" }}>
+        <SectionTitle sub="Festpreise inkl. Storen, Rahmen und Simse.">Preise Fensterreinigung</SectionTitle>
+        <div style={{ maxWidth: 500 }}>
+          {preise.map((p, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "14px 20px", background: i % 2 === 0 ? "#f9fdf9" : "#fff", borderRadius: 8, marginBottom: 4, fontSize: 14 }}>
+              <span style={{ fontWeight: 600 }}>{p.size}</span>
+              <span style={{ fontWeight: 700, color: "#3D7B4F" }}>{typeof p.price === "number" ? `CHF ${p.price} pauschal` : p.price}</span>
+            </div>
+          ))}
+          <div style={{ marginTop: 12, fontSize: 12, color: "#6b7280", padding: "0 4px" }}>
+            Inkl. Fenster beidseitig · Storen innen/aussen · Rahmen und Simse
+          </div>
+        </div>
+        <div style={{ marginTop: 48 }}>
+          <SectionTitle sub="Häufige Fragen zur Fensterreinigung.">Häufige Fragen</SectionTitle>
+          <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
+        </div>
+      </Container>
+    </div>
+  );
+}
+
+// ============================================================
+// СТРАНИЦА /baureinigung
+// ============================================================
+function BaureinigungPage() {
+  const faqItems = [
+    { q: "Was ist Baureinigung?", a: "Reinigung nach Renovation oder Neubau — Baustaub, Klebereste, Farbtupfer auf Böden und Fenstern, Mörtelreste. Intensiver als eine normale Reinigung." },
+    { q: "Wie läuft die Preisfindung ab?", a: "Schicken Sie uns Fotos und die Fläche in m². Wir berechnen ab CHF 13/m² je nach Verschmutzungsgrad und machen Ihnen eine verbindliche Offerte." },
+    { q: "Wie schnell können Sie?", a: "Meistens 3–7 Tage. Bei dringenden Abnahmeterminen bitte direkt fragen." },
+    { q: "Kommen Sie auch zu grösseren Objekten?", a: "Ja — Mehrfamilienhäuser und Gewerbebauten auf Anfrage. Offerte nach Besichtigung oder Fotos." },
+  ];
+  return (
+    <div>
+      <div style={{ background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)", padding: "56px 20px 64px", borderBottom: "1px solid #e8f2eb" }}>
+        <Container>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", lineHeight: 1.15, maxWidth: 620, marginBottom: 16 }}>
+            Baureinigung im Aargau —{" "}
+            <span style={{ color: "#3D7B4F" }}>nach Renovation sauber.</span>
+          </h1>
+          <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, maxWidth: 500, marginBottom: 28 }}>
+            Baustaub, Klebereste, Farbtupfer — wir machen das Objekt abnahmebereit.
+            Ab CHF 13/m², Offerte nach Fotos.
+          </p>
+          <WhatsAppButton service="general" label="Fotos senden & Offerte erhalten" />
+        </Container>
+      </div>
+      <Container style={{ padding: "56px 20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 48 }}>
+          {[
+            { icon: "🏗", title: "Nach Renovation", text: "Baustaub von allen Oberflächen, Böden, Decken, Fenstern." },
+            { icon: "🪟", title: "Fenster & Rahmen", text: "Klebereste von Folien, Farbtupfer, Mörtelreste auf Glas." },
+            { icon: "🧹", title: "Böden & Fliesen", text: "Grober Schmutz, Mörtelreste, Baustaub aus allen Ritzen." },
+            { icon: "📋", title: "Abnahmebereit", text: "Wir bereiten das Objekt für Abnahme oder Einzug vor." },
+          ].map((item, i) => (
+            <div key={i} style={{ padding: "24px", background: "#f9fdf9", borderRadius: 12, border: "1px solid #e8f2eb" }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>{item.icon}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{item.title}</div>
+              <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.6 }}>{item.text}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ background: "#fff9f0", border: "1px solid #f5d9c0", borderRadius: 12, padding: "20px 24px", marginBottom: 48, fontSize: 14, color: "#92400e" }}>
+          <strong>Preisindikation:</strong> ab CHF 13/m² je nach Verschmutzungsgrad. Starke Verschmutzung oder Sonderarbeiten werden separat offertiert.
+        </div>
+        <SectionTitle sub="Häufige Fragen zur Baureinigung.">Häufige Fragen</SectionTitle>
+        <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
+      </Container>
+    </div>
+  );
+}
+
+// ============================================================
+// СТРАНИЦА /bueroreinigung
+// ============================================================
+function BueroreinigungPage() {
+  const faqItems = [
+    { q: "Wann kommen Sie?", a: "Abends ab 18 Uhr oder am Wochenende — damit Ihr Betrieb nicht gestört wird." },
+    { q: "Wie oft?", a: "2–3× pro Woche ist Standard. Auch 1× wöchentlich oder täglich möglich." },
+    { q: "Was wird gereinigt?", a: "Böden, Oberflächen, Küche/Kaffeeecke, WC, Eingangsbereich. Umfang nach Absprache." },
+    { q: "Brauchen wir einen langen Vertrag?", a: "Nein — monatlich kündbar. Wir starten mit einer Probezeit von 4 Wochen." },
+    { q: "Wie gross muss das Büro sein?", a: "Wir reinigen Büros ab 5 Mitarbeitern. Kleinstbüros auf Anfrage." },
+  ];
+  return (
+    <div>
+      <div style={{ background: "linear-gradient(160deg, #f0f7f2 0%, #fff 55%)", padding: "56px 20px 64px", borderBottom: "1px solid #e8f2eb" }}>
+        <Container>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", lineHeight: 1.15, maxWidth: 620, marginBottom: 16 }}>
+            Büroreinigung im Aargau —{" "}
+            <span style={{ color: "#3D7B4F" }}>abends, zuverlässig, legal.</span>
+          </h1>
+          <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, maxWidth: 500, marginBottom: 28 }}>
+            2–3× pro Woche, abends nach Büroschluss. Offizielle Rechnung, versichert, angemeldete Mitarbeiter. Offerte nach Mass.
+          </p>
+          <WhatsAppButton service="general" label="Offerte anfragen per WhatsApp" />
+          <div style={{ marginTop: 16, fontSize: 12, color: "#8a95a0", display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <span>✓ Monatlich kündbar</span>
+            <span>✓ Offizielle Rechnung</span>
+            <span>✓ Angemeldete Mitarbeiter</span>
+          </div>
+        </Container>
+      </div>
+      <Container style={{ padding: "56px 20px" }}>
+        <SectionTitle sub="Was wir für Ihr Büro tun.">Leistungen</SectionTitle>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, marginBottom: 48 }}>
+          {[
+            "Böden saugen und wischen",
+            "Schreibtische und Oberflächen",
+            "Küche / Kaffeeecke",
+            "WC und Sanitäranlagen",
+            "Eingangsbereich und Empfang",
+            "Mülleimer leeren",
+            "Fenster innen (auf Wunsch)",
+            "Treppenhäuser",
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", padding: "10px 14px", background: "#f9fdf9", borderRadius: 8, border: "1px solid #e8f2eb", fontSize: 13 }}>
+              <Check size={13} color="#3D7B4F" style={{ flexShrink: 0 }} />{item}
+            </div>
+          ))}
+        </div>
+        <SectionTitle sub="Häufige Fragen zur Büroreinigung.">Häufige Fragen</SectionTitle>
+        <div style={{ maxWidth: 700 }}><FAQAccordion items={faqItems} /></div>
+      </Container>
+    </div>
+  );
+}
+
+// ============================================================
 // РОУТЕР — переключение страниц
 // ============================================================
 const PAGE_TITLES = {
   home:               "Fleissig — Reinigung & Gartenpflege im Kanton Aargau",
+  umzugsreinigung:    "Umzugsreinigung Aargau | Festpreis & Abgabegarantie — Fleissig",
   unterhaltsreinigung:"Unterhaltsreinigung Aargau | Wöchentlich & Monatlich — Fleissig",
   gartenpflege:       "Gartenpflege Aargau | Saisonpflege & Abo — Fleissig",
   preise:             "Preise & Pakete | Reinigung Aargau — Fleissig",
+  fensterreinigung:   "Fensterreinigung Aargau | Festpreis — Fleissig",
+  baureinigung:       "Baureinigung Aargau | Nach Renovation — Fleissig",
+  bueroreinigung:     "Büroreinigung Aargau | Gewerbliche Reinigung — Fleissig",
   faq:                "FAQ | Häufige Fragen zur Reinigung — Fleissig",
   kontakt:            "Kontakt per WhatsApp | Fleissig Reinigung Aargau",
   "über-uns":         "Über uns | Fleissig Reinigung Aargau",
@@ -2984,9 +3915,13 @@ function AppLayout() {
       <main>
         <Routes>
           <Route path="/"                   element={<HomePage setPage={setPage} />} />
+          <Route path="/umzugsreinigung"    element={<UmzugsreinigungPage setPage={setPage} />} />
           <Route path="/unterhaltsreinigung"element={<UnterhaltsreinigungPage setPage={setPage} />} />
           <Route path="/gartenpflege"       element={<GartenpflegePage />} />
           <Route path="/preise"             element={<PreisePage setPage={setPage} />} />
+          <Route path="/fensterreinigung"   element={<FensterreinigungPage />} />
+          <Route path="/baureinigung"       element={<BaureinigungPage />} />
+          <Route path="/bueroreinigung"     element={<BueroreinigungPage />} />
           <Route path="/faq"                element={<FAQPage />} />
           <Route path="/kontakt"            element={<KontaktPage />} />
           <Route path="/über-uns"           element={<UeberUnsPage setPage={setPage} />} />

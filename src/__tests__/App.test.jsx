@@ -46,16 +46,16 @@ describe('App router', () => {
     expect(screen.getByText(/Häufige Fragen/i)).toBeInTheDocument()
   })
 
-  it('navigates to Gartenpflege page via desktop nav', () => {
+  it('navigates to Umzugsreinigung page via desktop nav', () => {
     render(<App />)
-    clickNavLink('Garten')
-    expect(screen.getAllByText(/Gartenpflege/i).length).toBeGreaterThan(0)
+    clickNavLink('Umzugsreinigung')
+    expect(screen.getAllByText(/Umzugsreinigung/i).length).toBeGreaterThan(0)
   })
 
   it('navigates to Kontakt page via mobile menu', () => {
     render(<App />)
     fireEvent.click(screen.getByTestId('burger-btn'))
-    fireEvent.click(within(getNav()).getAllByText('Kontakt')[0])
+    fireEvent.click(within(getNav()).getByText('Kontakt'))
     expect(screen.getAllByText(/Kontakt/i).length).toBeGreaterThan(0)
   })
 

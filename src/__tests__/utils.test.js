@@ -104,7 +104,7 @@ describe('buildWaLink', () => {
   })
 
   it('generates different links for each known service', () => {
-    const services = ['general', 'unterhalt', 'garten']
+    const services = ['general', 'endreinigung', 'unterhalt', 'garten', 'fenster']
     const links = services.map(s => buildWaLink(s))
     const unique = new Set(links)
     expect(unique.size).toBe(services.length)
@@ -115,7 +115,7 @@ describe('buildWaLink', () => {
   })
 
   it('URL-encodes the message (no raw spaces)', () => {
-    const link = buildWaLink('unterhalt')
+    const link = buildWaLink('endreinigung')
     const textParam = link.split('?text=')[1]
     expect(textParam).not.toContain(' ')
   })
