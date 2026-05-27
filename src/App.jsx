@@ -66,9 +66,9 @@ export const PRICES = {
   },
   unterhalt: {
     einmalig: 55,   // CHF/Std
-    basis:   370,   // CHF/Monat
-    komfort: 730,
-    premium: 1420,
+    basis:   300,   // CHF/Monat
+    komfort: 600,
+    premium: 1200,
   },
   garten: {
     stunde_abo: 55,
@@ -971,7 +971,7 @@ export function Calculator() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           {[
             { id: "basic",    label: "Basic",    sub: "Küche, Bad, Zimmer" },
-            { id: "komplett", label: "Komplett", sub: "+ Fenster, Balkon, Keller", badge: "Empfohlen" },
+            { id: "komplett", label: "Komplett", sub: "+ Fenster, Balkon", badge: "Empfohlen" },
           ].map(v => (
             <button key={v.id}
               onClick={() => setVariant(v.id)}
@@ -1132,7 +1132,7 @@ function UmzugsreinigungPage({ setPage }) {
     { q: "Was ist bei starker Verschmutzung?", a: "Wir besichtigen vor Ort oder prüfen anhand von Fotos. Danach erhalten Sie eine separate Offerte." },
     { q: "Kann ich per Rechnung zahlen?", a: "Ja. Sie erhalten immer eine offizielle Rechnung. Zahlung auch per TWINT möglich." },
     { q: "Kommen Sie nach [Ort] im Aargau?", a: "Wir arbeiten im gesamten Kanton Aargau: Lenzburg, Aarau, Wohlen, Baden, Brugg, Zofingen und weitere. Einfach fragen." },
-    { q: "Was ist der Unterschied zwischen Basic und Komplett?", a: "Basic umfasst Küche, Bad und Wohnräume nach Checkliste. Komplett beinhaltet zusätzlich Fenster und Storen beidseitig, Balkon/Terrasse, Keller/Estrich und Backofen-Tiefenreinigung." },
+    { q: "Was ist der Unterschied zwischen Basic und Komplett?", a: "Basic umfasst Küche, Bad und Wohnräume nach Checkliste. Komplett beinhaltet zusätzlich Fenster und Storen beidseitig, Balkon/Terrasse und Backofen-Tiefenreinigung." },
     { q: "Bezahle ich vor oder nach der Abgabe?", a: "Nach der erfolgreichen Abgabe. Sie zahlen erst, wenn die Wohnungsübergabe geklappt hat." },
   ];
 
@@ -1255,7 +1255,7 @@ function UmzugsreinigungPage({ setPage }) {
               },
               {
                 title: "✅ Abschluss (Komplett)",
-                items: ["Balkon / Terrasse", "Keller / Estrich", "Kontrolle gemeinsam mit Kunden"],
+                items: ["Balkon / Terrasse", "Kontrolle gemeinsam mit Kunden"],
               },
             ].map((cat, i) => (
               <div key={i} style={{
@@ -1392,13 +1392,14 @@ function UnterhaltsreinigungPage({ setPage }) {
     {
       id: "komfort",
       label: "Komfort",
-      freq: "1× pro Woche · 3 Std.",
+      freq: "1× pro Woche · 2 Mitarbeiter · 1.5 Std.",
       hours: "12 Std./Monat",
       price: PRICES.unterhalt.komfort,
       unit: "/Monat",
       badge: "Beliebteste Wahl",
       color: "#f0f7f2",
       border: "#3D7B4F",
+      extra: "+CHF 50 pro zusätzliche Stunde",
       items: [
         "Alles aus Basis",
         "Fenster innen monatlich",
@@ -2302,7 +2303,7 @@ function PreisePage({ setPage }) {
                   <div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>Paket</div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                      {[["basic","Basic","Küche, Bad, Zimmer"],["komplett","Komplett","+ Fenster, Balkon, Keller"]].map(([id, label, sub]) => (
+                      {[["basic","Basic","Küche, Bad, Zimmer"],["komplett","Komplett","+ Fenster, Balkon"]].map(([id, label, sub]) => (
                         <button key={id} onClick={() => setVariant(id)} style={{
                           padding: "12px", borderRadius: 8, cursor: "pointer", textAlign: "left",
                           border: variant === id ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
@@ -2532,7 +2533,7 @@ function PreisePage({ setPage }) {
           }}>
             {[
               { label: "Basic beinhaltet", items: ["Küche, Bad, Wohnräume nach Checkliste", "Böden, Oberflächen, Armaturen", "Abgabegarantie mit kostenloser Nachreinigung"] },
-              { label: "Komplett beinhaltet zusätzlich", items: ["Fenster und Storen beidseitig", "Balkon / Terrasse · Keller / Estrich", "Backofen-Tiefenreinigung · Kalkentfernung", "Teamleiter bei der Wohnungsabnahme"] },
+              { label: "Komplett beinhaltet zusätzlich", items: ["Fenster und Storen beidseitig", "Balkon / Terrasse", "Backofen-Tiefenreinigung · Kalkentfernung", "Teamleiter bei der Wohnungsabnahme"] },
             ].map((col, i) => (
               <div key={i} style={{
                 padding: "16px 20px", borderRadius: 10,
