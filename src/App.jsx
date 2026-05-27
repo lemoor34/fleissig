@@ -1947,7 +1947,7 @@ function GartenpflegePage() {
           }}>
             Gärtner im Aargau kosten{" "}
             <span style={{ textDecoration: "line-through", color: "#9ca3af" }}>80–120</span>{" "}
-            <span style={{ color: "#3D7B4F" }}>39 CHF/Std.</span> im Abo.
+            <span style={{ color: "#3D7B4F" }}>{PRICES.garten.stunde_abo} CHF/Std.</span> im Abo.
           </h1>
           <p style={{
             fontSize: 16, color: "#5a6472", lineHeight: 1.65,
@@ -2715,8 +2715,8 @@ function PreisePage({ setPage }) {
               {
                 title: "Extras & Zuschläge",
                 rows: [
-                  ["Grüngutentsorgung", "+CHF 120"],
-                  ["Teppichreinigung", "+CHF 180"],
+                  ["Grüngutentsorgung", `+CHF ${PRICES.extras.entsorgung}`],
+                  ["Teppichreinigung", `+CHF ${PRICES.extras.teppich}`],
                   ["Notfall <24h", "+25%"],
                   ["Anfahrt >20 km", "nach Offerte"],
                   ["Bio-Reinigungsmittel", "+Aufpreis"],
