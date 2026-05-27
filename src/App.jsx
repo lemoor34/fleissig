@@ -1542,11 +1542,11 @@ function UnterhaltsreinigungPage({ setPage }) {
             },
             {
               label: "Abo Komfort",
-              price: `CHF ${PRICES.unterhalt.komfort / 12}`,
-              unit: "/Std.",
-              sub: `CHF ${formatPrice(PRICES.unterhalt.komfort)}/Monat — Sie sparen CHF ${(PRICES.unterhalt.einmalig - PRICES.unterhalt.komfort / 12) * 12}/Monat`,
+              price: `CHF ${formatPrice(PRICES.unterhalt.komfort)}`,
+              unit: "/Monat",
+              sub: "12 Std./Monat — feste Reinigungsperson & Prioritätsbuchung",
               highlight: true,
-              badge: "Günstiger",
+              badge: "Empfohlen",
             },
           ].map((o, i) => (
             <div key={i} style={{
