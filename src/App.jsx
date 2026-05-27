@@ -77,7 +77,7 @@ export const PRICES = {
     herbst: 360,
     abo_monat: 360,
   },
-  fenster: { pauschal_25zi: 189 },
+  fenster: { pauschal_25zi: 320 },
 };
 
 export const PAKETE = [
@@ -1646,53 +1646,6 @@ function UnterhaltsreinigungPage({ setPage }) {
           </div>
         </Container>
       </div>
-
-      {/* RUNDUM-SORGLOS */}
-      <Container style={{ padding: "60px 20px" }}>
-        <div style={{
-          background: "linear-gradient(135deg, #1a1a1a 0%, #2d3a2e 100%)",
-          borderRadius: 20, padding: "40px",
-          display: "flex", gap: 32, alignItems: "center",
-          flexWrap: "wrap",
-        }}>
-          <div style={{ flex: "1 1 300px" }}>
-            <div style={{
-              display: "inline-block",
-              background: "#E87D3E", color: "#fff",
-              fontSize: 11, fontWeight: 700, padding: "3px 10px",
-              borderRadius: 6, marginBottom: 14,
-            }}>
-              RUNDUM-SORGLOS
-            </div>
-            <h3 style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              color: "#fff", fontSize: 22, fontWeight: 800,
-              marginBottom: 10, letterSpacing: "-0.3px",
-            }}>
-              Alles aus einer Hand — CHF 820/Monat
-            </h3>
-            <p style={{ color: "#9ca3af", fontSize: 14, lineHeight: 1.7, marginBottom: 0 }}>
-              Wöchentliche Reinigung + Fensterreinigung 2× pro Jahr +
-              Frühjahrsputz inklusive. Günstiger als Einzelbuchungen.
-            </p>
-          </div>
-          <div style={{ flexShrink: 0 }}>
-            <a
-              href={buildWaLink("unterhalt")}
-              target="_blank" rel="noopener noreferrer"
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                background: "#E87D3E", color: "#fff",
-                padding: "14px 24px", borderRadius: 10,
-                fontSize: 14, fontWeight: 700, textDecoration: "none",
-              }}
-            >
-              <MessageCircle size={16} />
-              Paket anfragen
-            </a>
-          </div>
-        </div>
-      </Container>
 
       {/* ЧТО ВХОДИТ */}
       <div style={{ background: "#f9fdf9", padding: "60px 0" }}>
