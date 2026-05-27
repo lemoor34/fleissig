@@ -23,10 +23,16 @@ describe('Nav', () => {
     expect(waLink).toBeTruthy()
   })
 
-  it('desktop nav shows Umzugsreinigung link', () => {
+  it('desktop nav shows Unterhalt link', () => {
     render(<Nav currentPage="home" setPage={vi.fn()} />)
-    const link = screen.getAllByRole('link').find(l => l.textContent === 'Umzugsreinigung')
+    const link = screen.getAllByRole('link').find(l => l.textContent === 'Unterhalt')
     expect(link).toBeTruthy()
+  })
+
+  it('does not show Umzugsreinigung link in nav', () => {
+    render(<Nav currentPage="home" setPage={vi.fn()} />)
+    const link = screen.queryAllByRole('link').find(l => l.textContent === 'Umzugsreinigung')
+    expect(link).toBeFalsy()
   })
 
   it('mobile menu is closed by default (no Start link visible)', () => {
@@ -52,21 +58,21 @@ describe('Nav', () => {
     const setPage = vi.fn()
     render(<Nav currentPage="home" setPage={setPage} />)
     fireEvent.click(screen.getByTestId('burger-btn'))
-    fireEvent.click(screen.getByText('Kontakt'))
+    fireEvent.click(screen.getAllByText('Kontakt')[0])
     expect(setPage).toHaveBeenCalledWith('kontakt')
   })
 
   it('calls setPage when a desktop nav link is clicked', () => {
     const setPage = vi.fn()
     render(<Nav currentPage="home" setPage={setPage} />)
-    const link = screen.getAllByRole('link').find(l => l.textContent === 'Umzugsreinigung')
+    const link = screen.getAllByRole('link').find(l => l.textContent === 'Unterhalt')
     fireEvent.click(link)
-    expect(setPage).toHaveBeenCalledWith('umzugsreinigung')
+    expect(setPage).toHaveBeenCalledWith('unterhaltsreinigung')
   })
 
   it('highlights the currently active page link', () => {
-    render(<Nav currentPage="umzugsreinigung" setPage={vi.fn()} />)
-    const activeLink = screen.getAllByRole('link').find(l => l.textContent === 'Umzugsreinigung')
+    render(<Nav currentPage="unterhaltsreinigung" setPage={vi.fn()} />)
+    const activeLink = screen.getAllByRole('link').find(l => l.textContent === 'Unterhalt')
     expect(activeLink.style.color).toBe('rgb(61, 123, 79)')
   })
 })

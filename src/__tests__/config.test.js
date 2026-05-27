@@ -24,45 +24,6 @@ describe('CONFIG', () => {
   })
 })
 
-describe('PRICES.endreinigung', () => {
-  const roomSizes = ['2.5', '3.5', '4.5', '5.5', 'EFH']
-
-  roomSizes.forEach(size => {
-    it(`${size}-Zi has a positive basic price`, () => {
-      expect(PRICES.endreinigung[size].basic).toBeGreaterThan(0)
-    })
-
-    it(`${size}-Zi has a positive komplett price`, () => {
-      expect(PRICES.endreinigung[size].komplett).toBeGreaterThan(0)
-    })
-
-    it(`${size}-Zi: komplett is more expensive than basic`, () => {
-      expect(PRICES.endreinigung[size].komplett).toBeGreaterThan(
-        PRICES.endreinigung[size].basic
-      )
-    })
-  })
-
-  it('prices increase with apartment size (basic)', () => {
-    const sizes = ['2.5', '3.5', '4.5', '5.5', 'EFH']
-    for (let i = 0; i < sizes.length - 1; i++) {
-      expect(PRICES.endreinigung[sizes[i + 1]].basic).toBeGreaterThan(
-        PRICES.endreinigung[sizes[i]].basic
-      )
-    }
-  })
-})
-
-describe('PRICES.extras', () => {
-  it('entsorgung has a positive price', () => {
-    expect(PRICES.extras.entsorgung).toBeGreaterThan(0)
-  })
-
-  it('teppich has a positive price', () => {
-    expect(PRICES.extras.teppich).toBeGreaterThan(0)
-  })
-})
-
 describe('PRICES.unterhalt', () => {
   it('has all four tiers', () => {
     expect(PRICES.unterhalt.einmalig).toBeGreaterThan(0)
@@ -77,22 +38,19 @@ describe('PRICES.unterhalt', () => {
   })
 })
 
-describe('PAKETE', () => {
-  it('contains exactly 4 packages', () => {
-    expect(PAKETE).toHaveLength(4)
+describe('PRICES.garten', () => {
+  it('has all required garten prices', () => {
+    expect(PRICES.garten.stunde_abo).toBeGreaterThan(0)
+    expect(PRICES.garten.stunde_einmalig).toBeGreaterThan(0)
+    expect(PRICES.garten.fruehling).toBeGreaterThan(0)
+    expect(PRICES.garten.herbst).toBeGreaterThan(0)
+    expect(PRICES.garten.abo_monat).toBeGreaterThan(0)
   })
+})
 
-  PAKETE.forEach((p, i) => {
-    it(`package ${i} (${p.name}) has a name, items, einzeln and paket`, () => {
-      expect(p.name).toBeTruthy()
-      expect(p.items).toBeTruthy()
-      expect(p.einzeln).toBeGreaterThan(0)
-      expect(p.paket).toBeGreaterThan(0)
-    })
-
-    it(`package ${i} (${p.name}): paket price is less than einzeln (real discount)`, () => {
-      expect(p.paket).toBeLessThan(p.einzeln)
-    })
+describe('PAKETE', () => {
+  it('is an empty array', () => {
+    expect(PAKETE).toHaveLength(0)
   })
 })
 
@@ -115,5 +73,9 @@ describe('PAGES', () => {
 
   it('includes kontakt page', () => {
     expect(PAGES.some(p => p.id === 'kontakt')).toBe(true)
+  })
+
+  it('does not include umzugsreinigung', () => {
+    expect(PAGES.some(p => p.id === 'umzugsreinigung')).toBe(false)
   })
 })
