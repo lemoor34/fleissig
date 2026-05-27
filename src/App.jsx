@@ -567,7 +567,7 @@ function HomePage({ setPage }) {
       icon: <Wrench size={22} color="#3D7B4F" />,
       title: "Baureinigung",
       desc: "Nach Renovation, gründlich.",
-      price: "ab CHF 9/m²",
+      price: "ab CHF 13/m²",
       service: "general",
       page: "baureinigung",
     },
