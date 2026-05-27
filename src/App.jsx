@@ -1399,7 +1399,7 @@ function UnterhaltsreinigungPage({ setPage }) {
       badge: "Beliebteste Wahl",
       color: "#f0f7f2",
       border: "#3D7B4F",
-      extra: "+CHF 50 pro zusätzliche Stunde",
+      extra: "CHF 50 pro zusätzliche Stunde",
       items: [
         "Alles aus Basis",
         "Fenster innen monatlich",
