@@ -1374,7 +1374,7 @@ function UnterhaltsreinigungPage({ setPage }) {
     {
       id: "basis",
       label: "Basis",
-      freq: "Alle 2 Wochen · 3 Std.",
+      freq: "Alle 2 Wochen · 2 Mitarbeiter · 1.5 Std.",
       hours: "6 Std./Monat",
       price: PRICES.unterhalt.basis,
       unit: "/Monat",
@@ -1411,7 +1411,7 @@ function UnterhaltsreinigungPage({ setPage }) {
     {
       id: "premium",
       label: "Premium",
-      freq: "2× pro Woche · 3 Std.",
+      freq: "2× pro Woche · 2 Mitarbeiter · 1.5 Std.",
       hours: "24 Std./Monat",
       price: PRICES.unterhalt.premium,
       unit: "/Monat",
