@@ -677,7 +677,7 @@ function HomePage({ setPage }) {
           }}>
             Reinigung und Gartenpflege<br />
             <span style={{ color: "#3D7B4F" }}>im Aargau</span> —<br />
-            Festpreise, keine Anrufe.
+            Festpreise, keine Besichtigungstermine.
           </h1>
 
           <p style={{
@@ -741,7 +741,7 @@ function HomePage({ setPage }) {
 
       {/* 3 ШАГА */}
       <Container id="wie-es-funktioniert" style={{ padding: "60px 20px" }}>
-        <SectionTitle sub="So einfach funktioniert es — ohne Termine, ohne Anrufe.">
+        <SectionTitle sub="So einfach funktioniert es — ganz ohne Besichtigungstermin.">
           Drei Schritte zur sauberen Wohnung
         </SectionTitle>
         <div style={{
@@ -1409,7 +1409,7 @@ function UmzugsreinigungPage({ setPage }) {
                     {fs.submitting ? "Wird gesendet..." : "Offerte anfordern"}
                   </button>
                   <div style={{ fontSize: 11, color: "#9ca3af", textAlign: "center" }}>
-                    Keine Anrufe — wir schreiben Ihnen zurück.
+                    Kein Spam — wir melden uns schriftlich zurück.
                   </div>
                 </form>
               ) : (
