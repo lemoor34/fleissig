@@ -51,7 +51,7 @@ export const CONFIG = {
   COMPANY_NAME: "Fleissig",
   TAGLINE: "Reinigung & Gartenpflege im Kanton Aargau",
   EMAIL: "fleissig.reinigungen@gmail.com",
-  PHONE: "+41 77 958 85 26",
+  PHONE: "+41 79 685 09 80",
   ADDRESS: "Seengen, Kanton Aargau",
   UID: "CHE-461.009.759",
 };
@@ -193,6 +193,20 @@ export function Nav({ currentPage, setPage }) {
 
         {/* CTA + burger */}
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <a
+            href={`tel:${CONFIG.PHONE.replace(/\s/g, "")}`}
+            className="desktop-nav"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              color: "#3D7B4F", textDecoration: "none",
+              fontSize: 14, fontWeight: 600,
+              padding: "6px 12px", borderRadius: 6,
+              border: "1px solid #3D7B4F",
+            }}
+          >
+            <Phone size={14} />
+            {CONFIG.PHONE}
+          </a>
           <button
             onClick={() => setOpen(!open)}
             data-testid="burger-btn"
@@ -231,7 +245,7 @@ export function Nav({ currentPage, setPage }) {
               {p.label}
             </a>
           ))}
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0" }}>
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0", display: "flex", flexDirection: "column", gap: 8 }}>
             <a href={buildWaLink("general")}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -242,6 +256,18 @@ export function Nav({ currentPage, setPage }) {
             >
               <MessageCircle size={16} />
               Offerte per WhatsApp anfordern
+            </a>
+            <a href={`tel:${CONFIG.PHONE.replace(/\s/g, "")}`}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                background: "#fff", color: "#3D7B4F",
+                border: "2px solid #3D7B4F",
+                padding: "10px", borderRadius: 8,
+                fontSize: 15, fontWeight: 600, textDecoration: "none",
+              }}
+            >
+              <Phone size={16} />
+              {CONFIG.PHONE}
             </a>
           </div>
         </div>
@@ -299,6 +325,39 @@ function WhatsAppButton({ service = "general", label = "Offerte per WhatsApp", s
   );
 }
 
+function CallButton({ label = "Anrufen", size = "normal" }) {
+  const small = size === "small";
+  return (
+    <a
+      href={`tel:${CONFIG.PHONE.replace(/\s/g, "")}`}
+      onClick={() => {
+        if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+        if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'phone_call' });
+      }}
+      style={{
+        display: "inline-flex", alignItems: "center", gap: small ? 6 : 8,
+        background: "#fff", color: "#3D7B4F",
+        border: "2px solid #3D7B4F",
+        padding: small ? "6px 12px" : "10px 20px",
+        borderRadius: 8, textDecoration: "none",
+        fontSize: small ? 13 : 15, fontWeight: 600,
+        transition: "transform 0.15s, box-shadow 0.15s",
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = "translateY(-1px)";
+        e.currentTarget.style.boxShadow = "0 4px 14px rgba(61,123,79,0.25)";
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = "";
+        e.currentTarget.style.boxShadow = "";
+      }}
+    >
+      <Phone size={small ? 14 : 16} />
+      {label}
+    </a>
+  );
+}
+
 function OfferBanner() {
   if (!isOfferActive()) return null;
   return (
@@ -315,7 +374,7 @@ function OfferBanner() {
 
 function TrustBadges() {
   const items = [
-    { icon: <Shield size={20} color="#3D7B4F" />, title: "Legal & versichert", text: "Offizielle Rechnung, Betriebshaftpflicht bis CHF 5 Mio." },
+    { icon: <Shield size={20} color="#3D7B4F" />, title: "Legal & versichert", text: "Offizielle Rechnung, Betriebshaftpflicht bis CHF 2 Mio." },
     { icon: <Star size={20} color="#3D7B4F" />,   title: "Festpreise",         text: "Was in der Offerte steht, zahlen Sie. Nie mehr." },
     { icon: <Check size={20} color="#3D7B4F" />,  title: "Abgabegarantie",    text: "Kostenlose Nachreinigung in 48h — schriftlich." },
     { icon: <MapPin size={20} color="#3D7B4F" />, title: "Lokales Team",       text: "Wir leben hier, im Kanton Aargau." },
@@ -392,7 +451,10 @@ function Footer({ setPage }) {
         <p style={{ color: "#c8e6d0", marginBottom: 20, fontSize: 14 }}>
           Senden Sie 3 Fotos — Offerte in 2 Stunden.
         </p>
-        <WhatsAppButton service="general" label="Offerte per WhatsApp" />
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+          <WhatsAppButton service="general" label="Offerte per WhatsApp" />
+          <CallButton />
+        </div>
       </div>
 
       <Container style={{ padding: "40px 20px" }}>
@@ -403,9 +465,9 @@ function Footer({ setPage }) {
           <div>
             <div style={{ marginBottom: 12 }}>
               <img
-                src="/logo.png"
+                src="/logo-transparent.png"
                 alt="Fleissig Reinigung"
-                style={{ height: 40, width: "auto", filter: "brightness(0) invert(1)" }}
+                style={{ height: 44, width: "auto" }}
               />
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.7 }}>
@@ -648,6 +710,7 @@ function HomePage({ setPage }) {
               <MessageCircle size={16} />
               Offerte per WhatsApp
             </a>
+            <CallButton />
             <button
               onClick={() => setPage("preise")}
               style={{
@@ -668,7 +731,7 @@ function HomePage({ setPage }) {
             <span>✓ Antwort innerhalb von 15 Minuten</span>
             <span>✓ Werktags 8:00–18:00</span>
             <span>✓ Offizielle Rechnung</span>
-            <span>✓ Versichert bis CHF 5 Mio.</span>
+            <span>✓ Versichert bis CHF 2 Mio.</span>
           </div>
           </div>
         </div>
@@ -1172,11 +1235,12 @@ function UmzugsreinigungPage({ setPage }) {
               </p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
                 <WhatsAppButton service="endreinigung" label="Offerte in 2 Stunden" />
+                <CallButton />
               </div>
               <div style={{ fontSize: 12, color: "#8a95a0", display: "flex", flexDirection: "column", gap: 5 }}>
                 <span>✓ Zahlung erst nach erfolgreicher Abgabe</span>
                 <span>✓ Kostenlose Nachreinigung in 48h — schriftlich garantiert</span>
-                <span>✓ Offizielle Rechnung · Versichert bis CHF 5 Mio.</span>
+                <span>✓ Offizielle Rechnung · Versichert bis CHF 2 Mio.</span>
               </div>
             </div>
             {/* Калькулятор */}
@@ -1468,7 +1532,10 @@ function UnterhaltsreinigungPage({ setPage }) {
             Wir stellen eine offizielle Rechnung — und Ihre Reinigungsperson
             ist versichert und angemeldet.
           </p>
-          <WhatsAppButton service="unterhalt" label="Abo anfragen per WhatsApp" />
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <WhatsAppButton service="unterhalt" label="Abo anfragen per WhatsApp" />
+            <CallButton />
+          </div>
           <div style={{ marginTop: 16, fontSize: 12, color: "#8a95a0", display: "flex", gap: 16, flexWrap: "wrap" }}>
             <span>✓ Monatlich kündbar</span>
             <span>✓ Feste Reinigungsperson</span>
@@ -1866,6 +1933,7 @@ function GartenpflegePage() {
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <WhatsAppButton service="garten" label="Fotos senden & Offerte erhalten" />
+            <CallButton />
           </div>
           <div style={{ marginTop: 16, fontSize: 12, color: "#8a95a0", display: "flex", gap: 16, flexWrap: "wrap" }}>
             <span>✓ Offerte nach Fotoprüfung — noch heute</span>
@@ -2666,7 +2734,7 @@ function FAQPage() {
       items: [
         { q: "Was ist die Abgabegarantie genau?", a: "Wir reinigen nach einer klaren Checkliste, sind bei der Wohnungsabnahme dabei und kommen kostenlos zurück — innerhalb von 48 Stunden — falls die Verwaltung etwas beanstandet. Das ist schriftlich in der Auftragsbestätigung festgehalten." },
         { q: "Was passiert bei Beanstandungen?", a: "Wir kommen kostenlos zurück und machen es richtig. Kein Diskutieren, keine versteckten Bedingungen. Das ist Teil unserer Garantie." },
-        { q: "Was wenn etwas kaputtgeht?", a: "Wir sind über eine Betriebshaftpflicht bis CHF 5 Mio. versichert. Schäden melden wir sofort und regeln das unkompliziert." },
+        { q: "Was wenn etwas kaputtgeht?", a: "Wir sind über eine Betriebshaftpflicht bis CHF 2 Mio. versichert. Schäden melden wir sofort und regeln das unkompliziert." },
         { q: "Verwenden Sie umweltfreundliche Reinigungsmittel?", a: "Standardmässig professionelle Mittel — wirksam und sicher zugelassen. Auf Wunsch arbeiten wir mit bio-zertifizierten Produkten, das kostet einen kleinen Aufpreis." },
       ],
     },
@@ -3199,7 +3267,7 @@ function UeberUnsPage({ setPage }) {
   const registrations = [
     { label: "UID", value: CONFIG.UID },
     // MwSt-Nummer entfernt — noch nicht registriert
-    { label: "Betriebshaftpflicht", value: "Versichert bis CHF 5 Mio." },
+    { label: "Betriebshaftpflicht", value: "Versichert bis CHF 2 Mio." },
     { label: "AHV / SUVA", value: "Angemeldet" },
     { label: "GAV Reinigung", value: "Konform ab 1.1.2026" },
   ];
@@ -3307,7 +3375,7 @@ function UeberUnsPage({ setPage }) {
             }}>
               {[
                 { icon: "📄", text: "Offizielle Rechnung als Beleg" },
-                { icon: "🛡", text: "Betriebshaftpflicht bis CHF 5 Mio." },
+                { icon: "🛡", text: "Betriebshaftpflicht bis CHF 2 Mio." },
                 { icon: "📋", text: "GAV-konforme Löhne" },
                 { icon: "✅", text: "AHV / SUVA-Anmeldung" },
               ].map((item, i) => (
@@ -3517,7 +3585,7 @@ function LegalPage({ type }) {
         },
         {
           heading: "6. Haftung",
-          text: "Wir haften für Schäden, die durch unser Team verursacht werden, im Rahmen unserer Betriebshaftpflichtversicherung bis CHF 5 Mio. Schäden sind umgehend — noch am Einsatztag — zu melden.",
+          text: "Wir haften für Schäden, die durch unser Team verursacht werden, im Rahmen unserer Betriebshaftpflichtversicherung bis CHF 2 Mio. Schäden sind umgehend — noch am Einsatztag — zu melden.",
         },
         {
           heading: "7. Datenschutz",
@@ -3627,7 +3695,10 @@ function FensterreinigungPage() {
           <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, maxWidth: 500, marginBottom: 28 }}>
             Pauschalpreise je nach Wohnungsgrösse. Kein Aufmass, kein Besichtigungstermin — schicken Sie uns Fotos.
           </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <WhatsAppButton service="fenster" label="Offerte per WhatsApp" />
+            <CallButton />
+          </div>
         </Container>
       </div>
       <Container style={{ padding: "56px 20px" }}>
@@ -3674,7 +3745,10 @@ function BaureinigungPage() {
             Baustaub, Klebereste, Farbtupfer — wir machen das Objekt abnahmebereit.
             Ab CHF 13/m², Offerte nach Fotos.
           </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <WhatsAppButton service="general" label="Fotos senden & Offerte erhalten" />
+            <CallButton />
+          </div>
         </Container>
       </div>
       <Container style={{ padding: "56px 20px" }}>
@@ -3724,7 +3798,10 @@ function BueroreinigungPage() {
           <p style={{ fontSize: 16, color: "#5a6472", lineHeight: 1.65, maxWidth: 500, marginBottom: 28 }}>
             2–3× pro Woche, abends nach Büroschluss. Offizielle Rechnung, versichert, angemeldete Mitarbeiter. Offerte nach Mass.
           </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <WhatsAppButton service="general" label="Offerte anfragen per WhatsApp" />
+            <CallButton />
+          </div>
           <div style={{ marginTop: 16, fontSize: 12, color: "#8a95a0", display: "flex", gap: 16, flexWrap: "wrap" }}>
             <span>✓ Monatlich kündbar</span>
             <span>✓ Offizielle Rechnung</span>
