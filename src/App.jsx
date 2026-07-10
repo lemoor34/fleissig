@@ -1034,7 +1034,7 @@ export function Calculator() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           {[
             { id: "basic",    label: "Basic",    sub: "Küche, Bad, Zimmer" },
-            { id: "komplett", label: "Komplett", sub: "+ Fenster, Balkon", badge: "Empfohlen" },
+            { id: "komplett", label: "Komplett", sub: "+ Fenster, Backofen, Kühlschrank", badge: "Empfohlen" },
           ].map(v => (
             <button key={v.id}
               onClick={() => setVariant(v.id)}
@@ -1195,7 +1195,7 @@ function UmzugsreinigungPage({ setPage }) {
     { q: "Was ist bei starker Verschmutzung?", a: "Wir besichtigen vor Ort oder prüfen anhand von Fotos. Danach erhalten Sie eine separate Offerte." },
     { q: "Kann ich per Rechnung zahlen?", a: "Ja. Sie erhalten immer eine offizielle Rechnung. Zahlung auch per TWINT möglich." },
     { q: "Kommen Sie nach [Ort] im Aargau?", a: "Wir arbeiten im gesamten Kanton Aargau: Lenzburg, Aarau, Wohlen, Baden, Brugg, Zofingen und weitere. Einfach fragen." },
-    { q: "Was ist der Unterschied zwischen Basic und Komplett?", a: "Basic umfasst Küche, Bad und Wohnräume nach Checkliste. Komplett beinhaltet zusätzlich Fenster und Storen beidseitig, Balkon/Terrasse und Backofen-Tiefenreinigung." },
+    { q: "Was ist der Unterschied zwischen Basic und Komplett?", a: "Basic umfasst Küche, Bad und Wohnräume nach Checkliste. Komplett beinhaltet zusätzlich Fenster und Storen beidseitig, Balkon/Terrasse sowie Backofen- und Kühlschrankreinigung." },
     { q: "Bezahle ich vor oder nach der Abgabe?", a: "Nach der erfolgreichen Abgabe. Sie zahlen erst, wenn die Wohnungsübergabe geklappt hat." },
   ];
 
@@ -1303,7 +1303,11 @@ function UmzugsreinigungPage({ setPage }) {
             {[
               {
                 title: "🍳 Küche",
-                items: ["Backofen innen und Backbleche", "Kühlschrank abtauen, innen/aussen", "Dampfabzug inkl. Filter", "Armaturen entkalkt"],
+                items: ["Küchenfronten und Arbeitsflächen", "Dampfabzug inkl. Filter", "Armaturen entkalkt"],
+              },
+              {
+                title: "🍽 Backofen & Kühlschrank (Komplett)",
+                items: ["Backofen innen und Backbleche", "Kühlschrank abtauen, innen/aussen"],
               },
               {
                 title: "🚿 Bad / Toilette",
@@ -2324,7 +2328,7 @@ function PreisePage({ setPage }) {
                   <div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>Paket</div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                      {[["basic","Basic","Küche, Bad, Zimmer"],["komplett","Komplett","+ Fenster, Balkon"]].map(([id, label, sub]) => (
+                      {[["basic","Basic","Küche, Bad, Zimmer"],["komplett","Komplett","+ Fenster, Backofen, Kühlschrank"]].map(([id, label, sub]) => (
                         <button key={id} onClick={() => setVariant(id)} style={{
                           padding: "12px", borderRadius: 8, cursor: "pointer", textAlign: "left",
                           border: variant === id ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
@@ -2554,7 +2558,7 @@ function PreisePage({ setPage }) {
           }}>
             {[
               { label: "Basic beinhaltet", items: ["Küche, Bad, Wohnräume nach Checkliste", "Böden, Oberflächen, Armaturen", "Abgabegarantie mit kostenloser Nachreinigung"] },
-              { label: "Komplett beinhaltet zusätzlich", items: ["Fenster und Storen beidseitig", "Balkon / Terrasse", "Backofen-Tiefenreinigung · Kalkentfernung", "Teamleiter bei der Wohnungsabnahme"] },
+              { label: "Komplett beinhaltet zusätzlich", items: ["Fenster und Storen beidseitig", "Balkon / Terrasse", "Backofen & Kühlschrank · Kalkentfernung", "Teamleiter bei der Wohnungsabnahme"] },
             ].map((col, i) => (
               <div key={i} style={{
                 padding: "16px 20px", borderRadius: 10,
