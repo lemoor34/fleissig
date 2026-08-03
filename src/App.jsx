@@ -102,6 +102,11 @@ export const REVIEWS = [
   // Пример:
   // { name: "M. Keller", ort: "Lenzburg", stars: 5, service: "Umzugsreinigung",
   //   text: "Wohnungsübergabe ohne Beanstandung — sehr zuverlässig.", hidden: false },
+  {
+    name: "Daniela & Martin",
+    stars: 5,
+    text: "Herzlichen Dank 😍, ihr habt SUPER ARBEIT geleistet 👏🏼👏🏼👏🏼 Mache sehr gerne für Euch Werbung 🥰",
+  },
 ];
 
 export const PAGES = [
@@ -422,7 +427,11 @@ function ReviewsSection() {
                   «{r.text}»
                 </p>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{r.name}</div>
-                <div style={{ fontSize: 12, color: "#8a95a0" }}>{r.ort} · {r.service}</div>
+                {(r.ort || r.service) && (
+                  <div style={{ fontSize: 12, color: "#8a95a0" }}>
+                    {[r.ort, r.service].filter(Boolean).join(" · ")}
+                  </div>
+                )}
               </div>
             ))}
           </div>
