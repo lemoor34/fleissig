@@ -63,7 +63,7 @@ export const PRICES = {
     "5.5": { basic: 1010, komplett: 1240 },
     "EFH": { basic: 1240, komplett: 1560 },
   },
-  reinigung: { stunde: 55 },   // CHF/Std, 2 Mitarbeiter im Einsatz
+  reinigung: { stunde: 55, stunde2: 100 },   // CHF/Std: 1 Mitarbeiter / 2 Mitarbeiter
   garten:    { stunde: 65, fruehling: 340, herbst: 260 },
   fenster:   { "2.5": 270, "3.5": 360, "4.5": 440, "5.5": 540 },
 };
@@ -338,11 +338,16 @@ function CallButton({ label = "Anrufen", size = "normal" }) {
   );
 }
 
-// Селектор часов: выбор количества часов + заказ в 1 клик
-function StundenRechner({ rate, serviceLabel, note }) {
+// Селектор часов: часы + (опционально) число сотрудников, заказ в 1 клик.
+// rates = {1: цена/ч за одного, 2: цена/ч за двоих} — если передан, показывает выбор команды.
+function StundenRechner({ rate, rates, serviceLabel, note }) {
   const [hours, setHours] = useState(3);
-  const total = hours * rate;
-  const waText = `Grüezi! Ich möchte ${serviceLabel} für ${hours} Stunden buchen (CHF ${formatPrice(total)}). Wann haben Sie Zeit?`;
+  const [workers, setWorkers] = useState(1);
+  const effRate = rates ? rates[workers] : rate;
+  const total = hours * effRate;
+  const waText = rates
+    ? `Grüezi! Ich möchte ${serviceLabel} für ${hours} Stunden mit ${workers} Mitarbeiter${workers > 1 ? "n" : ""} buchen (CHF ${formatPrice(total)}). Wann haben Sie Zeit?`
+    : `Grüezi! Ich möchte ${serviceLabel} für ${hours} Stunden buchen (CHF ${formatPrice(total)}). Wann haben Sie Zeit?`;
   return (
     <div style={{
       background: "#fff", border: "2px solid #3D7B4F", borderRadius: 14,
@@ -350,8 +355,25 @@ function StundenRechner({ rate, serviceLabel, note }) {
       boxShadow: "0 8px 32px rgba(61,123,79,0.10)",
     }}>
       <div style={{ fontSize: 13, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 14 }}>
-        Stundenweise buchen — CHF {rate}/Std.
+        Stundenweise buchen — CHF {effRate}/Std.
       </div>
+      {rates && (
+        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+          {[1, 2].map(w => (
+            <button key={w} onClick={() => setWorkers(w)}
+              style={{
+                flex: 1, padding: "10px 0", borderRadius: 8, cursor: "pointer",
+                border: workers === w ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
+                background: workers === w ? "#f0f7f2" : "#fff",
+                fontSize: 13, fontWeight: 700,
+                color: workers === w ? "#3D7B4F" : "#4A4A4A",
+              }}
+            >
+              {w} Mitarbeiter · CHF {rates[w]}/Std.
+            </button>
+          ))}
+        </div>
+      )}
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
         {[2, 3, 4, 6].map(h => (
           <button key={h} onClick={() => setHours(h)}
@@ -1449,14 +1471,6 @@ function UmzugsreinigungPage({ setPage }) {
               </div>
             ))}
           </div>
-          {/* До/после фото */}
-          <div style={{ marginTop: 32, borderRadius: 16, overflow: "hidden", maxHeight: 360 }}>
-            <img
-              src="https://i.ibb.co/84GQ71m8/a122fcea-22e5-4670-bf48-183b9f5bc805.png"
-              alt="Küche Vorher Nachher — Umzugsreinigung Aargau"
-              style={{ width: "100%", objectFit: "cover", display: "block" }}
-            />
-          </div>
         </Container>
       </div>
 
@@ -1606,9 +1620,9 @@ function UnterhaltsreinigungPage({ setPage }) {
           gap: 24, alignItems: "start",
         }}>
           <StundenRechner
-            rate={PRICES.reinigung.stunde}
+            rates={{ 1: PRICES.reinigung.stunde, 2: PRICES.reinigung.stunde2 }}
             serviceLabel="eine Reinigung"
-            note="2 Reinigungskräfte im Einsatz · Material inklusive"
+            note="Material inklusive · Mit 2 Mitarbeitern doppelt so schnell fertig"
           />
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
@@ -1883,17 +1897,9 @@ function GartenpflegePage() {
             <span>✓ Entsorgung auf Wunsch</span>
           </div>
             </div>
-            <div style={{ borderRadius: 16, overflow: "hidden", width: 340, height: 280, flexShrink: 0, display: "none" }} className="garten-img">
-              <img
-                src="https://i.ibb.co/LDTVC0Sj/c99c4965-4e82-4ea4-a4c8-ac9c95a16e1f.png"
-                alt="Gartenpflege Aargau — Heckenschnitt"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </div>
           </div>
         </Container>
       </div>
-      <style>{`@media(min-width:900px){.garten-img{display:block !important;}}`}</style>
 
       {/* ПАКЕТЫ */}
       <Container style={{ padding: "60px 20px" }}>
@@ -2107,6 +2113,7 @@ function PreisePage({ setPage }) {
   const [roomSize, setRoomSize]   = useState("3.5");
   const [variant, setVariant]     = useState("komplett");
   const [hoursCount, setHoursCount] = useState(3);
+  const [workersCount, setWorkersCount] = useState(1);
   const [gartenType, setGartenType] = useState("stunden");
   const [fensterSize, setFensterSize] = useState("2.5");
   const [calcDone, setCalcDone]   = useState(false);
@@ -2125,8 +2132,9 @@ function PreisePage({ setPage }) {
       return { base, ex: 0, disc: 0, total: base };
     }
     if (activeService === "unterhalt") {
-      const base = hoursCount * PRICES.reinigung.stunde;
-      return { base, ex: 0, disc: 0, total: base, note: `${hoursCount} Std.` };
+      const rate = workersCount === 2 ? PRICES.reinigung.stunde2 : PRICES.reinigung.stunde;
+      const base = hoursCount * rate;
+      return { base, ex: 0, disc: 0, total: base, note: `${hoursCount} Std. · ${workersCount} MA` };
     }
     if (activeService === "garten") {
       const base = gartenType === "stunden"
@@ -2148,7 +2156,7 @@ function PreisePage({ setPage }) {
     if (activeService === "endreinigung")
       detail = `${roomSize}-Zi, ${variant === "basic" ? "Basic" : "Komplett"}`;
     if (activeService === "unterhalt")
-      detail = `${hoursCount} Stunden`;
+      detail = `${hoursCount} Stunden, ${workersCount} Mitarbeiter`;
     if (activeService === "garten")
       detail = gartenType === "stunden" ? `${hoursCount} Stunden` : gartenType === "fruehling" ? "Frühjahrspaket" : "Herbstpaket";
     if (activeService === "fenster")
@@ -2272,7 +2280,23 @@ function PreisePage({ setPage }) {
               {activeService === "unterhalt" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>
-                    Wie viele Stunden? — CHF {PRICES.reinigung.stunde}/Std.
+                    Team
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[1, 2].map(w => (
+                      <button key={w} onClick={() => setWorkersCount(w)} style={{
+                        flex: 1, padding: "12px 0", borderRadius: 10, cursor: "pointer",
+                        border: workersCount === w ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
+                        background: workersCount === w ? "#f0f7f2" : "#fff",
+                        fontWeight: 700, fontSize: 13,
+                        color: workersCount === w ? "#3D7B4F" : "#4A4A4A",
+                      }}>
+                        {w} Mitarbeiter · CHF {w === 2 ? PRICES.reinigung.stunde2 : PRICES.reinigung.stunde}/Std.
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4, marginTop: 8 }}>
+                    Wie viele Stunden?
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
                     {[2, 3, 4, 6].map(h => (
@@ -2289,7 +2313,7 @@ function PreisePage({ setPage }) {
                   </div>
                   <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.6 }}>
                     Einmalig oder regelmässig — gleicher Preis, keine Vertragsbindung.
-                    2 Reinigungskräfte im Einsatz, Material inklusive.
+                    Material inklusive. Mit 2 Mitarbeitern doppelt so schnell fertig.
                   </div>
                 </div>
               )}
@@ -2524,8 +2548,8 @@ function PreisePage({ setPage }) {
               {
                 title: "Reinigung stundenweise",
                 rows: [
-                  ["Pro Stunde", `CHF ${PRICES.reinigung.stunde}/Std.`],
-                  ["2 Reinigungskräfte", "inklusive"],
+                  ["1 Mitarbeiter", `CHF ${PRICES.reinigung.stunde}/Std.`],
+                  ["2 Mitarbeiter", `CHF ${PRICES.reinigung.stunde2}/Std.`],
                   ["Material", "inklusive"],
                 ],
               },
@@ -3199,14 +3223,6 @@ function UeberUnsPage({ setPage }) {
             <p style={{ fontSize: 14, color: "#4A4A4A", lineHeight: 1.8 }}>
               Unser Büro ist in Seengen — von dort decken wir den gesamten Kanton Aargau ab.
             </p>
-          </div>
-          {/* Фото команды */}
-          <div style={{ borderRadius: 16, overflow: "hidden", height: 260 }}>
-            <img
-              src="https://i.ibb.co/yFpNH4M0/c1a22c8b-b221-4264-bfbe-35d9ab889670.png"
-              alt="Fleissig Team — Reinigung Aargau"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
           </div>
         </div>
 
