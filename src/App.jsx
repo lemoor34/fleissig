@@ -92,6 +92,18 @@ export const buildWaLink = (service) => {
 // ============================================================
 // НАВИГАЦИЯ
 // ============================================================
+// ============================================================
+// ОТЗЫВЫ КЛИЕНТОВ
+// Новые отзывы приходят на почту через форму на сайте и
+// публикуются только вручную — добавьте объект в этот список.
+// Чтобы скрыть отзыв, удалите его или поставьте hidden: true.
+// ============================================================
+export const REVIEWS = [
+  // Пример:
+  // { name: "M. Keller", ort: "Lenzburg", stars: 5, service: "Umzugsreinigung",
+  //   text: "Wohnungsübergabe ohne Beanstandung — sehr zuverlässig.", hidden: false },
+];
+
 export const PAGES = [
   { id: "home",              label: "Start"           },
   { id: "umzugsreinigung",   label: "Umzugsreinigung" },
@@ -374,6 +386,112 @@ function StundenRechner({ rate, serviceLabel, note }) {
       {note && (
         <div style={{ marginTop: 10, fontSize: 12, color: "#6b7280", textAlign: "center" }}>{note}</div>
       )}
+    </div>
+  );
+}
+
+// Секция отзывов: показывает только одобренные (из REVIEWS),
+// плюс форма "оставить отзыв" — отправляется владельцу на почту.
+function ReviewsSection() {
+  const [fs, handleSubmit] = useForm("mkoevlva");
+  const [formOpen, setFormOpen] = useState(false);
+  const visible = REVIEWS.filter(r => !r.hidden);
+
+  return (
+    <div style={{ background: "#fff", padding: "60px 0" }}>
+      <Container>
+        <SectionTitle sub="Echte Stimmen aus dem Kanton Aargau.">
+          Das sagen unsere Kunden
+        </SectionTitle>
+
+        {visible.length > 0 ? (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: 16, marginBottom: 32,
+          }}>
+            {visible.map((r, i) => (
+              <div key={i} style={{
+                background: "#f9fdf9", border: "1px solid #e8f2eb",
+                borderRadius: 14, padding: "24px",
+              }}>
+                <div style={{ color: "#E8A33D", fontSize: 15, letterSpacing: 2, marginBottom: 10 }}>
+                  {"★".repeat(r.stars)}{"☆".repeat(5 - r.stars)}
+                </div>
+                <p style={{ fontSize: 14, color: "#4A4A4A", lineHeight: 1.65, marginBottom: 14 }}>
+                  «{r.text}»
+                </p>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{r.name}</div>
+                <div style={{ fontSize: 12, color: "#8a95a0" }}>{r.ort} · {r.service}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 24, maxWidth: 480 }}>
+            Wir sind ein junges Unternehmen — Ihre Bewertung wäre eine der ersten
+            und hilft uns besonders.
+          </p>
+        )}
+
+        {!formOpen ? (
+          <button
+            onClick={() => setFormOpen(true)}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              background: "none", border: "1.5px solid #3D7B4F",
+              color: "#3D7B4F", padding: "11px 22px", borderRadius: 8,
+              fontSize: 14, fontWeight: 600, cursor: "pointer",
+            }}
+          >
+            <Star size={15} />
+            Bewertung abgeben
+          </button>
+        ) : !fs.succeeded ? (
+          <form onSubmit={handleSubmit} style={{
+            display: "flex", flexDirection: "column", gap: 12, maxWidth: 480,
+            background: "#f9fdf9", border: "1px solid #e8f2eb",
+            borderRadius: 14, padding: "24px",
+          }}>
+            <div style={{ fontWeight: 700, fontSize: 15, color: "#1a1a1a" }}>Ihre Bewertung</div>
+            <input name="name" type="text" placeholder="Ihr Name" required
+              style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            />
+            <input name="ort" type="text" placeholder="Ort (z.B. Lenzburg)"
+              style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            />
+            <select name="sterne" defaultValue="5"
+              style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff" }}
+            >
+              {[5, 4, 3, 2, 1].map(n => (
+                <option key={n} value={n}>{"★".repeat(n)} ({n}/5)</option>
+              ))}
+            </select>
+            <textarea name="bewertung" placeholder="Wie war Ihre Erfahrung mit Fleissig?" rows={3} required
+              style={{ padding: "12px 14px", borderRadius: 8, fontSize: 14, border: "1.5px solid #e0e0e0", outline: "none", resize: "vertical", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            />
+            <input type="hidden" name="seite" value="Bewertung" />
+            <button type="submit" disabled={fs.submitting}
+              style={{ background: "#3D7B4F", color: "#fff", padding: "13px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", border: "none" }}
+            >
+              {fs.submitting ? "Wird gesendet..." : "Bewertung senden"}
+            </button>
+            <div style={{ fontSize: 11, color: "#9ca3af" }}>
+              Ihre Bewertung wird nach Prüfung veröffentlicht.
+            </div>
+          </form>
+        ) : (
+          <div style={{
+            background: "#f0f7f2", border: "1px solid #c8e6d0",
+            borderRadius: 10, padding: "20px", maxWidth: 480, textAlign: "center",
+          }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>✓</div>
+            <div style={{ fontWeight: 700, color: "#3D7B4F" }}>Merci für Ihre Bewertung!</div>
+            <div style={{ fontSize: 13, color: "#6b7280", marginTop: 4 }}>
+              Wir prüfen sie kurz und schalten sie dann frei.
+            </div>
+          </div>
+        )}
+      </Container>
     </div>
   );
 }
@@ -693,8 +811,8 @@ function HomePage({ setPage }) {
             Schreiben Sie uns einfach auf WhatsApp — wir fragen alles Nötige selbst ab. Offerte innerhalb von 2 Stunden.
           </p>
 
-          {/* Две главные кнопки: Уборка / Сад */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 14, maxWidth: 560 }}>
+          {/* Две главные кнопки: Уборка / Сад — вертикально */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 420 }}>
             {[
               { icon: "🧹", title: "Reinigung", sub: `ab CHF ${PRICES.reinigung.stunde}/Std. oder Festpreis`, page: "unterhaltsreinigung" },
               { icon: "🌿", title: "Garten",    sub: `ab CHF ${PRICES.garten.stunde}/Std. oder Festpreis`,    page: "gartenpflege" },
@@ -909,6 +1027,9 @@ function HomePage({ setPage }) {
           <TrustBadges />
         </Container>
       </div>
+
+      {/* ОТЗЫВЫ */}
+      <ReviewsSection />
 
       {/* ЗОНА РАБОТ */}
       <Container style={{ padding: "60px 20px" }}>
