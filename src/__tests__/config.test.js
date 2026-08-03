@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { CONFIG, PRICES, PAKETE, PAGES } from '../App.jsx'
+import { CONFIG, PRICES, PAGES } from '../App.jsx'
 
 describe('CONFIG', () => {
   it('has a WA_NUMBER', () => {
@@ -16,11 +16,6 @@ describe('CONFIG', () => {
 
   it('has a UID (company registration number)', () => {
     expect(CONFIG.UID).toBeTruthy()
-  })
-
-  it('OFFER_END is a valid Date object', () => {
-    expect(CONFIG.OFFER_END).toBeInstanceOf(Date)
-    expect(isNaN(CONFIG.OFFER_END.getTime())).toBe(false)
   })
 })
 
@@ -53,37 +48,35 @@ describe('PRICES.endreinigung', () => {
   })
 })
 
-
-describe('PRICES.unterhalt', () => {
-  it('has all four tiers', () => {
-    expect(PRICES.unterhalt.einmalig).toBeGreaterThan(0)
-    expect(PRICES.unterhalt.basis).toBeGreaterThan(0)
-    expect(PRICES.unterhalt.komfort).toBeGreaterThan(0)
-    expect(PRICES.unterhalt.premium).toBeGreaterThan(0)
+describe('PRICES hourly rates', () => {
+  it('cleaning hourly rate is positive', () => {
+    expect(PRICES.reinigung.stunde).toBeGreaterThan(0)
   })
 
-  it('monthly tiers increase in price (basis < komfort < premium)', () => {
-    expect(PRICES.unterhalt.komfort).toBeGreaterThan(PRICES.unterhalt.basis)
-    expect(PRICES.unterhalt.premium).toBeGreaterThan(PRICES.unterhalt.komfort)
+  it('garden hourly rate is positive and higher than cleaning', () => {
+    expect(PRICES.garten.stunde).toBeGreaterThan(0)
+    expect(PRICES.garten.stunde).toBeGreaterThan(PRICES.reinigung.stunde)
+  })
+
+  it('garden packages have positive prices', () => {
+    expect(PRICES.garten.fruehling).toBeGreaterThan(0)
+    expect(PRICES.garten.herbst).toBeGreaterThan(0)
   })
 })
 
-describe('PAKETE', () => {
-  it('contains exactly 4 packages', () => {
-    expect(PAKETE).toHaveLength(4)
+describe('PRICES.fenster', () => {
+  const sizes = ['2.5', '3.5', '4.5', '5.5']
+
+  sizes.forEach(size => {
+    it(`${size}-Zi has a positive pauschal price`, () => {
+      expect(PRICES.fenster[size]).toBeGreaterThan(0)
+    })
   })
 
-  PAKETE.forEach((p, i) => {
-    it(`package ${i} (${p.name}) has a name, items, einzeln and paket`, () => {
-      expect(p.name).toBeTruthy()
-      expect(p.items).toBeTruthy()
-      expect(p.einzeln).toBeGreaterThan(0)
-      expect(p.paket).toBeGreaterThan(0)
-    })
-
-    it(`package ${i} (${p.name}): paket price is less than einzeln (real discount)`, () => {
-      expect(p.paket).toBeLessThan(p.einzeln)
-    })
+  it('prices increase with apartment size', () => {
+    for (let i = 0; i < sizes.length - 1; i++) {
+      expect(PRICES.fenster[sizes[i + 1]]).toBeGreaterThan(PRICES.fenster[sizes[i]])
+    }
   })
 })
 

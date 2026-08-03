@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import {
   formatPrice,
-  isOfferActive,
-  getOfferDiscount,
   buildWaLink,
+  buildWaOrderLink,
   CONFIG,
 } from '../App.jsx'
 
@@ -27,70 +26,6 @@ describe('formatPrice', () => {
 
   it('handles 0', () => {
     expect(formatPrice(0)).toBe('0')
-  })
-})
-
-describe('isOfferActive', () => {
-  afterEach(() => vi.useRealTimers())
-
-  it('returns true when current date is before offer end', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-01-01T12:00:00'))
-    expect(isOfferActive()).toBe(true)
-  })
-
-  it('returns false when current date is after offer end', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-07-01T00:00:00'))
-    expect(isOfferActive()).toBe(false)
-  })
-
-  it('returns false the day after offer ends (2026-07-01)', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-07-01T10:00:00'))
-    expect(isOfferActive()).toBe(false)
-  })
-
-  it('returns true on the last day of the offer (2026-06-30)', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-06-30T12:00:00'))
-    expect(isOfferActive()).toBe(true)
-  })
-})
-
-describe('getOfferDiscount', () => {
-  afterEach(() => vi.useRealTimers())
-
-  it('returns 50 for 2.5-room apartment when offer is active', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-01-01'))
-    expect(getOfferDiscount('2.5')).toBe(50)
-  })
-
-  it('returns 100 for 3.5-room apartment when offer is active', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-01-01'))
-    expect(getOfferDiscount('3.5')).toBe(100)
-  })
-
-  it('returns 100 for 4.5-room apartment when offer is active', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-01-01'))
-    expect(getOfferDiscount('4.5')).toBe(100)
-  })
-
-  it('returns 100 for EFH when offer is active', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-01-01'))
-    expect(getOfferDiscount('EFH')).toBe(100)
-  })
-
-  it('returns 0 for all sizes when offer is expired', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-07-01'))
-    expect(getOfferDiscount('2.5')).toBe(0)
-    expect(getOfferDiscount('3.5')).toBe(0)
-    expect(getOfferDiscount('EFH')).toBe(0)
   })
 })
 
@@ -122,5 +57,20 @@ describe('buildWaLink', () => {
 
   it('includes a text query parameter', () => {
     expect(buildWaLink('general')).toContain('?text=')
+  })
+})
+
+describe('buildWaOrderLink', () => {
+  it('returns a wa.me URL with the configured number', () => {
+    const link = buildWaOrderLink('Grüezi! Testbestellung.')
+    expect(link).toMatch(/^https:\/\/wa\.me\//)
+    expect(link).toContain(CONFIG.WA_NUMBER)
+  })
+
+  it('URL-encodes the custom message', () => {
+    const link = buildWaOrderLink('Grüezi! Ich möchte 3 Stunden buchen (CHF 165).')
+    const textParam = link.split('?text=')[1]
+    expect(textParam).not.toContain(' ')
+    expect(decodeURIComponent(textParam)).toContain('3 Stunden')
   })
 })

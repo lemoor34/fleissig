@@ -47,7 +47,6 @@ import {
 // ============================================================
 export const CONFIG = {
   WA_NUMBER: "41779588526",
-  OFFER_END: new Date("2026-06-30T23:59:59"),
   COMPANY_NAME: "Fleissig",
   TAGLINE: "Reinigung & Gartenpflege im Kanton Aargau",
   EMAIL: "fleissig.reinigungen@gmail.com",
@@ -58,50 +57,16 @@ export const CONFIG = {
 
 export const PRICES = {
   endreinigung: {
-    "2.5": { basic: 630,  komplett: 820  },
-    "3.5": { basic: 820,  komplett: 1010 },
-    "4.5": { basic: 1010, komplett: 1290 },
-    "5.5": { basic: 1290, komplett: 1560 },
-    "EFH": { basic: 1560, komplett: 1940 },
+    "2.5": { basic: 490,  komplett: 650  },
+    "3.5": { basic: 610,  komplett: 770  },
+    "4.5": { basic: 770,  komplett: 1010 },
+    "5.5": { basic: 1010, komplett: 1240 },
+    "EFH": { basic: 1240, komplett: 1560 },
   },
-  unterhalt: {
-    einmalig: 55,   // CHF/Std
-    basis:   300,   // CHF/Monat
-    komfort: 600,
-    premium: 1200,
-  },
-  garten: {
-    stunde_abo: 55,
-    stunde_einmalig: 65,
-    fruehling: 450,
-    herbst: 360,
-    abo_monat: 360,
-  },
-  fenster: { pauschal_25zi: 320 },
+  reinigung: { stunde: 55 },   // CHF/Std, 2 Mitarbeiter im Einsatz
+  garten:    { stunde: 65, fruehling: 340, herbst: 260 },
+  fenster:   { "2.5": 270, "3.5": 360, "4.5": 440, "5.5": 540 },
 };
-
-export const PAKETE = [
-  {
-    name: "Umzug komplett 3.5-Zi",
-    items: "Endreinigung Komplett inkl. Fenster & Balkon",
-    einzeln: 930, paket: 820,
-  },
-  {
-    name: "Umzug komplett 4.5-Zi",
-    items: "Endreinigung Komplett inkl. Fenster & Balkon",
-    einzeln: 1180, paket: 1010,
-  },
-  {
-    name: "Frühjahrsputz 3.5-Zi",
-    items: "Grundreinigung + Fenster",
-    einzeln: 790, paket: 630,
-  },
-  {
-    name: "Frühjahrsputz 4.5-Zi",
-    items: "Grundreinigung + Fenster",
-    einzeln: 1010, paket: 820,
-  },
-];
 
 // ============================================================
 // ХЕЛПЕРЫ
@@ -109,10 +74,8 @@ export const PAKETE = [
 export const formatPrice = (val) =>
   val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
 
-export const isOfferActive = () => new Date() < CONFIG.OFFER_END;
-
-export const getOfferDiscount = (roomSize) =>
-  isOfferActive() ? (roomSize === "2.5" ? 50 : 100) : 0;
+export const buildWaOrderLink = (text) =>
+  `https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(text)}`;
 
 export const buildWaLink = (service) => {
   const texts = {
@@ -358,16 +321,59 @@ function CallButton({ label = "Anrufen", size = "normal" }) {
   );
 }
 
-function OfferBanner() {
-  if (!isOfferActive()) return null;
+// Селектор часов: выбор количества часов + заказ в 1 клик
+function StundenRechner({ rate, serviceLabel, note }) {
+  const [hours, setHours] = useState(3);
+  const total = hours * rate;
+  const waText = `Grüezi! Ich möchte ${serviceLabel} für ${hours} Stunden buchen (CHF ${formatPrice(total)}). Wann haben Sie Zeit?`;
   return (
     <div style={{
-      background: "linear-gradient(135deg, #3D7B4F 0%, #2d5c3a 100%)",
-      color: "#fff", textAlign: "center",
-      padding: "10px 20px", fontSize: 13, fontWeight: 500,
+      background: "#fff", border: "2px solid #3D7B4F", borderRadius: 14,
+      padding: "24px", maxWidth: 440,
+      boxShadow: "0 8px 32px rgba(61,123,79,0.10)",
     }}>
-      🎉 <strong>Eröffnungsangebot bis 30. Juni 2026:</strong>{" "}
-      CHF 50 auf Gartenpakete · 10% auf das erste Abo
+      <div style={{ fontSize: 13, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 14 }}>
+        Stundenweise buchen — CHF {rate}/Std.
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        {[2, 3, 4, 6].map(h => (
+          <button key={h} onClick={() => setHours(h)}
+            style={{
+              flex: 1, padding: "12px 0", borderRadius: 8, cursor: "pointer",
+              border: hours === h ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
+              background: hours === h ? "#f0f7f2" : "#fff",
+              fontSize: 15, fontWeight: 700,
+              color: hours === h ? "#3D7B4F" : "#4A4A4A",
+            }}
+          >
+            {h} Std.
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 16 }}>
+        <span style={{ fontSize: 32, fontWeight: 800, color: "#1a1a1a" }}>CHF {formatPrice(total)}</span>
+        <span style={{ fontSize: 13, color: "#6b7280" }}>Festpreis</span>
+      </div>
+      <a
+        href={buildWaOrderLink(waText)}
+        target="_blank" rel="noopener noreferrer"
+        onClick={() => {
+          if (typeof gtag === 'function') gtag('event', 'conversion_event_contact');
+          if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'stunden_buchung' });
+        }}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          background: "#25D366", color: "#fff",
+          padding: "13px", borderRadius: 8,
+          fontSize: 15, fontWeight: 700, textDecoration: "none",
+        }}
+      >
+        <MessageCircle size={16} />
+        Jetzt buchen — 1 Klick
+      </a>
+      {note && (
+        <div style={{ marginTop: 10, fontSize: 12, color: "#6b7280", textAlign: "center" }}>{note}</div>
+      )}
     </div>
   );
 }
@@ -613,7 +619,7 @@ function HomePage({ setPage }) {
       icon: <Scissors size={22} color="#3D7B4F" />,
       title: "Unterhaltsreinigung",
       desc: "Regelmässig oder einmalig.",
-      price: `Abo ab CHF ${formatPrice(PRICES.unterhalt.basis)}/Mt.`,
+      price: `CHF ${PRICES.reinigung.stunde}/Std.`,
       service: "unterhalt",
       page: "unterhaltsreinigung",
     },
@@ -621,7 +627,7 @@ function HomePage({ setPage }) {
       icon: <Eye size={22} color="#3D7B4F" />,
       title: "Fensterreinigung",
       desc: "Inkl. Storen und Rahmen.",
-      price: `ab CHF ${formatPrice(PRICES.fenster.pauschal_25zi)} pauschal`,
+      price: `ab CHF ${PRICES.fenster["2.5"]} pauschal`,
       service: "fenster",
       page: "fensterreinigung",
     },
@@ -645,7 +651,7 @@ function HomePage({ setPage }) {
       icon: <Leaf size={22} color="#3D7B4F" />,
       title: "Gartenpflege",
       desc: "Rasen, Hecken, Unkraut.",
-      price: `ab CHF ${PRICES.garten.stunde_abo}/Std. im Abo`,
+      price: `CHF ${PRICES.garten.stunde}/Std.`,
       service: "garten",
       page: "gartenpflege",
     },
@@ -687,7 +693,42 @@ function HomePage({ setPage }) {
             Schreiben Sie uns einfach auf WhatsApp — wir fragen alles Nötige selbst ab. Offerte innerhalb von 2 Stunden.
           </p>
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+          {/* Две главные кнопки: Уборка / Сад */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 14, maxWidth: 560 }}>
+            {[
+              { icon: "🧹", title: "Reinigung", sub: `ab CHF ${PRICES.reinigung.stunde}/Std. oder Festpreis`, page: "unterhaltsreinigung" },
+              { icon: "🌿", title: "Garten",    sub: `ab CHF ${PRICES.garten.stunde}/Std. oder Festpreis`,    page: "gartenpflege" },
+            ].map(b => (
+              <button key={b.page}
+                onClick={() => setPage(b.page)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 14,
+                  background: "#fff", border: "2px solid #3D7B4F",
+                  borderRadius: 14, padding: "18px 20px", cursor: "pointer",
+                  textAlign: "left",
+                  boxShadow: "0 4px 20px rgba(61,123,79,0.12)",
+                  transition: "transform 0.15s, box-shadow 0.15s",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 8px 28px rgba(61,123,79,0.22)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "";
+                  e.currentTarget.style.boxShadow = "0 4px 20px rgba(61,123,79,0.12)";
+                }}
+              >
+                <span style={{ fontSize: 30 }}>{b.icon}</span>
+                <span>
+                  <span style={{ display: "block", fontSize: 18, fontWeight: 800, color: "#1a1a1a" }}>{b.title}</span>
+                  <span style={{ display: "block", fontSize: 12.5, color: "#5a6472", marginTop: 2 }}>{b.sub}</span>
+                </span>
+                <ChevronRight size={18} color="#3D7B4F" style={{ marginLeft: "auto", flexShrink: 0 }} />
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginTop: 18 }}>
             <a
               href={buildWaLink("general")}
               target="_blank" rel="noopener noreferrer"
@@ -696,35 +737,26 @@ function HomePage({ setPage }) {
                 if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'whatsapp_hero' });
               }}
               style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                background: "#E87D3E", color: "#fff",
-                padding: "14px 26px", borderRadius: 10,
-                fontSize: 15, fontWeight: 700,
-                textDecoration: "none",
-                boxShadow: "0 4px 20px rgba(232,125,62,0.35)",
-                transition: "transform 0.15s",
+                display: "inline-flex", alignItems: "center", gap: 6,
+                color: "#25a35a", textDecoration: "none",
+                fontSize: 14, fontWeight: 600,
               }}
-              onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
-              onMouseLeave={e => e.currentTarget.style.transform = ""}
             >
-              <MessageCircle size={16} />
+              <MessageCircle size={15} />
               Offerte per WhatsApp
             </a>
-            <CallButton />
-            <button
-              onClick={() => setPage("preise")}
+            <span style={{ color: "#d0d8e0" }}>·</span>
+            <a
+              href={`tel:${CONFIG.PHONE.replace(/\s/g, "")}`}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
-                background: "transparent", border: "1.5px solid #d0d8e0",
-                color: "#4A4A4A", padding: "14px 22px", borderRadius: 10,
-                fontSize: 15, fontWeight: 600, cursor: "pointer",
-                transition: "border-color 0.15s",
+                color: "#3D7B4F", textDecoration: "none",
+                fontSize: 14, fontWeight: 600,
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "#3D7B4F"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "#d0d8e0"}
             >
-              Preise ansehen <ChevronRight size={14} />
-            </button>
+              <Phone size={14} />
+              {CONFIG.PHONE}
+            </a>
           </div>
 
           <div style={{ marginTop: 20, fontSize: 12, color: "#8a95a0", display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -869,62 +901,6 @@ function HomePage({ setPage }) {
           </div>
         </Container>
       </div>
-
-      {/* ПАКЕТЫ */}
-      <Container id="pakete" style={{ padding: "60px 20px" }}>
-        <SectionTitle sub="Kombinierte Leistungen mit echten Ersparnissen.">
-          Sparen mit Paketen
-        </SectionTitle>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: 16,
-        }}>
-          {PAKETE.map((p, i) => {
-            const saving = p.einzeln - p.paket;
-            const pct = Math.round(saving / p.einzeln * 100);
-            return (
-              <div key={i} style={{
-                padding: "24px", borderRadius: 14,
-                border: "1.5px solid #e8f2eb", background: "#fff",
-              }}>
-                <div style={{
-                  display: "inline-block",
-                  background: "#e8f5ec", color: "#3D7B4F",
-                  fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 6,
-                  marginBottom: 10,
-                }}>
-                  Sie sparen {pct}%
-                </div>
-                <div style={{ fontWeight: 700, fontSize: 15, color: "#1a1a1a", marginBottom: 4 }}>
-                  {p.name}
-                </div>
-                <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 12 }}>{p.items}</div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: "#1a1a1a" }}>
-                    CHF {formatPrice(p.paket)}
-                  </span>
-                  <span style={{ fontSize: 13, color: "#9ca3af", textDecoration: "line-through" }}>
-                    CHF {formatPrice(p.einzeln)}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div style={{ marginTop: 20, textAlign: "center" }}>
-          <button
-            onClick={() => setPage("preise")}
-            style={{
-              background: "none", border: "1.5px solid #3D7B4F",
-              color: "#3D7B4F", padding: "10px 24px", borderRadius: 8,
-              fontSize: 14, fontWeight: 600, cursor: "pointer",
-            }}
-          >
-            Alle Pakete ansehen →
-          </button>
-        </div>
-      </Container>
 
       {/* ДОВЕРИЕ */}
       <div style={{ background: "#f9fdf9", padding: "60px 0" }}>
@@ -1438,67 +1414,9 @@ function UnterhaltsreinigungPage({ setPage }) {
   const [fs, handleFsSubmit] = useForm("mkoevlva");
   const [formState, setFormState] = useState({ name: "", contact: "", desc: "" });
 
-  const abos = [
-    {
-      id: "basis",
-      label: "Basis",
-      freq: "Alle 2 Wochen · 2 Mitarbeiter · 1.5 Std.",
-      hours: "6 Std./Monat",
-      price: PRICES.unterhalt.basis,
-      unit: "/Monat",
-      badge: null,
-      color: "#f9fdf9",
-      border: "#e8f2eb",
-      items: [
-        "Böden saugen und wischen",
-        "Küche reinigen",
-        "Bad und WC",
-        "Oberflächen abstauben",
-        "Mülleimer leeren",
-      ],
-    },
-    {
-      id: "komfort",
-      label: "Komfort",
-      freq: "1× pro Woche · 2 Mitarbeiter · 1.5 Std.",
-      hours: "12 Std./Monat",
-      price: PRICES.unterhalt.komfort,
-      unit: "/Monat",
-      badge: "Beliebteste Wahl",
-      color: "#f0f7f2",
-      border: "#3D7B4F",
-      extra: "CHF 50 pro zusätzliche Stunde",
-      items: [
-        "Alles aus Basis",
-        "Fenster innen monatlich",
-        "Kühlschrank monatlich",
-        "Backofen nach Bedarf",
-        "Feste Reinigungsperson",
-      ],
-    },
-    {
-      id: "premium",
-      label: "Premium",
-      freq: "2× pro Woche · 2 Mitarbeiter · 1.5 Std.",
-      hours: "24 Std./Monat",
-      price: PRICES.unterhalt.premium,
-      unit: "/Monat",
-      badge: null,
-      color: "#fff",
-      border: "#e8e8e8",
-      extra: "Fensterreinigung 1× pro Quartal inkl.",
-      items: [
-        "Alles aus Komfort",
-        "Priorität bei Terminwünschen",
-        "Fenster komplett 1×/Quartal",
-        "Persönliche Ansprechperson",
-      ],
-    },
-  ];
-
   const faqItems = [
-    { q: "Kann ich jederzeit kündigen?", a: "Ja. Das Abo läuft monatlich — Kündigung jederzeit mit 2 Wochen Vorlauf. Keine Mindestlaufzeit." },
-    { q: "Kommt immer dieselbe Person?", a: "Im Abo versuchen wir maximale Kontinuität. Bei Krankheit oder Urlaub schicken wir eine Vertretung, die eingewiesen wurde." },
+    { q: "Muss ich mich langfristig binden?", a: "Nein. Sie buchen stundenweise — einmalig oder regelmässig, ganz wie es Ihnen passt. Keine Mindestlaufzeit, kein Vertrag mit Kleingedrucktem." },
+    { q: "Kommt immer dieselbe Person?", a: "Bei regelmässigen Buchungen versuchen wir maximale Kontinuität. Bei Krankheit oder Urlaub schicken wir eine Vertretung, die eingewiesen wurde." },
     { q: "Was wenn mir die Reinigung nicht gefällt?", a: "Wir kommen kostenlos nach und machen es richtig. Ihre Zufriedenheit ist unser Massstab." },
     { q: "Muss ich Reinigungsmittel bereitstellen?", a: "Nein. Wir bringen alles mit. Auf Wunsch arbeiten wir auch mit Ihren Produkten oder bio-Mitteln (gegen kleinen Aufpreis)." },
     { q: "Kann ich Haustiere haben?", a: "Kein Problem. Bitte einfach beim ersten Kontakt erwähnen." },
@@ -1537,186 +1455,94 @@ function UnterhaltsreinigungPage({ setPage }) {
             ist versichert und angemeldet.
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <WhatsAppButton service="unterhalt" label="Abo anfragen per WhatsApp" />
+            <WhatsAppButton service="unterhalt" label="Reinigung anfragen per WhatsApp" />
             <CallButton />
           </div>
           <div style={{ marginTop: 16, fontSize: 12, color: "#8a95a0", display: "flex", gap: 16, flexWrap: "wrap" }}>
-            <span>✓ Monatlich kündbar</span>
+            <span>✓ Keine Vertragsbindung</span>
             <span>✓ Feste Reinigungsperson</span>
             <span>✓ Antwort ≤15 Min.</span>
           </div>
         </Container>
       </div>
 
-      {/* СРАВНЕНИЕ разовая vs абонемент */}
+      {/* ВЫБОР: ЧАСЫ ИЛИ ФИКСПРАЙС */}
       <Container style={{ padding: "60px 20px" }}>
-        <SectionTitle sub="Wer regelmässig bucht, zahlt weniger — und hat immer Ordnung.">
-          Einmalig oder Abo?
+        <SectionTitle sub="Stundenweise für Unterhalt — oder Festpreis für grosse Einsätze.">
+          Wie möchten Sie buchen?
         </SectionTitle>
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: 16, maxWidth: 700,
+          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: 24, alignItems: "start",
         }}>
-          {[
-            {
-              label: "Einmalig",
-              price: `CHF ${PRICES.unterhalt.einmalig}`,
-              unit: "/Std.",
-              sub: "Flexibel, kein Abo",
-              highlight: false,
-            },
-            {
-              label: "Abo Komfort",
-              price: `CHF ${formatPrice(PRICES.unterhalt.komfort)}`,
-              unit: "/Monat",
-              sub: "12 Std./Monat — feste Reinigungsperson & Prioritätsbuchung",
-              highlight: true,
-              badge: "Empfohlen",
-            },
-          ].map((o, i) => (
-            <div key={i} style={{
-              padding: "28px 24px", borderRadius: 14,
-              border: `2px solid ${o.highlight ? "#3D7B4F" : "#e8e8e8"}`,
-              background: o.highlight ? "#f0f7f2" : "#fff",
-              position: "relative",
-            }}>
-              {o.badge && (
-                <div style={{
-                  position: "absolute", top: -11, left: 20,
-                  background: "#E87D3E", color: "#fff",
-                  fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6,
-                }}>
-                  {o.badge}
-                </div>
-              )}
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#6b7280", marginBottom: 8 }}>{o.label}</div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 8 }}>
-                <span style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontSize: 36, fontWeight: 900, color: o.highlight ? "#3D7B4F" : "#1a1a1a",
-                }}>
-                  {o.price}
-                </span>
-                <span style={{ fontSize: 14, color: "#6b7280" }}>{o.unit}</span>
-              </div>
-              <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.6 }}>{o.sub}</div>
+          <StundenRechner
+            rate={PRICES.reinigung.stunde}
+            serviceLabel="eine Reinigung"
+            note="2 Reinigungskräfte im Einsatz · Material inklusive"
+          />
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Oder Festpreis-Paket
             </div>
-          ))}
-        </div>
-      </Container>
-
-      {/* АБО КАРТОЧКИ */}
-      <div style={{ background: "#f9fdf9", padding: "60px 0" }}>
-        <Container>
-          <SectionTitle sub="Wählen Sie, was zu Ihrem Alltag passt.">
-            Unsere Abo-Pakete
-          </SectionTitle>
-          {isOfferActive() && (
-            <div style={{
-              background: "#fff9f0", border: "1px solid #f5d9c0",
-              borderRadius: 10, padding: "12px 20px",
-              fontSize: 13, color: "#c2611a", fontWeight: 600,
-              marginBottom: 24, display: "inline-flex", alignItems: "center", gap: 8,
-            }}>
-              🎉 Eröffnungsangebot: 10% Rabatt im ersten Monat — automatisch in der Offerte.
-            </div>
-          )}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 16, alignItems: "start",
-          }}>
-            {abos.map((abo) => (
-              <div key={abo.id} style={{
-                background: abo.color,
-                border: `2px solid ${abo.border}`,
-                borderRadius: 16, padding: "28px",
-                position: "relative",
-                boxShadow: abo.badge ? "0 8px 32px rgba(61,123,79,0.12)" : "none",
+            {[
+              {
+                title: "Umzugsreinigung",
+                sub: "Mit Abgabegarantie, nach Wohnungsgrösse",
+                price: `ab CHF ${PRICES.endreinigung["2.5"].basic}`,
+                page: "umzugsreinigung",
+                wa: "Grüezi! Ich brauche eine Umzugsreinigung mit Abgabegarantie und möchte eine Offerte.",
+              },
+              {
+                title: "Fensterreinigung",
+                sub: "Inkl. Storen und Rahmen, pauschal",
+                price: `ab CHF ${PRICES.fenster["2.5"]}`,
+                page: "fensterreinigung",
+                wa: "Grüezi! Ich möchte meine Fenster reinigen lassen (Pauschalpreis) und bitte um eine Offerte.",
+              },
+            ].map((p, i) => (
+              <div key={i} style={{
+                background: "#fff", border: "1.5px solid #e8f2eb", borderRadius: 12,
+                padding: "18px 20px",
               }}>
-                {abo.badge && (
-                  <div style={{
-                    position: "absolute", top: -12, left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "#3D7B4F", color: "#fff",
-                    fontSize: 11, fontWeight: 700,
-                    padding: "4px 14px", borderRadius: 20,
-                    whiteSpace: "nowrap",
-                  }}>
-                    {abo.badge}
-                  </div>
-                )}
-
-                <div style={{ fontWeight: 800, fontSize: 20, color: "#1a1a1a", marginBottom: 4,
-                  fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                  {abo.label}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+                  <span style={{ fontWeight: 700, fontSize: 15, color: "#1a1a1a" }}>{p.title}</span>
+                  <span style={{ fontWeight: 800, fontSize: 16, color: "#3D7B4F" }}>{p.price}</span>
                 </div>
-                <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 16 }}>
-                  {abo.freq} · {abo.hours}
+                <div style={{ fontSize: 12.5, color: "#6b7280", marginBottom: 12 }}>{p.sub}</div>
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <a
+                    href={buildWaOrderLink(p.wa)}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      background: "#25D366", color: "#fff",
+                      padding: "8px 14px", borderRadius: 8,
+                      fontSize: 13, fontWeight: 600, textDecoration: "none",
+                    }}
+                  >
+                    <MessageCircle size={14} />
+                    Buchen
+                  </a>
+                  <button
+                    onClick={() => setPage(p.page)}
+                    style={{
+                      background: "none", border: "none", cursor: "pointer",
+                      color: "#3D7B4F", fontSize: 13, fontWeight: 600,
+                      textDecoration: "underline", padding: 0,
+                    }}
+                  >
+                    Details & Preise →
+                  </button>
                 </div>
-
-                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 6 }}>
-                  <span style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontSize: 38, fontWeight: 900,
-                    color: abo.badge ? "#3D7B4F" : "#1a1a1a",
-                  }}>
-                    CHF {formatPrice(abo.price)}
-                  </span>
-                  <span style={{ fontSize: 14, color: "#6b7280" }}>{abo.unit}</span>
-                </div>
-
-                {isOfferActive() && (
-                  <div style={{
-                    fontSize: 12, color: "#3D7B4F", fontWeight: 600, marginBottom: 16,
-                  }}>
-                    Erster Monat: CHF {formatPrice(Math.round(abo.price * 0.9))} (−10%)
-                  </div>
-                )}
-
-                <div style={{
-                  borderTop: "1px solid #e8e8e8", paddingTop: 16, marginBottom: 20,
-                }}>
-                  {abo.items.map((item, j) => (
-                    <div key={j} style={{
-                      display: "flex", gap: 8, alignItems: "flex-start",
-                      fontSize: 13, color: "#4A4A4A", marginBottom: 7,
-                    }}>
-                      <Check size={13} color="#3D7B4F" style={{ flexShrink: 0, marginTop: 2 }} />
-                      {item}
-                    </div>
-                  ))}
-                  {abo.extra && (
-                    <div style={{
-                      marginTop: 10, padding: "6px 10px",
-                      background: "#e8f5ec", borderRadius: 6,
-                      fontSize: 12, color: "#3D7B4F", fontWeight: 600,
-                    }}>
-                      + {abo.extra}
-                    </div>
-                  )}
-                </div>
-
               </div>
             ))}
-          </div>
-
-          {/* Einmalig */}
-          <div style={{
-            marginTop: 24, padding: "20px 24px", borderRadius: 12,
-            background: "#fff", border: "1px solid #e8e8e8",
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            flexWrap: "wrap", gap: 16,
-          }}>
-            <div>
-              <span style={{ fontWeight: 700, fontSize: 15 }}>Einmalige Reinigung</span>
-              <span style={{ fontSize: 13, color: "#6b7280", marginLeft: 10 }}>
-                Ohne Abo · CHF {PRICES.unterhalt.einmalig}/Std. · Termin nach Absprache
-              </span>
+            <div style={{ fontSize: 12, color: "#8a95a0", lineHeight: 1.6 }}>
+              Alle Festpreise sind Endpreise — bereits inklusive aller Rabatte.
+              Keine versteckten Kosten.
             </div>
           </div>
-        </Container>
-      </div>
+        </div>
+      </Container>
 
       {/* ЧТО ВХОДИТ */}
       <div style={{ background: "#f9fdf9", padding: "60px 0" }}>
@@ -1757,7 +1583,7 @@ function UnterhaltsreinigungPage({ setPage }) {
 
       {/* FAQ */}
       <Container style={{ padding: "60px 20px" }}>
-        <SectionTitle sub="Die häufigsten Fragen zum Abo.">
+        <SectionTitle sub="Die häufigsten Fragen zur regelmässigen Reinigung.">
           Häufige Fragen
         </SectionTitle>
         <div style={{ maxWidth: 700 }}>
@@ -1774,9 +1600,9 @@ function UnterhaltsreinigungPage({ setPage }) {
           }}>
             <div>
               <SectionTitle sub="Kurz beschreiben, was Sie brauchen — wir machen einen Vorschlag.">
-                Abo starten
+                Reinigung anfragen
               </SectionTitle>
-              <WhatsAppButton service="unterhalt" label="Abo anfragen per WhatsApp" />
+              <WhatsAppButton service="unterhalt" label="Reinigung anfragen per WhatsApp" />
               <div style={{ marginTop: 16, fontSize: 12, color: "#8a95a0", lineHeight: 1.9 }}>
                 <div>📋 Wohnfläche + Ort + Wunschtag</div>
                 <div>⏱ Antwort innerhalb von 15 Minuten</div>
@@ -1809,7 +1635,7 @@ function UnterhaltsreinigungPage({ setPage }) {
                   <button type="submit" disabled={fs.submitting}
                     style={{ background: "#E87D3E", color: "#fff", padding: "13px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", border: "none" }}
                   >
-                    {fs.submitting ? "Wird gesendet..." : "Abo anfragen"}
+                    {fs.submitting ? "Wird gesendet..." : "Reinigung anfragen"}
                   </button>
                 </form>
               ) : (
@@ -1869,31 +1695,13 @@ function GartenpflegePage() {
       color: "#fff",
       border: "#e8e8e8",
     },
-    {
-      id: "abo",
-      season: "📅 März–Oktober",
-      title: "Garten-Abo Saison",
-      price: PRICES.garten.abo_monat,
-      priceNote: "ab CHF",
-      unit: "/Monat",
-      items: [
-        "Monatlich 1–2 Einsätze",
-        "Rasen, Hecken, Unkraut laufend",
-        "Feste Ansprechperson",
-        "Priorität bei Terminen",
-        "Frühjahrs- und Herbstpaket inkl.",
-      ],
-      badge: "Beliebteste Wahl",
-      color: "#fff",
-      border: "#e8e8e8",
-    },
   ];
 
   const faqItems = [
     { q: "Macht ihr auch Neugestaltung oder Baumpfege?", a: "Nein — wir übernehmen Unterhalt und kleinere Arbeiten. Für Neugestaltung, Baumfällungen oder Landschaftsbau empfehlen wir Fachbetriebe. Das sagen wir ehrlich." },
     { q: "Wie kommt ihr zum Preis — ich weiss nicht wie viel Arbeit es ist?", a: "Schicken Sie uns 3–4 Fotos aus verschiedenen Ecken. Wir sehen darauf meistens genug für eine verbindliche Offerte. Sonst vereinbaren wir einen kurzen Besichtigungstermin." },
     { q: "Könnt ihr das Schnittgut entsorgen?", a: "Ja — Entsorgung ist auf Wunsch inbegriffen oder als Zusatz buchbar." },
-    { q: "Ab wann und bis wann läuft die Gartensaison?", a: "Wir starten je nach Wetter ab Mitte März und arbeiten bis Ende Oktober. Das Abo läuft über 8 Monate." },
+    { q: "Ab wann und bis wann läuft die Gartensaison?", a: "Wir starten je nach Wetter ab Mitte März und arbeiten bis Ende Oktober." },
     { q: "Muss ich dabei sein?", a: "Nein. Viele Kunden sind bei der Arbeit. Wir schliessen nach dem Einsatz ab und schicken ein kurzes Foto-Update." },
     { q: "Habt ihr eigene Maschinen?", a: "Ja — wir kommen mit allem, was wir brauchen. Sie müssen nichts bereitstellen." },
   ];
@@ -1925,13 +1733,13 @@ function GartenpflegePage() {
           }}>
             Gärtner im Aargau kosten{" "}
             <span style={{ textDecoration: "line-through", color: "#9ca3af" }}>80–120</span>{" "}
-            <span style={{ color: "#3D7B4F" }}>{PRICES.garten.stunde_abo} CHF/Std.</span> im Abo.
+            <span style={{ color: "#3D7B4F" }}>{PRICES.garten.stunde} CHF/Std.</span> bei uns.
           </h1>
           <p style={{
             fontSize: 16, color: "#5a6472", lineHeight: 1.65,
             maxWidth: 500, marginBottom: 28,
           }}>
-            Rasen, Hecken, Unkraut — zuverlässig, saisonal oder als Abo.
+            Rasen, Hecken, Unkraut — stundenweise oder als Festpreis-Paket.
             Schicken Sie uns Fotos Ihres Gartens, wir schicken eine
             verbindliche Offerte noch am selben Tag.
           </p>
@@ -1959,19 +1767,9 @@ function GartenpflegePage() {
 
       {/* ПАКЕТЫ */}
       <Container style={{ padding: "60px 20px" }}>
-        <SectionTitle sub="Einmalig saisonal oder das ganze Jahr als Abo.">
+        <SectionTitle sub="Festpreis-Pakete oder stundenweise — Sie wählen.">
           Unsere Gartenpakete
         </SectionTitle>
-        {isOfferActive() && (
-          <div style={{
-            background: "#fff9f0", border: "1px solid #f5d9c0",
-            borderRadius: 10, padding: "12px 20px",
-            fontSize: 13, color: "#c2611a", fontWeight: 600,
-            marginBottom: 24, display: "inline-flex", alignItems: "center", gap: 8,
-          }}>
-            🎉 Eröffnungsangebot: CHF 50 Rabatt auf jedes Gartenpaket — automatisch.
-          </div>
-        )}
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
@@ -2011,15 +1809,10 @@ function GartenpflegePage() {
                   fontSize: 36, fontWeight: 900,
                   color: p.badge ? "#3D7B4F" : "#1a1a1a",
                 }}>
-                  {formatPrice(isOfferActive() && p.id !== "abo" ? p.price - 50 : p.price)}
+                  {formatPrice(p.price)}
                 </span>
                 {p.unit && <span style={{ fontSize: 14, color: "#6b7280" }}>{p.unit}</span>}
               </div>
-              {isOfferActive() && p.id !== "abo" && (
-                <div style={{ fontSize: 12, color: "#9ca3af", textDecoration: "line-through", marginBottom: 12 }}>
-                  CHF {formatPrice(p.price)} (regulär)
-                </div>
-              )}
               <div style={{ borderTop: "1px solid #e8e8e8", paddingTop: 16, marginBottom: 20 }}>
                 {p.items.map((item, j) => (
                   <div key={j} style={{
@@ -2031,8 +1824,30 @@ function GartenpflegePage() {
                   </div>
                 ))}
               </div>
+              <a
+                href={buildWaOrderLink(`Grüezi! Ich möchte das Paket "${p.title}" buchen (ab CHF ${formatPrice(p.price)}). Ich schicke Ihnen Fotos vom Garten.`)}
+                target="_blank" rel="noopener noreferrer"
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  background: "#25D366", color: "#fff",
+                  padding: "12px", borderRadius: 8,
+                  fontSize: 14, fontWeight: 700, textDecoration: "none",
+                }}
+              >
+                <MessageCircle size={15} />
+                Paket buchen — 1 Klick
+              </a>
             </div>
           ))}
+        </div>
+
+        {/* Почасовая для сада */}
+        <div style={{ marginTop: 32 }}>
+          <StundenRechner
+            rate={PRICES.garten.stunde}
+            serviceLabel="Gartenarbeit"
+            note="Eigene Maschinen inklusive · Entsorgung auf Wunsch"
+          />
         </div>
       </Container>
 
@@ -2048,10 +1863,10 @@ function GartenpflegePage() {
             gap: 16,
           }}>
             {[
-              { icon: "💰", title: "Faire Preise", text: `CHF ${PRICES.garten.stunde_abo}/Std. im Abo — deutlich unter dem Marktschnitt von 80–120 CHF.` },
+              { icon: "💰", title: "Faire Preise", text: `CHF ${PRICES.garten.stunde}/Std. — deutlich unter dem Marktschnitt von 80–120 CHF.` },
               { icon: "📸", title: "Offerte per Foto", text: "Kein Besichtigungstermin nötig. Fotos per WhatsApp genügen für eine verbindliche Offerte." },
               { icon: "🔧", title: "Eigene Maschinen", text: "Wir kommen ausgerüstet. Sie brauchen nichts bereitstellen oder ausleihen." },
-              { icon: "📅", title: "Zuverlässiger Rhythmus", text: "Im Abo kommen wir regelmässig — Sie müssen nicht jedes Mal neu anfragen." },
+              { icon: "📅", title: "Zuverlässiger Rhythmus", text: "Auf Wunsch kommen wir regelmässig — Sie müssen nicht jedes Mal neu anfragen." },
             ].map((item, i) => (
               <div key={i} style={{
                 padding: "24px", background: "#fff",
@@ -2161,8 +1976,9 @@ function PreisePage({ setPage }) {
   const [activeService, setActiveService] = useState("endreinigung");
   const [roomSize, setRoomSize]   = useState("3.5");
   const [variant, setVariant]     = useState("komplett");
-  const [aboType, setAboType]     = useState("komfort");
-  const [gartenType, setGartenType] = useState("fruehling");
+  const [hoursCount, setHoursCount] = useState(3);
+  const [gartenType, setGartenType] = useState("stunden");
+  const [fensterSize, setFensterSize] = useState("2.5");
   const [calcDone, setCalcDone]   = useState(false);
 
   const services = [
@@ -2179,19 +1995,17 @@ function PreisePage({ setPage }) {
       return { base, ex: 0, disc: 0, total: base };
     }
     if (activeService === "unterhalt") {
-      const base = PRICES.unterhalt[aboType];
-      const disc = isOfferActive() ? Math.round(base * 0.1) : 0;
-      return { base, ex: 0, disc, total: base - disc, note: "erster Monat" };
+      const base = hoursCount * PRICES.reinigung.stunde;
+      return { base, ex: 0, disc: 0, total: base, note: `${hoursCount} Std.` };
     }
     if (activeService === "garten") {
-      const base = gartenType === "abo"
-        ? PRICES.garten.abo_monat
+      const base = gartenType === "stunden"
+        ? hoursCount * PRICES.garten.stunde
         : PRICES.garten[gartenType];
-      const disc = isOfferActive() && gartenType !== "abo" ? 50 : 0;
-      return { base, ex: 0, disc, total: base - disc };
+      return { base, ex: 0, disc: 0, total: base };
     }
     if (activeService === "fenster") {
-      return { base: PRICES.fenster.pauschal_25zi, ex: 0, disc: 0, total: PRICES.fenster.pauschal_25zi, note: "2.5-Zi pauschal" };
+      return { base: PRICES.fenster[fensterSize], ex: 0, disc: 0, total: PRICES.fenster[fensterSize], note: `${fensterSize}-Zi pauschal` };
     }
     return { base: 0, ex: 0, disc: 0, total: 0 };
   };
@@ -2204,11 +2018,11 @@ function PreisePage({ setPage }) {
     if (activeService === "endreinigung")
       detail = `${roomSize}-Zi, ${variant === "basic" ? "Basic" : "Komplett"}`;
     if (activeService === "unterhalt")
-      detail = `Abo ${aboType.charAt(0).toUpperCase() + aboType.slice(1)}`;
+      detail = `${hoursCount} Stunden`;
     if (activeService === "garten")
-      detail = gartenType === "abo" ? "Saison-Abo" : gartenType === "fruehling" ? "Frühjahrspaket" : "Herbstpaket";
+      detail = gartenType === "stunden" ? `${hoursCount} Stunden` : gartenType === "fruehling" ? "Frühjahrspaket" : "Herbstpaket";
     if (activeService === "fenster")
-      detail = "Fensterreinigung";
+      detail = `Fensterreinigung ${fensterSize}-Zi`;
     const msg = `Grüezi, ich habe den Kalkulator auf fleissig.ch genutzt. Leistung: ${svc} (${detail}), Preis laut Kalkulator: CHF ${formatPrice(result.total)}. Ich bitte um eine verbindliche Offerte.`;
     return `https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`;
   };
@@ -2244,28 +2058,6 @@ function PreisePage({ setPage }) {
       </div>
 
       <Container style={{ padding: "56px 20px" }}>
-
-        {/* ERÖFFNUNGSANGEBOT */}
-        {isOfferActive() && (
-          <div style={{
-            background: "linear-gradient(135deg, #3D7B4F 0%, #2d5c3a 100%)",
-            borderRadius: 14, padding: "24px 28px", marginBottom: 48,
-            display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap",
-          }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ color: "#c8e6d0", fontSize: 12, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Eröffnungsangebot — bis 30. Juni 2026
-              </div>
-              <div style={{ color: "#fff", fontSize: 14, lineHeight: 1.7 }}>
-                CHF 50 Rabatt auf Gartenpakete ·
-                10% Rabatt auf das erste Unterhalt-Abo
-              </div>
-              <div style={{ color: "#a8d5b5", fontSize: 12, marginTop: 6 }}>
-                Kein Code nötig — der Rabatt wird automatisch in der Offerte abgezogen.
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* КАЛЬКУЛЯТОР */}
         <div style={{ marginBottom: 64 }}>
@@ -2346,31 +2138,29 @@ function PreisePage({ setPage }) {
                 </div>
               )}
 
-              {/* UNTERHALT */}
+              {/* UNTERHALT — почасовая */}
               {activeService === "unterhalt" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>Abo-Typ</div>
-                  {[
-                    ["basis",   "Basis",   "6 Std./Monat", PRICES.unterhalt.basis],
-                    ["komfort", "Komfort", "12 Std./Monat", PRICES.unterhalt.komfort],
-                    ["premium", "Premium", "24 Std./Monat", PRICES.unterhalt.premium],
-                    ["einmalig","Einmalig","ohne Abo, pro Std.", PRICES.unterhalt.einmalig],
-                  ].map(([id, label, sub, price]) => (
-                    <button key={id} onClick={() => setAboType(id)} style={{
-                      padding: "14px 16px", borderRadius: 10, cursor: "pointer", textAlign: "left",
-                      border: aboType === id ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
-                      background: aboType === id ? "#f0f7f2" : "#fff",
-                      display: "flex", justifyContent: "space-between", alignItems: "center",
-                    }}>
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: 13, color: aboType === id ? "#3D7B4F" : "#1a1a1a" }}>{label}</div>
-                        <div style={{ fontSize: 11, color: "#6b7280" }}>{sub}</div>
-                      </div>
-                      <div style={{ fontWeight: 800, fontSize: 15, color: "#3D7B4F" }}>
-                        CHF {formatPrice(price)}{id === "einmalig" ? "/Std." : "/Mt."}
-                      </div>
-                    </button>
-                  ))}
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>
+                    Wie viele Stunden? — CHF {PRICES.reinigung.stunde}/Std.
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[2, 3, 4, 6].map(h => (
+                      <button key={h} onClick={() => setHoursCount(h)} style={{
+                        flex: 1, padding: "14px 0", borderRadius: 10, cursor: "pointer",
+                        border: hoursCount === h ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
+                        background: hoursCount === h ? "#f0f7f2" : "#fff",
+                        fontWeight: 700, fontSize: 15,
+                        color: hoursCount === h ? "#3D7B4F" : "#4A4A4A",
+                      }}>
+                        {h} Std.
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.6 }}>
+                    Einmalig oder regelmässig — gleicher Preis, keine Vertragsbindung.
+                    2 Reinigungskräfte im Einsatz, Material inklusive.
+                  </div>
                 </div>
               )}
 
@@ -2379,9 +2169,9 @@ function PreisePage({ setPage }) {
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>Leistung</div>
                   {[
-                    ["fruehling", "🌱 Frühjahrspaket", "Einmalig", PRICES.garten.fruehling],
-                    ["herbst",    "🍂 Herbstpaket",    "Einmalig", PRICES.garten.herbst],
-                    ["abo",       "📅 Saison-Abo",     "März–Oktober", PRICES.garten.abo_monat],
+                    ["stunden",   "⏱ Stundenweise",   `CHF ${PRICES.garten.stunde}/Std.`, PRICES.garten.stunde],
+                    ["fruehling", "🌱 Frühjahrspaket", "Festpreis", PRICES.garten.fruehling],
+                    ["herbst",    "🍂 Herbstpaket",    "Festpreis", PRICES.garten.herbst],
                   ].map(([id, label, sub, price]) => (
                     <button key={id} onClick={() => setGartenType(id)} style={{
                       padding: "14px 16px", borderRadius: 10, cursor: "pointer", textAlign: "left",
@@ -2394,31 +2184,45 @@ function PreisePage({ setPage }) {
                         <div style={{ fontSize: 11, color: "#6b7280" }}>{sub}</div>
                       </div>
                       <div style={{ fontWeight: 800, fontSize: 15, color: "#3D7B4F" }}>
-                        ab CHF {formatPrice(price)}{id === "abo" ? "/Mt." : ""}
+                        {id === "stunden" ? `CHF ${price}/Std.` : `ab CHF ${formatPrice(price)}`}
                       </div>
                     </button>
                   ))}
+                  {gartenType === "stunden" && (
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {[2, 3, 4, 6].map(h => (
+                        <button key={h} onClick={() => setHoursCount(h)} style={{
+                          flex: 1, padding: "12px 0", borderRadius: 10, cursor: "pointer",
+                          border: hoursCount === h ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
+                          background: hoursCount === h ? "#f0f7f2" : "#fff",
+                          fontWeight: 700, fontSize: 14,
+                          color: hoursCount === h ? "#3D7B4F" : "#4A4A4A",
+                        }}>
+                          {h} Std.
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* FENSTER */}
               {activeService === "fenster" && (
-                <div style={{ fontSize: 14, color: "#4A4A4A", lineHeight: 1.8 }}>
-                  <div style={{ fontWeight: 700, fontSize: 16, color: "#1a1a1a", marginBottom: 12 }}>Fensterreinigung</div>
-                  <div>Pauschalpreis je nach Wohnungsgrösse:</div>
-                  {[
-                    ["2.5-Zi", 320], ["3.5-Zi", 420], ["4.5-Zi", 520],
-                  ].map(([size, price]) => (
-                    <div key={size} style={{
-                      display: "flex", justifyContent: "space-between",
-                      padding: "8px 0", borderBottom: "1px solid #f0f0f0",
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>Wohnungsgrösse</div>
+                  {["2.5", "3.5", "4.5", "5.5"].map(size => (
+                    <button key={size} onClick={() => setFensterSize(size)} style={{
+                      padding: "14px 16px", borderRadius: 10, cursor: "pointer", textAlign: "left",
+                      border: fensterSize === size ? "2px solid #3D7B4F" : "2px solid #e0e0e0",
+                      background: fensterSize === size ? "#f0f7f2" : "#fff",
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
                     }}>
-                      <span>{size}</span>
-                      <span style={{ fontWeight: 700 }}>CHF {price}</span>
-                    </div>
+                      <span style={{ fontWeight: 700, fontSize: 13, color: fensterSize === size ? "#3D7B4F" : "#1a1a1a" }}>{size}-Zi</span>
+                      <span style={{ fontWeight: 800, fontSize: 15, color: "#3D7B4F" }}>CHF {PRICES.fenster[size]} pauschal</span>
+                    </button>
                   ))}
-                  <div style={{ marginTop: 12, fontSize: 12, color: "#6b7280" }}>
-                    Inkl. Storen innen/aussen und Fensterrahmen. Offerte nach Fotoprüfung.
+                  <div style={{ fontSize: 12, color: "#6b7280" }}>
+                    Inkl. Storen innen/aussen und Fensterrahmen. EFH nach Offerte.
                   </div>
                 </div>
               )}
@@ -2463,9 +2267,6 @@ function PreisePage({ setPage }) {
                   fontSize: 36, fontWeight: 900, color: "#3D7B4F",
                 }}>
                   CHF {formatPrice(result.total)}
-                  {activeService === "unterhalt" && aboType !== "einmalig" && <span style={{ fontSize: 14, fontWeight: 600 }}>/Mt.</span>}
-                  {activeService === "garten" && gartenType === "abo" && <span style={{ fontSize: 14, fontWeight: 600 }}>/Mt.</span>}
-                  {activeService === "unterhalt" && aboType === "einmalig" && <span style={{ fontSize: 14, fontWeight: 600 }}>/Std.</span>}
                 </span>
               </div>
 
@@ -2579,57 +2380,6 @@ function PreisePage({ setPage }) {
           </div>
         </div>
 
-        {/* COMBO ПАКЕТЫ */}
-        <div style={{ marginBottom: 56 }}>
-          <SectionTitle sub="Kombinierte Leistungen — echte Ersparnis.">
-            Kombipakete
-          </SectionTitle>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{
-              width: "100%", borderCollapse: "collapse",
-              border: "1px solid #e8e8e8", borderRadius: 12, overflow: "hidden",
-            }}>
-              <thead>
-                <tr style={{ background: "#f9f9f9" }}>
-                  {["Paket", "Leistungen", "Einzeln", "Paketpreis", "Ersparnis"].map(h => (
-                    <th key={h} style={{
-                      padding: "12px 16px", textAlign: h === "Paket" || h === "Leistungen" ? "left" : "center",
-                      fontWeight: 700, fontSize: 13, color: "#4A4A4A",
-                      whiteSpace: "nowrap",
-                    }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {PAKETE.map((p, i) => {
-                  const save = p.einzeln - p.paket;
-                  const pct  = Math.round(save / p.einzeln * 100);
-                  return (
-                    <tr key={i} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                      <td style={{ padding: "12px 16px", fontWeight: 600, fontSize: 13 }}>{p.name}</td>
-                      <td style={{ padding: "12px 16px", fontSize: 12, color: "#6b7280" }}>{p.items}</td>
-                      <td style={{ padding: "12px 16px", textAlign: "center", fontSize: 13, color: "#9ca3af", textDecoration: "line-through" }}>
-                        CHF {formatPrice(p.einzeln)}
-                      </td>
-                      <td style={{ padding: "12px 16px", textAlign: "center", fontWeight: 700, fontSize: 14, color: "#3D7B4F" }}>
-                        CHF {formatPrice(p.paket)}
-                      </td>
-                      <td style={{ padding: "12px 16px", textAlign: "center" }}>
-                        <span style={{
-                          background: "#f0f7f2", color: "#3D7B4F",
-                          fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 6,
-                        }}>
-                          −{pct}%
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
         {/* ПРОЧИЕ УСЛУГИ */}
         <div>
           <SectionTitle sub="Überblick aller weiteren Leistungen.">
@@ -2642,30 +2392,28 @@ function PreisePage({ setPage }) {
           }}>
             {[
               {
-                title: "Unterhaltsreinigung",
+                title: "Reinigung stundenweise",
                 rows: [
-                  ["Einmalig", `CHF ${PRICES.unterhalt.einmalig}/Std.`],
-                  ["Abo Basis (6 Std./Mt.)", `CHF ${formatPrice(PRICES.unterhalt.basis)}/Mt.`],
-                  ["Abo Komfort (12 Std./Mt.)", `CHF ${formatPrice(PRICES.unterhalt.komfort)}/Mt.`],
-                  ["Abo Premium (24 Std./Mt.)", `CHF ${formatPrice(PRICES.unterhalt.premium)}/Mt.`],
+                  ["Pro Stunde", `CHF ${PRICES.reinigung.stunde}/Std.`],
+                  ["2 Reinigungskräfte", "inklusive"],
+                  ["Material", "inklusive"],
                 ],
               },
               {
                 title: "Gartenpflege",
                 rows: [
-                  ["Einmalig", `CHF ${PRICES.garten.stunde_einmalig}/Std.`],
-                  ["Abo (März–Oktober)", `CHF ${PRICES.garten.stunde_abo}/Std.`],
+                  ["Pro Stunde", `CHF ${PRICES.garten.stunde}/Std.`],
                   ["Frühjahrspaket", `ab CHF ${formatPrice(PRICES.garten.fruehling)}`],
                   ["Herbstpaket", `ab CHF ${formatPrice(PRICES.garten.herbst)}`],
-                  ["Saison-Abo", `ab CHF ${formatPrice(PRICES.garten.abo_monat)}/Mt.`],
                 ],
               },
               {
                 title: "Fensterreinigung",
                 rows: [
-                  ["2.5-Zi", "CHF 320 pauschal"],
-                  ["3.5-Zi", "CHF 420 pauschal"],
-                  ["4.5-Zi", "CHF 520 pauschal"],
+                  ["2.5-Zi", `CHF ${PRICES.fenster["2.5"]} pauschal`],
+                  ["3.5-Zi", `CHF ${PRICES.fenster["3.5"]} pauschal`],
+                  ["4.5-Zi", `CHF ${PRICES.fenster["4.5"]} pauschal`],
+                  ["5.5-Zi", `CHF ${PRICES.fenster["5.5"]} pauschal`],
                   ["Inkl.", "Storen, Rahmen, Simse"],
                 ],
               },
@@ -2729,7 +2477,7 @@ function FAQPage() {
         { q: "Kommen Zusatzkosten?", a: "Nein — alles steht in der Offerte. Wir fügen nach dem Einsatz keine Positionen hinzu. Einzige Ausnahme: Sie wünschen vor Ort zusätzliche Arbeiten, die nicht besprochen waren — das rechnen wir separat." },
         { q: "Kann ich per Rechnung zahlen?", a: "Ja. Sie erhalten immer eine offizielle Rechnung. Zahlungsfrist 10 Tage nach Einsatz." },
         { q: "TWINT oder Barzahlung?", a: "TWINT ja, Barzahlung nein. So bleibt alles sauber dokumentiert — für Sie und für uns." },
-        { q: "Gibt es einen Rabatt bei grösseren Aufträgen?", a: "Bei regelmässigen Abos und Kombipaketen sind die Rabatte bereits eingerechnet — bis 19%. Für Verwaltungen und Vermieter mit mehreren Objekten erstellen wir ein individuelles Angebot." },
+        { q: "Gibt es einen Rabatt bei grösseren Aufträgen?", a: "Unsere Festpreise sind bereits kalkuliert — ohne versteckte Zuschläge. Für Verwaltungen und Vermieter mit mehreren Objekten erstellen wir ein individuelles Angebot." },
       ],
     },
     {
@@ -2746,9 +2494,9 @@ function FAQPage() {
       title: "Personal & Legalität",
       icon: "👤",
       items: [
-        { q: "Wer kommt zu mir nach Hause?", a: "Feste Teammitglieder, die wir persönlich kennen und eingewiesen haben. Im Abo versuchen wir maximale Kontinuität — dieselbe Person, damit Vertrauen entsteht." },
+        { q: "Wer kommt zu mir nach Hause?", a: "Feste Teammitglieder, die wir persönlich kennen und eingewiesen haben. Bei regelmässigen Buchungen versuchen wir maximale Kontinuität — dieselbe Person, damit Vertrauen entsteht." },
         { q: "Sind Ihre Mitarbeiter angemeldet?", a: "Ja — mit Arbeitsvertrag, AHV/SUVA-Anmeldung und nach GAV Reinigung (gültig ab 1.1.2026). Kein Schwarzgeld, kein Risiko für Sie bei einer Steuerkontrolle." },
-        { q: "Darf ich dieselbe Reinigungsperson behalten?", a: "Im Abo ja — wir versuchen aktiv, Kontinuität herzustellen. Bei Krankheit oder Ferien schicken wir eine eingewiesene Vertretung." },
+        { q: "Darf ich dieselbe Reinigungsperson behalten?", a: "Ja — bei regelmässigen Buchungen versuchen wir aktiv, Kontinuität herzustellen. Bei Krankheit oder Ferien schicken wir eine eingewiesene Vertretung." },
         { q: "Warum kein Schwarzgeld?", a: "Weil es für Sie als Auftraggeber ein Risiko ist — nicht nur für uns. Bei einer Betriebskontrolle oder Steuerkontrolle haften Sie mit. Wir bieten legalen Schutz: offizielle Rechnung, Versicherung, Nachweis." },
       ],
     },
@@ -3676,15 +3424,15 @@ function LegalPage({ type }) {
 // ============================================================
 function FensterreinigungPage() {
   const preise = [
-    { size: "2.5-Zi", price: 320 },
-    { size: "3.5-Zi", price: 420 },
-    { size: "4.5-Zi", price: 520 },
-    { size: "5.5-Zi", price: 640 },
+    { size: "2.5-Zi", price: PRICES.fenster["2.5"] },
+    { size: "3.5-Zi", price: PRICES.fenster["3.5"] },
+    { size: "4.5-Zi", price: PRICES.fenster["4.5"] },
+    { size: "5.5-Zi", price: PRICES.fenster["5.5"] },
     { size: "EFH",    price: "nach Offerte" },
   ];
   const faqItems = [
     { q: "Was ist inbegriffen?", a: "Fenster beidseitig, Storen innen und aussen, Fensterrahmen und Simse. Auf Wunsch auch Rollläden und Velux-Fenster." },
-    { q: "Wie oft sollte man Fenster reinigen?", a: "Empfohlen 2× pro Jahr — Frühjahr und Herbst. Im Abo günstiger." },
+    { q: "Wie oft sollte man Fenster reinigen?", a: "Empfohlen 2× pro Jahr — Frühjahr und Herbst." },
     { q: "Brauche ich Leitern oder Gerüste?", a: "Für normale Wohnungen nein. Bei hohen Fenstern (ab 4. Stock) bitte bei Anfrage erwähnen." },
     { q: "Kann ich Fensterreinigung mit Umzugsreinigung kombinieren?", a: "Ja — Fensterreinigung ist bereits im Paket Komplett enthalten. Separat buchbar ab den oben genannten Preisen." },
   ];
@@ -3709,9 +3457,21 @@ function FensterreinigungPage() {
         <SectionTitle sub="Festpreise inkl. Storen, Rahmen und Simse.">Preise Fensterreinigung</SectionTitle>
         <div style={{ maxWidth: 500 }}>
           {preise.map((p, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "14px 20px", background: i % 2 === 0 ? "#f9fdf9" : "#fff", borderRadius: 8, marginBottom: 4, fontSize: 14 }}>
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "12px 20px", background: i % 2 === 0 ? "#f9fdf9" : "#fff", borderRadius: 8, marginBottom: 4, fontSize: 14 }}>
               <span style={{ fontWeight: 600 }}>{p.size}</span>
-              <span style={{ fontWeight: 700, color: "#3D7B4F" }}>{typeof p.price === "number" ? `CHF ${p.price} pauschal` : p.price}</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontWeight: 700, color: "#3D7B4F" }}>{typeof p.price === "number" ? `CHF ${p.price} pauschal` : p.price}</span>
+                {typeof p.price === "number" && (
+                  <a
+                    href={buildWaOrderLink(`Grüezi! Ich möchte eine Fensterreinigung für meine ${p.size}-Wohnung buchen (CHF ${p.price} pauschal).`)}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#25D366", color: "#fff", padding: "6px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, textDecoration: "none" }}
+                  >
+                    <MessageCircle size={12} />
+                    Buchen
+                  </a>
+                )}
+              </span>
             </div>
           ))}
           <div style={{ marginTop: 12, fontSize: 12, color: "#6b7280", padding: "0 4px" }}>
@@ -3845,7 +3605,7 @@ const PAGE_TITLES = {
   home:               "Fleissig — Reinigung & Gartenpflege im Kanton Aargau",
   umzugsreinigung:    "Umzugsreinigung Aargau | Festpreis & Abgabegarantie — Fleissig",
   unterhaltsreinigung:"Unterhaltsreinigung Aargau | Wöchentlich & Monatlich — Fleissig",
-  gartenpflege:       "Gartenpflege Aargau | Saisonpflege & Abo — Fleissig",
+  gartenpflege:       "Gartenpflege Aargau | Stundenweise & Saisonpakete — Fleissig",
   preise:             "Preise & Pakete | Reinigung Aargau — Fleissig",
   fensterreinigung:   "Fensterreinigung Aargau | Festpreis — Fleissig",
   baureinigung:       "Baureinigung Aargau | Nach Renovation — Fleissig",
@@ -3874,7 +3634,6 @@ function AppLayout() {
 
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#fff", minHeight: "100vh" }}>
-      <OfferBanner />
       <Nav currentPage={currentPage} setPage={setPage} />
       <main>
         <Routes>
