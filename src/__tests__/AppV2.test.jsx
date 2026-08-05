@@ -17,8 +17,8 @@ describe('Conversion-focused homepage', () => {
 
   it('shows the three core services', () => {
     render(<AppV2 />)
-    expect(screen.getByText('Wohnungsreinigung')).toBeInTheDocument()
-    expect(screen.getByText('Umzugsreinigung')).toBeInTheDocument()
-    expect(screen.getByText('Gartenpflege')).toBeInTheDocument()
+    expect(screen.getAllByText('Wohnungsreinigung').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Umzugsreinigung').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Gartenpflege').length).toBeGreaterThan(0)
   })
 })

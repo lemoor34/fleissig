@@ -1,0 +1,17 @@
+{
+  "name": "Fleissig — Reinigung & Gartenpflege",
+  "short_name": "Fleissig",
+  "description": "Wohnungsreinigung, Umzugsreinigung und Gartenpflege im Kanton Aargau.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f0f7f2",
+  "theme_color": "#3D7B4F",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
