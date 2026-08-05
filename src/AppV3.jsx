@@ -9,7 +9,7 @@ const CONFIG = {
 
 const waMessages = {
   regular: "Grüezi! Ich interessiere mich für eine einmalige oder regelmässige Wohnungsreinigung und möchte einen Termin anfragen.",
-  moving: "Grüezi! Ich brauche eine Umzugsreinigung. Ich sende gleich Fotos oder ein kurzes Video und möchte eine verbindliche Offerte mit Preisgarantie erhalten.",
+  moving: "Grüezi! Ich brauche eine Umzugsreinigung. Ich sende gleich Fotos oder ein kurzes Video und möchte eine verbindliche Offerte erhalten.",
   garden: "Grüezi! Ich interessiere mich für Gartenpflege und möchte einen Termin anfragen.",
   other: "Grüezi! Ich interessiere mich für eine weitere Reinigungsleistung und möchte kurz den Umfang besprechen.",
 };
@@ -31,7 +31,7 @@ function WhatsAppButton({ label, type = "regular", secondary = false }) {
 
 function Header() {
   const [open, setOpen] = useState(false);
-  const links = [["Wohnung reinigen", "#leistungen"], ["Wohnung abgeben", "#umzug"], ["Garten", "#garten"], ["Kontakt", "#kontakt"]];
+  const links = [["Wohnungsreinigung", "#leistungen"], ["Umzugsreinigung", "#umzug"], ["Gartenpflege", "#garten"], ["Kontakt", "#kontakt"]];
   return (
     <header className="header">
       <div className="shell header-inner">
@@ -68,26 +68,26 @@ function Results() {
 
 function Services() {
   const services = [
-    { id: "wohnung", icon: Home, title: "Wohnung reinigen", price: "CHF 55 / Std.", text: "Einmalig oder regelmässig. Reinigungsmittel inklusive.", detail: "2er-Team: CHF 100 pro Einsatzstunde", label: "Termin anfragen", type: "regular" },
-    { id: "umzug", icon: Truck, title: "Wohnung abgeben", price: "Preisgarantie nach Fotos", text: "Für Umzugsreinigungen erhalten Sie nach Foto- oder Videoprüfung eine verbindliche Offerte.", detail: "Abgabegarantie auf Wunsch inklusive", label: "Fotos senden & Preis erhalten", type: "moving" },
-    { id: "garten", icon: Leaf, title: "Garten pflegen", price: "CHF 65 / Mitarbeiterstunde", text: "Rasen, Hecken, Unkraut und saisonale Pflege.", detail: "Eigene Maschinen · Entsorgung nach Aufwand", label: "Gartentermin anfragen", type: "garden" },
+    { id: "wohnung", icon: Home, title: "Wohnungsreinigung", price: "CHF 55 / Std.", text: "Einmalig oder regelmässig. Die Reinigungsmittel sind inklusive.", detail: "2er-Team: CHF 100 pro Einsatzstunde", label: "Termin anfragen", type: "regular" },
+    { id: "umzug", icon: Truck, title: "Umzugsreinigung", price: "Verbindlicher Preis nach Prüfung", text: "Nach Prüfung Ihrer Fotos oder eines kurzen Videos erhalten Sie eine verbindliche Offerte.", detail: "Abgabegarantie auf Wunsch", label: "Fotos senden & Offerte erhalten", type: "moving" },
+    { id: "garten", icon: Leaf, title: "Gartenpflege", price: "CHF 65 / Mitarbeiterstunde", text: "Rasen, Hecken, Unkraut und saisonale Pflege.", detail: "Eigene Maschinen · Entsorgung nach Aufwand", label: "Gartentermin anfragen", type: "garden" },
   ];
   return (
     <section className="section services" id="leistungen"><div className="shell">
-      <div className="section-heading"><span className="eyebrow">Was brauchen Sie?</span><h2>Drei einfache Wege zum passenden Einsatz.</h2><p>Für normale Reinigungen und Gartenpflege rechnen wir nach Stunden ab. Nur bei Umzugsreinigungen benötigen wir Fotos oder ein kurzes Video für die Preisgarantie.</p></div>
+      <div className="section-heading"><span className="eyebrow">Unsere Leistungen</span><h2>Welche Leistung benötigen Sie?</h2><p>Wohnungsreinigung und Gartenpflege rechnen wir nach Stunden ab. Für eine Umzugsreinigung erstellen wir nach Prüfung Ihrer Fotos oder eines kurzen Videos eine verbindliche Offerte.</p></div>
       <div className="service-grid">{services.map(({ icon: Icon, ...s }) => <article className="service-card" key={s.id} id={s.id}>
         <div className="service-icon"><Icon size={25} /></div><h3>{s.title}</h3><div className="service-price">{s.price}</div><p>{s.text}</p><div className="service-detail">{s.detail}</div><WhatsAppButton label={s.label} type={s.type} />
       </article>)}</div>
-      <div className="other-services">Fenster-, Büro- oder Baureinigung benötigt? <a href={waLink("other")} target="_blank" rel="noopener noreferrer">Kurz auf WhatsApp anfragen <ChevronRight size={15} /></a></div>
+      <div className="other-services">Benötigen Sie eine Fenster-, Büro- oder Baureinigung? <a href={waLink("other")} target="_blank" rel="noopener noreferrer">Kurz per WhatsApp anfragen <ChevronRight size={15} /></a></div>
     </div></section>
   );
 }
 
 function WhyUs() {
-  const benefits = [["Schnell erreichbar", "WhatsApp für Anfragen, deutschsprachige Beratung per Telefon."], ["Klare Abrechnung", "Vor Beginn wissen Sie, ob nach Stunden oder zum bestätigten Preis abgerechnet wird."], ["Legal & versichert", "Offizielle Rechnung und Betriebshaftpflicht bis CHF 2 Mio."], ["Lokal im Aargau", "Basis in Seengen. Einsätze im ganzen Kanton Aargau."]];
+  const benefits = [["Schnell erreichbar", "Anfragen per WhatsApp, deutschsprachige Beratung per Telefon."], ["Klare Abrechnung", "Vor Beginn wissen Sie, ob nach Stunden oder zum bestätigten Preis abgerechnet wird."], ["Legal & versichert", "Offizielle Rechnung und Betriebshaftpflicht bis CHF 2 Mio."], ["Lokal im Aargau", "Unsere Basis ist in Seengen. Wir sind im ganzen Kanton Aargau im Einsatz."]];
   return (
     <section className="section why"><div className="shell why-layout">
-      <div className="section-heading compact"><span className="eyebrow">Warum Fleissig?</span><h2>Einfach buchen. Zuverlässig erledigt.</h2><p>Wir antworten schnell, vereinbaren den Umfang klar und erledigen die Arbeit ordentlich.</p><WhatsAppButton label="Reinigungstermin anfragen" type="regular" /></div>
+      <div className="section-heading compact"><span className="eyebrow">Warum Fleissig?</span><h2>Einfach buchen. Zuverlässig erledigt.</h2><p>Wir antworten schnell, vereinbaren den Umfang klar und erledigen die Arbeit sorgfältig.</p><WhatsAppButton label="Reinigungstermin anfragen" type="regular" /></div>
       <div className="benefit-list">{benefits.map(([title, text], i) => <div className="benefit" key={title}><span>{i + 1}</span><div><h3>{title}</h3><p>{text}</p></div></div>)}</div>
     </div></section>
   );
@@ -98,7 +98,7 @@ function Review() {
 }
 
 function Contact() {
-  return <section className="section final-cta" id="kontakt"><div className="shell final-card"><div><span className="eyebrow light">Kostenlose Anfrage</span><h2>Schreiben Sie uns.<br />Wir finden den passenden Termin.</h2><p>Für normale Reinigung genügt eine kurze Nachricht. Fotos oder Videos brauchen wir nur für Umzugsreinigungen und komplexe Aufträge.</p></div><div className="final-actions"><WhatsAppButton label="Reinigungstermin anfragen" type="regular" /><WhatsAppButton label="Umzugspreis nach Fotos erhalten" type="moving" secondary /><a className="btn btn-call" href={`tel:${CONFIG.phone.replace(/\s/g, "")}`}><Phone size={19} /> {CONFIG.phone}</a><small>Werktags 8:00–18:00 · Antwort in der Regel innerhalb von 15 Minuten</small></div></div></section>;
+  return <section className="section final-cta" id="kontakt"><div className="shell final-card"><div><span className="eyebrow light">Kostenlose Anfrage</span><h2>Schreiben Sie uns.<br />Wir finden den passenden Termin.</h2><p>Für eine normale Reinigung genügt eine kurze Nachricht. Fotos oder Videos benötigen wir nur für Umzugsreinigungen und komplexe Aufträge.</p></div><div className="final-actions"><WhatsAppButton label="Reinigungstermin anfragen" type="regular" /><WhatsAppButton label="Offerte für Umzugsreinigung erhalten" type="moving" secondary /><a className="btn btn-call" href={`tel:${CONFIG.phone.replace(/\s/g, "")}`}><Phone size={19} /> {CONFIG.phone}</a><small>Werktags 8:00–18:00 · Antwort in der Regel innerhalb von 15 Minuten</small></div></div></section>;
 }
 
 function Footer() {
@@ -108,7 +108,7 @@ function Footer() {
 export default function AppV3() {
   useEffect(() => { document.documentElement.style.scrollBehavior = "smooth"; return () => { document.documentElement.style.scrollBehavior = ""; }; }, []);
   return <div id="start"><Header /><main>
-    <section className="hero"><div className="shell hero-grid"><div className="hero-copy"><span className="eyebrow">Reinigung im Kanton Aargau</span><h1>Ihre Reinigung.<br /><em>Einfach organisiert.</em></h1><p>Wohnungsreinigung ab CHF 55 pro Stunde. Schreiben Sie uns kurz auf WhatsApp — wir klären den Bedarf und vereinbaren den Termin.</p><div className="hero-actions"><WhatsAppButton label="Reinigungstermin anfragen" type="regular" /><a className="btn btn-secondary" href={`tel:${CONFIG.phone.replace(/\s/g, "")}`}><Phone size={19} /> Deutsch sprechen</a></div><div className="hero-note"><Clock3 size={16} /> Antwort in der Regel innerhalb von 15 Minuten · werktags 8–18 Uhr</div></div><div className="hero-visual"><img src="/hero-clean-bathroom.webp" alt="Sauber gereinigtes Badezimmer im Kanton Aargau" /></div></div></section>
+    <section className="hero"><div className="shell hero-grid"><div className="hero-copy"><span className="eyebrow">Reinigung im Kanton Aargau</span><h1>Ihre Reinigung.<br /><em>Einfach organisiert.</em></h1><p>Wohnungsreinigung ab CHF 55 pro Stunde. Schreiben Sie uns kurz per WhatsApp — wir klären Ihren Bedarf und vereinbaren einen passenden Termin.</p><div className="hero-actions"><WhatsAppButton label="Reinigungstermin anfragen" type="regular" /><a className="btn btn-secondary" href={`tel:${CONFIG.phone.replace(/\s/g, "")}`}><Phone size={19} /> Beratung auf Deutsch</a></div><div className="hero-note"><Clock3 size={16} /> Antwort in der Regel innerhalb von 15 Minuten · werktags 8–18 Uhr</div></div><div className="hero-visual"><img src="/hero-clean-bathroom.webp" alt="Sauber gereinigtes Badezimmer im Kanton Aargau" /></div></div></section>
     <TrustStrip /><Results /><Services /><WhyUs /><Review /><Contact />
   </main><Footer /><a className="floating-wa" href={waLink("regular")} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp öffnen"><MessageCircle size={25} /></a><style>{styles}</style></div>;
 }
