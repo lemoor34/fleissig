@@ -121,8 +121,8 @@ function BeforeAfter() {
           <p>Keine Stockfotos. Diese Arbeiten haben wir selbst im Kanton Aargau ausgeführt.</p>
         </div>
         <div className="proof-grid">
-          <img src="/photo_2026-05-08_11-04-40.jpg" alt="Duschkabine vor und nach der Reinigung" loading="lazy" />
-          <img src="/photo_2026-05-08_11-04-40 (2).jpg" alt="Kochfeld vor und nach der Reinigung" loading="lazy" />
+          <img src="/vorher-nachher-duschkabine.jpg" alt="Duschkabine vor und nach der Reinigung" loading="lazy" />
+          <img src="/vorher-nachher-kochfeld.jpg" alt="Kochfeld vor und nach der Reinigung" loading="lazy" />
         </div>
       </div>
     </section>
@@ -279,7 +279,7 @@ export default function AppV2() {
               <div className="hero-note"><Clock3 size={16} /> Antwort in der Regel innerhalb von 15 Minuten · werktags 8–18 Uhr</div>
             </div>
             <div className="hero-visual">
-              <img src="/photo_2026-05-08_11-04-40.jpg" alt="Fleissig Reinigung vorher und nachher" />
+              <img src="/vorher-nachher-duschkabine.jpg" alt="Fleissig Reinigung vorher und nachher" />
               <div className="floating-card"><strong>CHF 55 / Std.</strong><span>Reinigungsmittel inklusive</span></div>
             </div>
           </div>

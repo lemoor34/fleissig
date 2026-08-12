@@ -59,8 +59,8 @@ function Results() {
     <section className="section proof" id="resultate"><div className="shell">
       <div className="section-heading compact"><span className="eyebrow">Echte Ergebnisse</span><h2>Sauber, wo man den Unterschied sieht.</h2><p>Keine Stockfotos. Diese Arbeiten haben wir selbst im Kanton Aargau ausgeführt.</p></div>
       <div className="proof-grid">
-        <img src="/photo_2026-05-08_11-04-40.jpg" alt="Duschkabine vor und nach der Reinigung" loading="lazy" />
-        <img src="/photo_2026-05-08_11-04-40 (2).jpg" alt="Kochfeld vor und nach der Reinigung" loading="lazy" />
+        <img src="/vorher-nachher-duschkabine.jpg" alt="Duschkabine vor und nach der Reinigung" loading="lazy" />
+        <img src="/vorher-nachher-kochfeld.jpg" alt="Kochfeld vor und nach der Reinigung" loading="lazy" />
       </div>
     </div></section>
   );

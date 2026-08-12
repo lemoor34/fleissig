@@ -976,8 +976,8 @@ function HomePage({ setPage }) {
             gap: 20,
           }}>
             {[
-              { src: "/photo_2026-05-08_11-04-40.jpg",     alt: "Duschkabine vorher und nachher" },
-              { src: "/photo_2026-05-08_11-04-40 (2).jpg", alt: "Kochfeld vorher und nachher" },
+              { src: "/vorher-nachher-duschkabine.jpg",     alt: "Duschkabine vorher und nachher" },
+              { src: "/vorher-nachher-kochfeld.jpg", alt: "Kochfeld vorher und nachher" },
             ].map((item, i) => (
               <div key={i} style={{
                 borderRadius: 16, overflow: "hidden",
