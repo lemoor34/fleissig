@@ -1,3 +1,9 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "redirects": [
+    { "source": "/umzugsreinigung", "destination": "/umzugsreinigung-aargau", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/umzugsreinigung-aargau", "destination": "/umzugsreinigung-aargau/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
