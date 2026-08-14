@@ -215,7 +215,7 @@ export default function UmzugsreinigungLanding() {
             <div className="lp-options three">
               <Choice selected={form.windows === "small"} onClick={() => set("windows", "small")}>Klein</Choice>
               <Choice selected={form.windows === "normal"} onClick={() => set("windows", "normal")}>Normal</Choice>
-              <Choice selected={form.windows === "panorama"} onClick={() => set("windows", "panorama")}>Panorama</Choice>
+              <Choice selected={form.windows === "panorama"} onClick={() => set("windows", "panorama")}>Normal + grosse/Panoramafenster</Choice>
             </div>
           </Field>
 
