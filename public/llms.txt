@@ -1,6 +1,6 @@
 # Fleissig — Reinigung & Gartenpflege im Kanton Aargau
 
-> Fleissig ist ein lokales Schweizer Unternehmen für professionelle Reinigung und Gartenpflege im Kanton Aargau. Festpreise, Abgabegarantie, offizielle MwSt-Rechnung.
+> Fleissig ist ein lokales Schweizer Unternehmen für professionelle Reinigung und Gartenpflege im Kanton Aargau. Festpreise, Abgabegarantie, offizielle Rechnung.
 
 ## Über uns
 
@@ -62,7 +62,7 @@ Regelmässige Reinigung für Büros und Gewerberäume. Preis nach Aufwand und Fl
 - **Festpreise**: Was in der Offerte steht, zahlen Sie. Keine Nachforderungen.
 - **Abgabegarantie**: Kostenlose Nachreinigung innerhalb 48h, schriftlich garantiert.
 - **Versichert**: Betriebshaftpflicht bis CHF 5 Mio.
-- **Legal**: Offizielle Rechnung mit MwSt-Ausweis, UID: CHE-461.009.759.
+- **Legal**: Offizielle Rechnung, UID: CHE-461.009.759.
 - **Lokal**: Wir leben und arbeiten im Kanton Aargau.
 
 ## Häufige Fragen
