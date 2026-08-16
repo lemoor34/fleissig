@@ -2,6 +2,12 @@ name: GA4 Sync
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/ga4_sync.py'
+      - '.github/workflows/ga4-sync.yml'
   schedule:
     - cron: '17 * * * *'
 
