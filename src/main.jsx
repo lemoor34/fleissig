@@ -1,8 +1,9 @@
-import { StrictMode } from 'react'
+import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
-import AppV4 from './AppV4.jsx'
-import UmzugsreinigungLanding from './UmzugsreinigungLanding.jsx'
-import FensterreinigungLanding from './FensterreinigungLanding.jsx'
+
+const AppV4 = lazy(() => import('./AppV4.jsx'))
+const UmzugsreinigungLanding = lazy(() => import('./UmzugsreinigungLanding.jsx'))
+const FensterreinigungLanding = lazy(() => import('./FensterreinigungLanding.jsx'))
 
 const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/'
 const isUmzugsreinigungLanding =
@@ -25,10 +26,14 @@ canonical.href = canonicalHref
 const ogUrl = document.querySelector('meta[property="og:url"]')
 if (ogUrl) ogUrl.setAttribute('content', canonicalHref)
 
-let page = <AppV4 />
-if (isUmzugsreinigungLanding) page = <UmzugsreinigungLanding />
-if (isFensterreinigungLanding) page = <FensterreinigungLanding />
+let Page = AppV4
+if (isUmzugsreinigungLanding) Page = UmzugsreinigungLanding
+if (isFensterreinigungLanding) Page = FensterreinigungLanding
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>{page}</StrictMode>,
+  <StrictMode>
+    <Suspense fallback={null}>
+      <Page />
+    </Suspense>
+  </StrictMode>,
 )
