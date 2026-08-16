@@ -7,7 +7,7 @@ from google.analytics.data_v1beta.types import (
     DateRange,
     Dimension,
     Metric,
-    RealtimeReportRequest,
+    RunRealtimeReportRequest,
     RunReportRequest,
 )
 from googleapiclient.discovery import build
@@ -138,7 +138,7 @@ def main():
     )
 
     realtime_response = data.run_realtime_report(
-        RealtimeReportRequest(
+        RunRealtimeReportRequest(
             property=f"properties/{property_id}",
             dimensions=[Dimension(name="eventName")],
             metrics=[Metric(name="eventCount")],
