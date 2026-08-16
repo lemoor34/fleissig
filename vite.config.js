@@ -9,6 +9,7 @@ export default defineConfig({
       input: {
         main: resolve(process.cwd(), 'index.html'),
         umzugsreinigung: resolve(process.cwd(), 'umzugsreinigung-aargau/index.html'),
+        fensterreinigung: resolve(process.cwd(), 'fensterreinigung-aargau/index.html'),
       },
     },
   },
