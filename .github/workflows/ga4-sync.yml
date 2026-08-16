@@ -1,0 +1,40 @@
+name: GA4 Sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: fleissig-analytics
+          workload_identity_provider: projects/465867116555/locations/global/workloadIdentityPools/github/providers/fleissig-repo
+          service_account: fleissig-analytics-reader@fleissig-analytics.iam.gserviceaccount.com
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-analytics-data google-analytics-admin google-api-python-client
+
+      - name: Sync GA4 to Google Sheets
+        env:
+          FLEISSIG_SPREADSHEET_ID: 162L8UbKvna-uha_dC8XTsBqo38mlM9iGFIaszZOIHc8
+          GA4_PROPERTY_NAME: Fleissig-Reinigung
+        run: python scripts/ga4_sync.py
