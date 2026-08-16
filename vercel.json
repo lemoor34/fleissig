@@ -4,6 +4,7 @@
   ],
   "rewrites": [
     { "source": "/umzugsreinigung-aargau", "destination": "/umzugsreinigung-aargau/index.html" },
+    { "source": "/fensterreinigung-aargau", "destination": "/fensterreinigung-aargau/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
