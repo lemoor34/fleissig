@@ -1,9 +1,12 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
+import { initTracking } from './tracking.js'
 
 const AppV4 = lazy(() => import('./AppV4.jsx'))
 const UmzugsreinigungLanding = lazy(() => import('./UmzugsreinigungLanding.jsx'))
 const FensterreinigungLanding = lazy(() => import('./FensterreinigungLanding.jsx'))
+
+initTracking()
 
 const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/'
 const isUmzugsreinigungLanding =
