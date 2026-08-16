@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - 'scripts/ga4_sync.py'
+      - 'scripts/google_ads_export.py'
       - '.github/workflows/ga4-sync.yml'
   schedule:
     - cron: '17 * * * *'
@@ -44,3 +45,8 @@ jobs:
           FLEISSIG_SPREADSHEET_ID: 162L8UbKvna-uha_dC8XTsBqo38mlM9iGFIaszZOIHc8
           GA4_PROPERTY_NAME: Fleissig-Reinigung
         run: python scripts/ga4_sync.py
+
+      - name: Prepare Google Ads offline conversions
+        env:
+          FLEISSIG_SPREADSHEET_ID: 162L8UbKvna-uha_dC8XTsBqo38mlM9iGFIaszZOIHc8
+        run: python scripts/google_ads_export.py
