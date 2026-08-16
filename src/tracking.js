@@ -174,8 +174,7 @@ function installCalculatorTracking() {
     const result = document.querySelector('.lp-result.ready')
     if (!result) return
 
-    sent = true
-    trackEvent('calculator_complete', {
+    sent = trackEvent('calculator_complete', {
       service: 'umzugsreinigung',
     })
   }
@@ -187,6 +186,12 @@ function installCalculatorTracking() {
     attributes: true,
     attributeFilter: ['class'],
   })
+
+  // If consent is accepted after the calculator is already complete,
+  // retry immediately after the consent click handler has run.
+  document.addEventListener('click', () => {
+    window.setTimeout(check, 0)
+  }, { capture: true })
 
   check()
 }
