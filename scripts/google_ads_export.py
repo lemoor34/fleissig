@@ -24,6 +24,7 @@ EXPORT_HEADERS = [
     "GBRAID",
     "WBRAID",
     "Conversion date and time",
+    "Event source",
     "Conversion value",
     "Currency",
     "Order ID",
@@ -85,11 +86,25 @@ def as_number(value):
         return ""
 
 
+def event_source_for_lead(comment):
+    """Return a Google Data Manager EventSource value.
+
+    Our CRM leads are created from GA4 contact events. WhatsApp contacts are
+    messages, phone contacts are calls; other/manual cases remain OTHER.
+    """
+    text = str(comment or "").lower()
+    if "phone_click" in text:
+        return "PHONE"
+    if "whatsapp_click" in text:
+        return "MESSAGE"
+    return "OTHER"
+
+
 def write_export(sheets, rows):
     ensure_sheet(sheets, EXPORT_SHEET)
     sheets.spreadsheets().values().clear(
         spreadsheetId=SPREADSHEET_ID,
-        range=f"'{EXPORT_SHEET}'!A:L",
+        range=f"'{EXPORT_SHEET}'!A:M",
         body={},
     ).execute()
     sheets.spreadsheets().values().update(
@@ -163,6 +178,7 @@ def main():
         service = str(padded[8] or "").strip()
         phone = normalize_phone(padded[11])
         value = as_number(padded[16]) or as_number(padded[15])
+        event_source = event_source_for_lead(padded[21])
 
         def add_conversion(action, conversion_time, suffix):
             if not conversion_time:
@@ -173,6 +189,7 @@ def main():
                 gbraid,
                 wbraid,
                 conversion_time,
+                event_source,
                 value,
                 "CHF",
                 f"{lead_id}-{suffix}",
