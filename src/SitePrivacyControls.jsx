@@ -28,7 +28,7 @@ const PRIVACY_SECTIONS = [
     'Nach Ihrer Einwilligung verwenden wir Google Analytics 4 zur Messung der Website-Nutzung und Google Ads zur Messung des Werbeerfolgs. Dabei können unter anderem Seitenaufrufe, Interaktionen, Referrer, Kampagnenparameter sowie Werbeklick-Kennungen wie GCLID, GBRAID oder WBRAID verarbeitet werden. Anbieter ist insbesondere Google Ireland Limited; eine Verarbeitung durch verbundene Google-Unternehmen ausserhalb der Schweiz beziehungsweise des EWR kann nicht ausgeschlossen werden. Google verwendet dafür die in seinen Bedingungen vorgesehenen vertraglichen und technischen Schutzmechanismen.',
   ],
   [
-    'Skвозная Zuordnung von Werbekanälen',
+    'First-Party-Zuordnung von Werbekanälen',
     'Damit wir erkennen können, welcher Werbekanal tatsächlich zu einer Anfrage oder einem Auftrag geführt hat, speichern wir nach Ihrer Einwilligung im Browser eine zufällige Journey-ID sowie Informationen zum ersten und letzten bekannten Kontakt, zur Einstiegsseite und zu Kampagnenparametern. Diese Zuordnungsdaten enthalten nach unserer Implementierung keine Namen, Telefonnummern oder freien Nachrichtentexte. Sie werden für die interne CRM-Zuordnung und die Auswertung von Leads, Aufträgen und Werbekosten verwendet.',
   ],
   [
