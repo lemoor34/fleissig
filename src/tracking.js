@@ -16,6 +16,8 @@ const ATTRIBUTION_PARAMS = [
   'utm_id',
 ]
 
+let trackingInitialized = false
+
 function hasAnalyticsConsent() {
   try {
     return window.localStorage.getItem(CONSENT_KEY) === 'accepted'
@@ -422,8 +424,22 @@ function installCalculatorTracking() {
   check()
 }
 
+function installConsentPersistence() {
+  window.addEventListener('fleissig-consent-changed', (event) => {
+    if (event?.detail?.choice !== 'accepted') return
+    // Persist the pre-consent landing/click context immediately. This prevents
+    // an accepted paid visitor from losing the original touch if they navigate
+    // internally before their first tracked contact event.
+    persistAttributionIfAllowed()
+  })
+}
+
 export function initTracking() {
+  if (trackingInitialized) return
+  trackingInitialized = true
+
   persistAttributionIfAllowed()
+  installConsentPersistence()
   installContactTracking()
   installCalculatorTracking()
 
