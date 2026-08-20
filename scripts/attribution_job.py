@@ -13,6 +13,11 @@ TEST_LEAD_IDS = {
     "FR-260818-2021-D0D98B4E",
 }
 
+# GA4 can temporarily return this value while advertising attribution is still
+# being processed. It is not a real traffic source and must never be converted
+# into "Другой сайт" or treated as confident attribution.
+core.UNKNOWN_GA.add("(data not available)")
+
 
 def ensure_leads_capacity(sheets):
     meta = sheets.spreadsheets().get(spreadsheetId=core.SPREADSHEET_ID).execute()
