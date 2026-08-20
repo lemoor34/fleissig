@@ -1,11 +1,15 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { initTracking } from './tracking.js'
+import { initConsentMode } from './privacyConsent.js'
+import SitePrivacyControls from './SitePrivacyControls.jsx'
 
 const AppV4 = lazy(() => import('./AppV4.jsx'))
 const UmzugsreinigungLanding = lazy(() => import('./UmzugsreinigungLanding.jsx'))
 const FensterreinigungLanding = lazy(() => import('./FensterreinigungLanding.jsx'))
 
+// Consent Mode v2 defaults must be established before any Google tag loads.
+initConsentMode()
 initTracking()
 
 const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/'
@@ -38,5 +42,6 @@ createRoot(document.getElementById('root')).render(
     <Suspense fallback={null}>
       <Page />
     </Suspense>
+    <SitePrivacyControls />
   </StrictMode>,
 )
