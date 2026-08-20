@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getConsentChoice, setConsentChoice } from './privacyConsent.js'
 
 const COMPANY = 'Swiss SMM Balian Einzelunternehmen'
@@ -81,6 +81,8 @@ function ConsentButtons({ onChoice }) {
 export default function SitePrivacyControls() {
   const [choice, setChoice] = useState(() => getConsentChoice())
   const [privacyOpen, setPrivacyOpen] = useState(false)
+  const modalRef = useRef(null)
+  const closeButtonRef = useRef(null)
 
   useEffect(() => {
     const openCentralPrivacy = (event) => {
@@ -97,6 +99,45 @@ export default function SitePrivacyControls() {
     document.addEventListener('click', openCentralPrivacy, true)
     return () => document.removeEventListener('click', openCentralPrivacy, true)
   }, [])
+
+  useEffect(() => {
+    if (!privacyOpen) return undefined
+
+    const previousFocus = document.activeElement
+    const modal = modalRef.current
+    const selector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setPrivacyOpen(false)
+        return
+      }
+
+      if (event.key !== 'Tab' || !modal) return
+      const focusable = Array.from(modal.querySelectorAll(selector))
+        .filter((element) => !element.hasAttribute('hidden'))
+      if (!focusable.length) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    window.requestAnimationFrame(() => closeButtonRef.current?.focus())
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      previousFocus?.focus?.()
+    }
+  }, [privacyOpen])
 
   const choose = (value) => {
     const saved = setConsentChoice(value)
@@ -123,8 +164,8 @@ export default function SitePrivacyControls() {
 
       {privacyOpen && (
         <div className="fpc-overlay" role="dialog" aria-modal="true" aria-labelledby="fpc-title">
-          <div className="fpc-modal">
-            <button type="button" className="fpc-close" aria-label="Schliessen" onClick={() => setPrivacyOpen(false)}>×</button>
+          <div className="fpc-modal" ref={modalRef}>
+            <button ref={closeButtonRef} type="button" className="fpc-close" aria-label="Schliessen" onClick={() => setPrivacyOpen(false)}>×</button>
             <span className="fpc-eyebrow">Datenschutz</span>
             <h1 id="fpc-title">Datenschutzerklärung</h1>
             <p className="fpc-intro">
