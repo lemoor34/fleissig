@@ -1,4 +1,4 @@
-name: GA4 Sync
+name: Attribution Sync
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'scripts/ga4_sync.py'
+      - 'scripts/attribution_sync.py'
       - 'scripts/google_ads_export.py'
       - '.github/workflows/ga4-sync.yml'
   schedule:
@@ -40,11 +40,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-analytics-data google-analytics-admin google-api-python-client
 
-      - name: Sync GA4 to Google Sheets
+      - name: Sync attribution and CRM
         env:
           FLEISSIG_SPREADSHEET_ID: 162L8UbKvna-uha_dC8XTsBqo38mlM9iGFIaszZOIHc8
           GA4_PROPERTY_NAME: Fleissig-Reinigung
-        run: python scripts/ga4_sync.py
+        run: python scripts/attribution_sync.py
 
       - name: Prepare Google Ads offline conversions
         env:
