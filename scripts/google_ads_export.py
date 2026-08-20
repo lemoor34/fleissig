@@ -18,6 +18,7 @@ COMPLETED_STATUS = "Выполнен"
 BOOKED_ACTION = "Fleissig - Auftrag gebucht"
 COMPLETED_ACTION = "Fleissig - Auftrag abgeschlossen"
 
+HELPER_HEADERS = ["GBRAID", "WBRAID", "Забронирован в", "Выполнен в"]
 EXPORT_HEADERS = [
     "Conversion action",
     "GCLID",
@@ -86,6 +87,61 @@ def as_number(value):
         return ""
 
 
+def parse_milestone_time(value):
+    """Parse a CRM milestone timestamp and normalize it to Europe/Zurich.
+
+    Google Ads requires the real conversion time with an explicit timezone.
+    CRM users can enter the local Swiss time in a human-readable format; ISO
+    timestamps are also accepted for compatibility with previously stored data.
+    """
+    if value is None or value == "":
+        return None
+
+    if isinstance(value, datetime):
+        parsed = value
+    else:
+        text = str(value).strip()
+        if not text:
+            return None
+
+        parsed = None
+        try:
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
+            pass
+
+        if parsed is None:
+            for fmt in (
+                "%d.%m.%Y %H:%M:%S",
+                "%d.%m.%Y %H:%M",
+                "%Y-%m-%d %H:%M:%S",
+                "%Y-%m-%d %H:%M",
+                "%d/%m/%Y %H:%M:%S",
+                "%d/%m/%Y %H:%M",
+            ):
+                try:
+                    parsed = datetime.strptime(text, fmt)
+                    break
+                except ValueError:
+                    continue
+
+        if parsed is None:
+            return None
+
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=TZ)
+    return parsed.astimezone(TZ)
+
+
+def format_google_ads_time(value):
+    """Return Google Ads click-conversion datetime format with timezone."""
+    parsed = parse_milestone_time(value)
+    if parsed is None:
+        return ""
+    compact = parsed.strftime("%Y-%m-%d %H:%M:%S%z")
+    return compact[:-2] + ":" + compact[-2:]
+
+
 def event_source_for_lead(comment):
     """Return a Google Data Manager EventSource value.
 
@@ -119,12 +175,13 @@ def main():
     sheets = build("sheets", "v4", cache_discovery=False)
     ensure_sheet(sheets, LEADS_SHEET)
 
-    # Internal helper columns keep click IDs and stable milestone timestamps.
+    # Y:Z are technical click identifiers. AA:AB are now explicit business
+    # milestone fields entered in CRM at the real moment of booking/completion.
     sheets.spreadsheets().values().update(
         spreadsheetId=SPREADSHEET_ID,
         range=f"'{LEADS_SHEET}'!Y1:AB1",
         valueInputOption="RAW",
-        body={"values": [["GBRAID", "WBRAID", "Google Ads: gebucht am", "Google Ads: abgeschlossen am"]]},
+        body={"values": [HELPER_HEADERS]},
     ).execute()
 
     response = sheets.spreadsheets().values().get(
@@ -135,7 +192,7 @@ def main():
 
     updates = []
     export_rows = []
-    now = datetime.now(TZ).isoformat(timespec="seconds")
+    warnings = []
 
     for sheet_row, row in enumerate(rows, start=2):
         padded = list(row) + [""] * (28 - len(row))
@@ -149,8 +206,8 @@ def main():
         gbraid = str(padded[24] or parsed_gbraid or "").strip()
         wbraid = str(padded[25] or parsed_wbraid or "").strip()
         status = str(padded[12] or "").strip()
-        booked_at = str(padded[26] or "").strip()
-        completed_at = str(padded[27] or "").strip()
+        booked_raw = padded[26]
+        completed_raw = padded[27]
 
         if not padded[6] and gclid:
             padded[6] = gclid
@@ -162,14 +219,40 @@ def main():
             padded[25] = wbraid
             updates.append({"range": f"'{LEADS_SHEET}'!Z{sheet_row}", "values": [[wbraid]]})
 
-        if status in {BOOKED_STATUS, COMPLETED_STATUS} and not booked_at:
-            booked_at = now
-            padded[26] = booked_at
-            updates.append({"range": f"'{LEADS_SHEET}'!AA{sheet_row}", "values": [[booked_at]]})
-        if status == COMPLETED_STATUS and not completed_at:
-            completed_at = now
-            padded[27] = completed_at
-            updates.append({"range": f"'{LEADS_SHEET}'!AB{sheet_row}", "values": [[completed_at]]})
+        booked_dt = parse_milestone_time(booked_raw)
+        completed_dt = parse_milestone_time(completed_raw)
+        lead_dt = parse_milestone_time(padded[0])
+
+        booked_at = format_google_ads_time(booked_dt)
+        completed_at = format_google_ads_time(completed_dt)
+
+        booked_valid = bool(booked_at)
+        completed_valid = bool(completed_at)
+
+        if booked_dt and lead_dt and booked_dt < lead_dt:
+            booked_valid = False
+            warnings.append(
+                f"{lead_id}: 'Забронирован в' is before the lead time; BOOKED export skipped"
+            )
+        if completed_dt and lead_dt and completed_dt < lead_dt:
+            completed_valid = False
+            warnings.append(
+                f"{lead_id}: 'Выполнен в' is before the lead time; COMPLETED export skipped"
+            )
+        if booked_dt and completed_dt and completed_dt < booked_dt:
+            completed_valid = False
+            warnings.append(
+                f"{lead_id}: 'Выполнен в' is before 'Забронирован в'; COMPLETED export skipped"
+            )
+
+        if status in {BOOKED_STATUS, COMPLETED_STATUS} and not booked_valid:
+            warnings.append(
+                f"{lead_id}: status '{status}' requires an exact 'Забронирован в' timestamp"
+            )
+        if status == COMPLETED_STATUS and not completed_valid:
+            warnings.append(
+                f"{lead_id}: status '{COMPLETED_STATUS}' requires an exact 'Выполнен в' timestamp"
+            )
 
         # Google Ads-only export: do not send unrelated/direct/Meta leads.
         if not any([gclid, gbraid, wbraid]):
@@ -199,9 +282,9 @@ def main():
                 status,
             ])
 
-        if status in {BOOKED_STATUS, COMPLETED_STATUS}:
+        if status in {BOOKED_STATUS, COMPLETED_STATUS} and booked_valid:
             add_conversion(BOOKED_ACTION, booked_at, "BOOKED")
-        if status == COMPLETED_STATUS:
+        if status == COMPLETED_STATUS and completed_valid:
             add_conversion(COMPLETED_ACTION, completed_at, "COMPLETED")
 
     if updates:
@@ -215,6 +298,10 @@ def main():
         f"Prepared {len(export_rows)} Google Ads offline conversion rows "
         f"from {len(rows)} CRM leads"
     )
+    if warnings:
+        print(f"Skipped/flagged {len(warnings)} milestone issue(s):")
+        for warning in warnings[:50]:
+            print(f"- {warning}")
 
 
 if __name__ == "__main__":
