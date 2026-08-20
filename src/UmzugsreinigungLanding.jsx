@@ -25,49 +25,6 @@ const initialForm = {
   handoverDate: "",
 };
 
-function track(name, params = {}) {
-  if (typeof window.gtag === "function") window.gtag("event", name, params);
-  if (typeof window.fbq === "function" && name === "umzug_whatsapp_click") {
-    window.fbq("track", "Lead", { content_name: "Umzugsreinigung Landing" });
-  }
-}
-
-function loadAnalyticsAfterConsent() {
-  if (localStorage.getItem("fleissig-consent") !== "accepted") return;
-  if (!document.getElementById("ga-script")) {
-    const ga = document.createElement("script");
-    ga.id = "ga-script";
-    ga.async = true;
-    ga.src = "https://www.googletagmanager.com/gtag/js?id=G-GY6PDS53F7";
-    document.head.appendChild(ga);
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function gtag(){ window.dataLayer.push(arguments); };
-    window.gtag("js", new Date());
-    window.gtag("config", "G-GY6PDS53F7", { anonymize_ip: true });
-  }
-}
-
-function CookieBanner() {
-  const [visible, setVisible] = useState(() => !localStorage.getItem("fleissig-consent"));
-  if (!visible) return null;
-
-  const choose = (value) => {
-    localStorage.setItem("fleissig-consent", value);
-    setVisible(false);
-    if (value === "accepted") loadAnalyticsAfterConsent();
-  };
-
-  return (
-    <div className="lp-cookie">
-      <div><strong>Datenschutzeinstellungen</strong><span>Optionale Analyse- und Marketingdienste nur mit Ihrer Einwilligung.</span></div>
-      <div className="lp-cookie-actions">
-        <button onClick={() => choose("rejected")}>Nur notwendige</button>
-        <button className="primary" onClick={() => choose("accepted")}>Alle akzeptieren</button>
-      </div>
-    </div>
-  );
-}
-
 function LegalModal({ type, onClose }) {
   const privacy = [
     ["Verantwortliche Stelle", `${CONFIG.company} · ${CONFIG.location} · ${CONFIG.email}`],
@@ -175,7 +132,6 @@ export default function UmzugsreinigungLanding() {
   useEffect(() => {
     const oldTitle = document.title;
     document.title = "Umzugsreinigung Aargau mit Abgabegarantie | Fleissig";
-    loadAnalyticsAfterConsent();
     return () => { document.title = oldTitle; };
   }, []);
 
@@ -191,16 +147,6 @@ export default function UmzugsreinigungLanding() {
   const whatsappHref = estimate
     ? `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(buildWhatsAppMessage(form, estimate))}`
     : "#";
-
-  const openWhatsApp = () => {
-    if (!estimate) return;
-    track("umzug_whatsapp_click", {
-      estimate_low: estimate.lower,
-      estimate_high: estimate.upper,
-      rooms: form.rooms,
-      area: Number(form.area),
-    });
-  };
 
   return (
     <div className="umzug-landing">
@@ -298,7 +244,7 @@ export default function UmzugsreinigungLanding() {
                 <span className="lp-result-label">Ihre vorläufige Preisschätzung</span>
                 <strong>CHF {estimate.lower}–{estimate.upper}</strong>
                 <p>Unverbindliche Vorabschätzung auf Basis Ihrer Angaben. Nach einem kurzen Foto-Check bestätigen wir Ihnen den verbindlichen Fixpreis.</p>
-                <a className="lp-wa" href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={openWhatsApp}>
+                <a className="lp-wa" href={whatsappHref} target="_blank" rel="noopener noreferrer">
                   <MessageCircle size={21} /> Fixpreis per WhatsApp bestätigen
                 </a>
                 <small>Ihre Angaben und die Preisspanne werden automatisch in die WhatsApp-Nachricht übernommen. Sie müssen nur noch auf „Senden“ tippen.</small>
@@ -332,7 +278,6 @@ export default function UmzugsreinigungLanding() {
       </footer>
 
       {legal && <LegalModal type={legal} onClose={() => setLegal(null)} />}
-      <CookieBanner />
       <style>{styles}</style>
     </div>
   );

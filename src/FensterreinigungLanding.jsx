@@ -12,40 +12,6 @@ const CONFIG = {
 const whatsappText = "Grüezi! Ich interessiere mich für eine Fensterreinigung im Kanton Aargau und möchte eine Offerte. Ich kann Ihnen Fotos der Fenster und Storen senden.";
 const whatsappHref = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(whatsappText)}`;
 
-function loadAnalyticsAfterConsent() {
-  if (localStorage.getItem("fleissig-consent") !== "accepted") return;
-  if (!document.getElementById("ga-script")) {
-    const ga = document.createElement("script");
-    ga.id = "ga-script";
-    ga.async = true;
-    ga.src = "https://www.googletagmanager.com/gtag/js?id=G-GY6PDS53F7";
-    document.head.appendChild(ga);
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(){ window.dataLayer.push(arguments); };
-    window.gtag("js", new Date());
-    window.gtag("config", "G-GY6PDS53F7", { anonymize_ip: true });
-  }
-}
-
-function CookieBanner() {
-  const [visible, setVisible] = useState(() => !localStorage.getItem("fleissig-consent"));
-  if (!visible) return null;
-  const choose = (value) => {
-    localStorage.setItem("fleissig-consent", value);
-    setVisible(false);
-    if (value === "accepted") loadAnalyticsAfterConsent();
-  };
-  return (
-    <div className="fw-cookie">
-      <div><strong>Datenschutzeinstellungen</strong><span>Optionale Analyse- und Marketingdienste nur mit Ihrer Einwilligung.</span></div>
-      <div>
-        <button onClick={() => choose("rejected")}>Nur notwendige</button>
-        <button className="primary" onClick={() => choose("accepted")}>Alle akzeptieren</button>
-      </div>
-    </div>
-  );
-}
-
 function LegalModal({ type, onClose }) {
   const privacy = [
     ["Verantwortliche Stelle", `${CONFIG.company} · ${CONFIG.location} · ${CONFIG.email}`],
@@ -72,7 +38,6 @@ export default function FensterreinigungLanding() {
   useEffect(() => {
     const oldTitle = document.title;
     document.title = "Fensterreinigung Aargau | Fleissig Reinigung";
-    loadAnalyticsAfterConsent();
     return () => { document.title = oldTitle; };
   }, []);
 
@@ -202,7 +167,6 @@ export default function FensterreinigungLanding() {
       </footer>
 
       {legal && <LegalModal type={legal} onClose={() => setLegal(null)} />}
-      <CookieBanner />
       <style>{styles}</style>
     </div>
   );

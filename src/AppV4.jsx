@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Menu, X, MessageCircle, Phone, ShieldCheck, ReceiptText, MapPin,
   Clock3, Home, Truck, Leaf, Star, Sparkles, CheckCircle2
@@ -24,15 +24,6 @@ const waText = {
 const waLink = (type = "regular") =>
   `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(waText[type] || waText.regular)}`;
 
-function trackLead(name) {
-  if (typeof window.gtag === "function") {
-    window.gtag("event", "conversion_event_contact", { contact_type: name });
-  }
-  if (typeof window.fbq === "function") {
-    window.fbq("track", "Lead", { content_name: name });
-  }
-}
-
 function WhatsAppButton({ label, type = "regular", secondary = false }) {
   return (
     <a
@@ -40,7 +31,6 @@ function WhatsAppButton({ label, type = "regular", secondary = false }) {
       href={waLink(type)}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={() => trackLead(type)}
     >
       <MessageCircle size={19} />
       {label}
@@ -73,7 +63,6 @@ function Header() {
           href={waLink("regular")}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => trackLead("header_whatsapp")}
         >
           <MessageCircle size={17} /> Anfrage
         </a>
@@ -297,61 +286,8 @@ function LegalPage({ type, onClose }) {
   );
 }
 
-function CookieBanner() {
-  const [visible, setVisible] = useState(() => !localStorage.getItem("fleissig-consent"));
-  const choose = (value) => {
-    localStorage.setItem("fleissig-consent", value);
-    setVisible(false);
-    if (value === "accepted") window.location.reload();
-  };
-  if (!visible) return null;
-
-  return (
-    <div className="cookie">
-      <div>
-        <strong>Datenschutzeinstellungen</strong>
-        <p>Optionale Analyse- und Marketingdienste werden nur mit Ihrer Einwilligung aktiviert.</p>
-      </div>
-      <div className="cookie-actions">
-        <button onClick={() => choose("rejected")}>Nur notwendige</button>
-        <button className="accept" onClick={() => choose("accepted")}>Alle akzeptieren</button>
-      </div>
-    </div>
-  );
-}
-
-function loadAnalyticsAfterConsent() {
-  if (localStorage.getItem("fleissig-consent") !== "accepted") return;
-
-  if (!document.getElementById("ga-script")) {
-    const ga = document.createElement("script");
-    ga.id = "ga-script";
-    ga.async = true;
-    ga.src = "https://www.googletagmanager.com/gtag/js?id=G-GY6PDS53F7";
-    document.head.appendChild(ga);
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(){ window.dataLayer.push(arguments); };
-    window.gtag("js", new Date());
-    window.gtag("config", "G-GY6PDS53F7", { anonymize_ip: true });
-  }
-
-  if (!window.fbq) {
-    !function(f,b,e,v,n,t,s){
-      if(f.fbq)return;
-      n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;
-      n.push=n;n.loaded=true;n.version="2.0";n.queue=[];
-      t=b.createElement(e);t.async=true;t.src=v;
-      s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)
-    }(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
-    window.fbq("init", "1607333053899638");
-    window.fbq("track", "PageView");
-  }
-}
-
 export default function AppV4() {
   const [legal, setLegal] = useState(null);
-  useEffect(() => { loadAnalyticsAfterConsent(); }, []);
 
   return (
     <div id="start">
@@ -376,7 +312,6 @@ export default function AppV4() {
                 <a
                   className="btn btn-secondary"
                   href={`tel:${CONFIG.phone.replace(/\s/g, "")}`}
-                  onClick={() => trackLead("phone")}
                 >
                   <Phone size={19} /> Anrufen
                 </a>
@@ -446,7 +381,6 @@ export default function AppV4() {
       </footer>
 
       {legal && <LegalPage type={legal} onClose={() => setLegal(null)} />}
-      <CookieBanner />
       <a className="floating-wa" href={waLink("regular")} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp öffnen">
         <MessageCircle size={25} />
       </a>

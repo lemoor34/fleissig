@@ -357,10 +357,18 @@ export function trackEvent(name, params = {}) {
   if (!hasAnalyticsConsent()) return false
   if (typeof window.gtag !== 'function') return false
 
-  window.gtag('event', name, compactParams({
+  const payload = compactParams({
     ...eventAttributionParams(params),
     ...params,
-  }))
+  })
+  window.gtag('event', name, payload)
+
+  if ((name === 'whatsapp_click' || name === 'phone_click') && typeof window.fbq === 'function') {
+    window.fbq('track', 'Lead', {
+      content_name: params.service || serviceFromPath(),
+    })
+  }
+
   return true
 }
 
