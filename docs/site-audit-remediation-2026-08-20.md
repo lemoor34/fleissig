@@ -6,9 +6,9 @@ Applied skills: `site-audit` + `attribution`
 
 ## Current verdict
 
-The first remediation pass is complete and deployed to production. All production builds now run the regression suite before Vite builds. The final checked build passed 12 test files / 96 tests and deployed successfully.
+The first remediation pass and the low-risk production hardening pass are complete. Production builds run the regression suite before Vite builds; the checked post-tracking build passed 12 test files / 96 tests and deployed successfully.
 
-No P0 issue remains from the audit. The highest-risk analytics/consent defects identified in the first audit are resolved or production-mitigated. Several lower-priority cleanup items remain and should be handled in a second pass.
+No P0 issue remains from the audit. The highest-risk analytics/consent defects identified in the first audit are resolved or production-mitigated. The remaining items are mainly CRM milestone accuracy, legacy-code cleanup, asset optimization and account/browser-level verification.
 
 ## Resolved / production-mitigated
 
@@ -22,6 +22,7 @@ No P0 issue remains from the audit. The highest-risk analytics/consent defects i
 | Public credential-shaped fal.ai example + unused client | Repository cleaned | Credential-shaped example was removed and unused `fal-ai-client.ts` deleted. If the historical value was ever a real credential, rotation/revocation remains a manual security action because Git history is public. |
 | Catch-all rewrite created soft 404s | Resolved | Catch-all rewrite removed. Live QA check of a random nonexistent path returns HTTP 404; the three intended pages remain HTTP 200. |
 | Missing browser hardening headers | Improved | Production now returns CSP (`base-uri`, `object-src`, `frame-ancestors`, `form-action`, upgrade-insecure-requests), HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy and Permissions-Policy. |
+| Google Fonts requested before consent | Resolved | Removed Google Fonts preconnects and CSS imports from all active pages. Active pages now use a local/system font stack and do not need a third-party font request before consent. |
 | Privacy dialog lacked keyboard focus management | Resolved | Added initial focus, tab trapping, Escape close and focus restoration; regression-tested. |
 | Duplicate root/public robots/manifest and stale public Vercel config | Resolved | Duplicate/stale source files were removed; `public/` is the canonical source for robots/manifest assets. |
 | Oversized PNG used as browser/app icon | Mitigated | Browser and manifest now use the lightweight SVG favicon. Large logo asset remains available for business/schema use and can be optimized separately. |
@@ -31,26 +32,25 @@ No P0 issue remains from the audit. The highest-risk analytics/consent defects i
 
 ## Confirmed production checks after remediation
 
-- Latest production deployment is READY and aliased to `fleissig-reinigung.ch`.
-- Final build passed 12 test files / 96 tests before bundling.
+- A post-tracking production deployment is READY and aliased to `fleissig-reinigung.ch`.
+- Checked build passed 12 test files / 96 tests before bundling.
 - `/`, `/umzugsreinigung-aargau`, `/fensterreinigung-aargau` return HTTP 200.
 - A random nonexistent URL returns HTTP 404 instead of the homepage.
 - Production HTML responses include the new security headers.
 - Current active AppV4 no longer owns raw GA/Meta contact tracking; canonical tracking is centralized.
+- Repository HTML no longer contains Google Fonts preconnects on the active entry pages.
 
-## Remaining second-pass work
+## Remaining work
 
-1. **Google Fonts before consent / performance (P2).** Static HTML still preconnects to Google Fonts and active page CSS imports Plus Jakarta Sans from Google. Prefer self-hosting/subsetting or a system stack; then align privacy text accordingly.
-2. **Offline conversion business timestamps (P2).** `google_ads_export.py` still stamps booked/completed helper times when the sync first observes the CRM status. We need explicit real milestone timestamps in CRM and must export those exact times.
-3. **Old application generations and dependencies (P2).** `App.jsx`, `AppV2.jsx`, `AppV3.jsx` and their old tests/dependencies remain. They no longer own production, but still add maintenance ambiguity. Migrate any useful coverage to AppV4/current landings, then delete the obsolete generations and remove unused dependencies from package/lock.
-4. **Large business-logo PNG (P2/P3).** The browser no longer needs it as favicon, but `logo.png` remains large and is referenced by schema. Generate an appropriately sized optimized logo asset before replacing it.
-5. **Exact external verification (manual).** Tag Assistant/GA4 DebugView, Google Ads auto-tagging/account link and Search Console URL Inspection still require account/browser-level verification.
-6. **Historical secret provenance (manual).** Determine whether the former fal.ai-looking example was ever a valid credential. If yes, revoke/rotate it regardless of its removal from the current branch.
+1. **Offline conversion business timestamps (P2).** `google_ads_export.py` still stamps booked/completed helper times when the sync first observes the CRM status. We need explicit real milestone timestamps in CRM and must export those exact times.
+2. **Old application generations and dependencies (P2).** `App.jsx`, `AppV2.jsx`, `AppV3.jsx` and their old tests/dependencies remain. They no longer own production, but still add maintenance ambiguity. Migrate any useful coverage to AppV4/current landings, then delete obsolete generations and remove unused dependencies from package/lock.
+3. **Large business-logo PNG (P2/P3).** The browser no longer needs it as favicon, but `logo.png` remains large and is referenced by schema. Generate an appropriately sized optimized logo asset before replacing it.
+4. **Exact external verification (manual).** Tag Assistant/GA4 DebugView, Google Ads auto-tagging/account link and Search Console URL Inspection still require account/browser-level verification.
+5. **Historical secret provenance (manual).** Determine whether the former fal.ai-looking example was ever a valid credential. If yes, revoke/rotate it regardless of its removal from the current branch.
 
 ## Next remediation order
 
-1. Move Google Fonts off third-party pre-consent loading.
-2. Add explicit `Gebucht am` / `Abgeschlossen am` business timestamps to the CRM workflow and use them for Ads export.
-3. Migrate useful tests from old app generations, then delete App/AppV2/AppV3 and unused dependencies.
-4. Optimize the remaining large logo asset.
-5. Re-run full `site-audit` after these changes and perform the manual Tag Assistant / DebugView / Search Console checks.
+1. Add explicit `Gebucht am` / `Abgeschlossen am` business timestamps to the CRM workflow and use them for Ads export.
+2. Migrate useful tests from old app generations, then delete App/AppV2/AppV3 and unused dependencies.
+3. Optimize the remaining large logo asset.
+4. Re-run full `site-audit` after these changes and perform the manual Tag Assistant / DebugView / Search Console checks.
