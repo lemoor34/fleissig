@@ -31,20 +31,40 @@ TARGET_EVENTS = {
     "fenster_whatsapp_click",
 }
 
-LEAD_EVENTS = {
-    "whatsapp_click",
-    "phone_click",
-    "umzug_whatsapp_click",
-    "fenster_whatsapp_click",
-}
+# CRM uses one canonical contact event per action. The specialized WhatsApp
+# events remain in GA4 for diagnostics, but are not imported as extra leads.
+LEAD_EVENTS = {"whatsapp_click", "phone_click"}
+REALTIME_LEAD_EVENTS = {"whatsapp_click", "phone_click"}
 
-REALTIME_LEAD_EVENTS = {
-    "phone_click",
-    "umzug_whatsapp_click",
-    "fenster_whatsapp_click",
-}
+UNKNOWN_VALUES = {"", "(not set)"}
+CLICK_ID_KEYS = ("gclid", "gbraid", "wbraid")
 
-NOT_SET_VALUES = {"", "(not set)", "(none)", "(direct)"}
+LEADS_HEADERS = [
+    "Дата/время",
+    "Lead ID",
+    "Источник",
+    "Канал",
+    "Кампания",
+    "Ключевая фраза",
+    "ID рекламного клика",
+    "Страница входа",
+    "Услуга",
+    "Город",
+    "Клиент",
+    "Телефон",
+    "Статус",
+    "Оценка от CHF",
+    "Оценка до CHF",
+    "Офер CHF",
+    "Заказ CHF",
+    "Прямые затраты CHF",
+    "Валовая прибыль CHF",
+    "Дата работы",
+    "Причина отказа",
+    "Комментарий",
+    "Последнее обновление",
+    "Ответственный",
+]
 
 
 def discover_property_id() -> str:
@@ -82,6 +102,16 @@ def ensure_sheet(sheets, title: str):
     ).execute()
 
 
+def ensure_leads_headers(sheets):
+    ensure_sheet(sheets, "Leads")
+    sheets.spreadsheets().values().update(
+        spreadsheetId=SPREADSHEET_ID,
+        range="'Leads'!A1:X1",
+        valueInputOption="RAW",
+        body={"values": [LEADS_HEADERS]},
+    ).execute()
+
+
 def replace_sheet(sheets, title: str, values):
     ensure_sheet(sheets, title)
     sheets.spreadsheets().values().clear(
@@ -98,43 +128,152 @@ def replace_sheet(sheets, title: str, values):
         ).execute()
 
 
-def clean_value(value: str) -> str:
+def clean_ga_value(value: str) -> str:
     value = (value or "").strip()
-    return "" if value in NOT_SET_VALUES else value
+    return "" if value in UNKNOWN_VALUES else value
 
 
-def parse_landing_params(landing_page: str):
+def parse_url_params(value: str):
     try:
-        query = urlsplit(landing_page or "").query
+        query = urlsplit(value or "").query
         params = parse_qs(query)
     except Exception:
         return {}
-    return {key: values[0] for key, values in params.items() if values}
+    return {key.lower(): values[0] for key, values in params.items() if values}
 
 
-def service_for_lead(event_name: str, landing_page: str) -> str:
-    landing = (landing_page or "").lower()
-    if event_name == "umzug_whatsapp_click" or "umzugsreinigung" in landing:
+def path_plus_query(value: str) -> str:
+    try:
+        parsed = urlsplit(value or "")
+    except Exception:
+        return ""
+    if not parsed.path and not parsed.query:
+        return ""
+    result = parsed.path or "/"
+    if parsed.query:
+        result += f"?{parsed.query}"
+    return result[:1000]
+
+
+def referrer_host(value: str) -> str:
+    try:
+        return urlsplit(value or "").hostname.lower().removeprefix("www.")
+    except Exception:
+        return ""
+
+
+def has_click_id(params: dict) -> bool:
+    return any(params.get(key) for key in CLICK_ID_KEYS)
+
+
+def combine_params(*sources):
+    result = {}
+    for source in sources:
+        for key, value in (source or {}).items():
+            if value:
+                result[key] = value
+    return result
+
+
+def infer_technical_attribution(
+    session_source: str,
+    session_medium: str,
+    landing_page: str,
+    page_location: str,
+    page_referrer: str,
+):
+    source = clean_ga_value(session_source)
+    medium = clean_ga_value(session_medium)
+
+    landing_params = parse_url_params(landing_page)
+    page_params = parse_url_params(page_location)
+    params = combine_params(landing_params, page_params)
+
+    if has_click_id(params):
+        source = "google"
+        medium = "cpc"
+    else:
+        source = source or params.get("utm_source", "")
+        medium = medium or params.get("utm_medium", "")
+
+    if not source:
+        host = referrer_host(page_referrer)
+        if host:
+            if "google." in host:
+                source, medium = "google", medium or "organic"
+            elif "bing." in host or "duckduckgo." in host:
+                source, medium = host, medium or "organic"
+            else:
+                source, medium = host, medium or "referral"
+
+    # Preserve a real GA4 direct visit. Unknown remains unknown and must not be
+    # silently rewritten as Direct.
+    if source == "(direct)":
+        source = "direct"
+    if medium == "(none)" and source == "direct":
+        medium = "direct"
+
+    return source, medium, params
+
+
+def friendly_source(source: str, medium: str) -> str:
+    src = (source or "").lower()
+    med = (medium or "").lower()
+
+    if src == "google" and med in {"cpc", "ppc", "paid", "paid_search"}:
+        return "Google Ads"
+    if src == "google" and med == "organic":
+        return "Google поиск"
+    if src == "direct":
+        return "Прямой заход"
+    if src in {"fb", "ig", "facebook", "instagram", "facebook.com", "instagram.com", "l.facebook.com", "lm.facebook.com"}:
+        return "Facebook / Instagram"
+    if med == "organic":
+        return "Другой поиск"
+    if med in {"referral", "social", "organic_social"} or src:
+        return "Другой сайт"
+    return "Не определено"
+
+
+def friendly_medium(source: str, medium: str) -> str:
+    src = (source or "").lower()
+    med = (medium or "").lower()
+
+    if med in {"cpc", "ppc", "paid", "paid_search", "paid_social"}:
+        return "Платная реклама"
+    if med == "organic":
+        return "Бесплатный поиск"
+    if src == "direct" or med == "direct":
+        return "Прямой"
+    if med in {"social", "organic_social"}:
+        return "Соцсети"
+    if med == "referral":
+        return "Переход по ссылке"
+    return "Не определено"
+
+
+def choose_effective_landing(landing_page: str, page_location: str, params: dict) -> str:
+    landing = (landing_page or "").strip()
+    current = path_plus_query(page_location)
+    landing_params = parse_url_params(landing)
+
+    # GA4 may expose a clean landing page while the event page still contains
+    # the Google click ID. Prefer the event URL in that case so offline
+    # conversion attribution can keep the click identifier.
+    if current and has_click_id(params) and not has_click_id(landing_params):
+        return current
+    return landing or current
+
+
+def service_for_lead(event_name: str, page_context: str) -> str:
+    page = (page_context or "").lower()
+    if "umzugsreinigung" in page:
         return "Umzugsreinigung"
-    if event_name == "fenster_whatsapp_click" or "fensterreinigung" in landing:
+    if "fensterreinigung" in page:
         return "Fensterreinigung"
     if event_name == "phone_click":
         return "Telefonanfrage"
     return "Reinigungsanfrage"
-
-
-def should_create_lead(event_name: str, landing_page: str) -> bool:
-    if event_name not in LEAD_EVENTS:
-        return False
-
-    # Service pages emit both a generic WhatsApp event and a dedicated event.
-    # Ignore the generic one there so one click creates exactly one CRM lead.
-    if event_name == "whatsapp_click":
-        landing = (landing_page or "").lower()
-        if "umzugsreinigung" in landing or "fensterreinigung" in landing:
-            return False
-
-    return True
 
 
 def make_lead_id(property_id: str, date_hour_minute: str, event_name: str, ordinal: int) -> str:
@@ -200,84 +339,59 @@ def build_lead_row(
     medium: str,
     campaign: str,
     keyword: str,
-    gclid: str,
+    click_id: str,
     landing_page: str,
     service: str,
     comment: str,
     synced_at: str,
 ):
     return [
-        display_datetime(date_hour_minute),
-        lead_id,
-        source,
-        medium,
-        campaign,
-        keyword,
-        gclid,
-        landing_page,
-        service,
-        "",
-        "",
-        "",
-        "Новый",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        comment,
-        synced_at,
-        "",
+        display_datetime(date_hour_minute), lead_id, source, medium, campaign, keyword,
+        click_id, landing_page, service, "", "", "", "Новый", "", "", "", "",
+        "", "", "", "", comment, synced_at, "",
     ]
+
+
+def run_lead_report(data, property_id: str):
+    candidates = [
+        [
+            "dateHourMinute", "eventName", "sessionSource", "sessionMedium",
+            "sessionCampaignName", "sessionManualTerm", "sessionGoogleAdsKeyword",
+            "landingPagePlusQueryString", "pageLocation", "pageReferrer",
+        ],
+        [
+            "dateHourMinute", "eventName", "sessionSource", "sessionMedium",
+            "sessionCampaignName", "landingPagePlusQueryString", "pageLocation",
+            "pageReferrer",
+        ],
+        [
+            "dateHourMinute", "eventName", "sessionSource", "sessionMedium",
+            "sessionCampaignName", "landingPagePlusQueryString",
+        ],
+    ]
+
+    last_error = None
+    for dimensions in candidates:
+        try:
+            response = data.run_report(
+                RunReportRequest(
+                    property=f"properties/{property_id}",
+                    dimensions=[Dimension(name=name) for name in dimensions],
+                    metrics=[Metric(name="eventCount")],
+                    date_ranges=[DateRange(start_date="7daysAgo", end_date="today")],
+                    limit=100000,
+                )
+            )
+            return dimensions, response
+        except Exception as exc:
+            last_error = exc
+            print(f"Lead report dimensions unavailable ({', '.join(dimensions)}): {exc}")
+
+    raise RuntimeError(f"No compatible GA4 lead report dimensions: {last_error}")
 
 
 def sync_processed_leads(data, sheets, property_id: str, synced_at: str):
-    rich_dimensions = [
-        "dateHourMinute",
-        "eventName",
-        "sessionSource",
-        "sessionMedium",
-        "sessionCampaignName",
-        "sessionManualTerm",
-        "sessionGoogleAdsKeyword",
-        "landingPagePlusQueryString",
-    ]
-    fallback_dimensions = [
-        "dateHourMinute",
-        "eventName",
-        "sessionSource",
-        "sessionMedium",
-        "sessionCampaignName",
-        "landingPagePlusQueryString",
-    ]
-
-    dimension_names = rich_dimensions
-    try:
-        response = data.run_report(
-            RunReportRequest(
-                property=f"properties/{property_id}",
-                dimensions=[Dimension(name=name) for name in rich_dimensions],
-                metrics=[Metric(name="eventCount")],
-                date_ranges=[DateRange(start_date="7daysAgo", end_date="today")],
-                limit=100000,
-            )
-        )
-    except Exception as exc:
-        print(f"Rich lead report unavailable, using fallback dimensions: {exc}")
-        dimension_names = fallback_dimensions
-        response = data.run_report(
-            RunReportRequest(
-                property=f"properties/{property_id}",
-                dimensions=[Dimension(name=name) for name in fallback_dimensions],
-                metrics=[Metric(name="eventCount")],
-                date_ranges=[DateRange(start_date="7daysAgo", end_date="today")],
-                limit=100000,
-            )
-        )
-
+    dimension_names, response = run_lead_report(data, property_id)
     existing = load_existing_leads(sheets)
     new_rows = []
     enrich_updates = []
@@ -285,26 +399,31 @@ def sync_processed_leads(data, sheets, property_id: str, synced_at: str):
     for raw_row in rows_from_report(response):
         values = dict(zip(dimension_names + ["eventCount"], raw_row))
         event_name = values.get("eventName", "")
-        landing_page = values.get("landingPagePlusQueryString", "")
-        date_hour_minute = values.get("dateHourMinute", "")
-
-        if not should_create_lead(event_name, landing_page):
+        if event_name not in LEAD_EVENTS:
             continue
 
-        source = clean_value(values.get("sessionSource", "")) or "direct"
-        medium = clean_value(values.get("sessionMedium", "")) or "(none)"
-        campaign = clean_value(values.get("sessionCampaignName", ""))
-        google_keyword = clean_value(values.get("sessionGoogleAdsKeyword", ""))
-        manual_term = clean_value(values.get("sessionManualTerm", ""))
-        keyword = google_keyword or manual_term
-        landing_params = parse_landing_params(landing_page)
-        gclid = landing_params.get("gclid", "")
+        date_hour_minute = values.get("dateHourMinute", "")
+        landing_page = values.get("landingPagePlusQueryString", "")
+        page_location = values.get("pageLocation", "")
+        page_referrer = values.get("pageReferrer", "")
 
-        source = source or landing_params.get("utm_source", "")
-        medium = medium or landing_params.get("utm_medium", "")
-        campaign = campaign or landing_params.get("utm_campaign", "")
-        keyword = keyword or landing_params.get("utm_term", "")
-        service = service_for_lead(event_name, landing_page)
+        source_raw, medium_raw, params = infer_technical_attribution(
+            values.get("sessionSource", ""),
+            values.get("sessionMedium", ""),
+            landing_page,
+            page_location,
+            page_referrer,
+        )
+
+        source = friendly_source(source_raw, medium_raw)
+        medium = friendly_medium(source_raw, medium_raw)
+        campaign = clean_ga_value(values.get("sessionCampaignName", "")) or params.get("utm_campaign", "")
+        google_keyword = clean_ga_value(values.get("sessionGoogleAdsKeyword", ""))
+        manual_term = clean_ga_value(values.get("sessionManualTerm", ""))
+        keyword = google_keyword or manual_term or params.get("utm_term", "")
+        click_id = params.get("gclid", "")
+        effective_landing = choose_effective_landing(landing_page, page_location, params)
+        service = service_for_lead(event_name, effective_landing or page_location)
 
         try:
             count = max(1, int(float(values.get("eventCount", "1"))))
@@ -313,7 +432,7 @@ def sync_processed_leads(data, sheets, property_id: str, synced_at: str):
 
         for ordinal in range(1, count + 1):
             lead_id = make_lead_id(property_id, date_hour_minute, event_name, ordinal)
-            enrichment = [source, medium, campaign, keyword, gclid, landing_page, service]
+            enrichment = [source, medium, campaign, keyword, click_id, effective_landing, service]
 
             if lead_id in existing:
                 enrich_updates.append((existing[lead_id]["row"], enrichment, synced_at))
@@ -327,8 +446,8 @@ def sync_processed_leads(data, sheets, property_id: str, synced_at: str):
                     medium,
                     campaign,
                     keyword,
-                    gclid,
-                    landing_page,
+                    click_id,
+                    effective_landing,
                     service,
                     f"Auto-import aus GA4: {event_name}",
                     synced_at,
@@ -380,8 +499,8 @@ def sync_realtime_leads(data, sheets, property_id: str, synced_at: str) -> int:
                 build_lead_row(
                     date_hour_minute,
                     lead_id,
-                    "",
-                    "",
+                    "Ожидает данных",
+                    "Ожидает данных",
                     "",
                     "",
                     "",
@@ -402,14 +521,14 @@ def main():
     sheets = build("sheets", "v4", cache_discovery=False)
     synced_at = datetime.now(timezone.utc).isoformat()
 
+    ensure_leads_headers(sheets)
+
     events_response = data.run_report(
         RunReportRequest(
             property=f"properties/{property_id}",
             dimensions=[
-                Dimension(name="date"),
-                Dimension(name="eventName"),
-                Dimension(name="sessionSource"),
-                Dimension(name="sessionMedium"),
+                Dimension(name="date"), Dimension(name="eventName"),
+                Dimension(name="sessionSource"), Dimension(name="sessionMedium"),
                 Dimension(name="sessionCampaignName"),
             ],
             metrics=[Metric(name="eventCount"), Metric(name="totalUsers")],
@@ -429,10 +548,8 @@ def main():
         RunReportRequest(
             property=f"properties/{property_id}",
             dimensions=[
-                Dimension(name="date"),
-                Dimension(name="landingPagePlusQueryString"),
-                Dimension(name="sessionSource"),
-                Dimension(name="sessionMedium"),
+                Dimension(name="date"), Dimension(name="landingPagePlusQueryString"),
+                Dimension(name="sessionSource"), Dimension(name="sessionMedium"),
                 Dimension(name="sessionCampaignName"),
             ],
             metrics=[Metric(name="sessions"), Metric(name="totalUsers")],
