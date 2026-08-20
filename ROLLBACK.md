@@ -1,21 +1,31 @@
-# Fleissig conversion-focused homepage experiment
+# Fleissig production rollback
 
-The original production application remains in `src/App.jsx`.
+The active production entry point is `src/main.jsx`.
 
-The current preview renders `src/AppV3.jsx`, which:
+Current routes:
 
-- uses a clean bathroom photo in the hero without text overlays;
-- separates normal cleaning, moving cleaning, and garden enquiries;
-- asks for photos or video only for moving cleaning and complex work;
-- keeps hourly pricing as the primary model;
-- preserves the original before/after proof images lower on the page.
+- `/` → `src/AppV4.jsx`
+- `/umzugsreinigung-aargau` → `src/UmzugsreinigungLanding.jsx`
+- `/fensterreinigung-aargau` → `src/FensterreinigungLanding.jsx`
 
-## Rollback
+Consent and measurement ownership is centralized in:
 
-To restore the old application, change `src/main.jsx` back to:
+- `src/privacyConsent.js`
+- `src/tracking.js`
+- `src/SitePrivacyControls.jsx`
 
-```jsx
-import App from './App.jsx'
-```
+Do not restore an older `AppV2`/`AppV3` generation as a rollback method. Those files are historical code, not a supported production fallback.
 
-and render `<App />` instead of `<AppV3 />`.
+## Rollback procedure
+
+Use the last known-good Git commit / Vercel production deployment and redeploy that exact revision. This keeps the HTML entry points, routing, Consent Mode, analytics and CRM attribution code on one consistent revision.
+
+After a rollback verify:
+
+1. `/`, `/umzugsreinigung-aargau` and `/fensterreinigung-aargau` return HTTP 200.
+2. A nonexistent URL returns HTTP 404.
+3. `npm run build` passes the regression tests.
+4. Consent defaults are denied before optional measurement loads.
+5. One WhatsApp or phone action emits one canonical contact event.
+
+Avoid partial file-by-file rollback of analytics or consent code because the tracking, consent and attribution layers are designed to work as one versioned system.
