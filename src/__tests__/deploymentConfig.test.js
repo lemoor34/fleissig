@@ -10,7 +10,7 @@ describe('Vercel production config', () => {
     expect(rewrites.some((rule) => rule.source === '/(.*)' && rule.destination === '/index.html')).toBe(false)
   })
 
-  it('keeps explicit rewrites for the two service landings', () => {
+  it('keeps explicit rewrites for all service landings', () => {
     expect(config.rewrites).toEqual(expect.arrayContaining([
       expect.objectContaining({
         source: '/umzugsreinigung-aargau',
@@ -19,6 +19,10 @@ describe('Vercel production config', () => {
       expect.objectContaining({
         source: '/fensterreinigung-aargau',
         destination: '/fensterreinigung-aargau/index.html',
+      }),
+      expect.objectContaining({
+        source: '/wohnungsreinigung-aargau',
+        destination: '/wohnungsreinigung-aargau/index.html',
       }),
     ]))
   })

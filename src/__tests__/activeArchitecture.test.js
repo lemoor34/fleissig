@@ -6,6 +6,7 @@ const activeFiles = [
   'src/AppV4.jsx',
   'src/UmzugsreinigungLanding.jsx',
   'src/FensterreinigungLanding.jsx',
+  'src/WohnungsreinigungLanding.jsx',
 ]
 
 function source(path) {
@@ -25,5 +26,6 @@ describe('active production architecture', () => {
     expect(text).not.toContain('conversion_event_contact')
     expect(text).not.toContain('umzug_whatsapp_click')
     expect(text).not.toContain('fenster_whatsapp_click')
+    expect(text).not.toContain('wohnungsreinigung_whatsapp_click')
   })
 })
