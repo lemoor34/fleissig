@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-const config = JSON.parse(readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8'))
+const config = JSON.parse(readFileSync(resolve(process.cwd(), 'vercel.json'), 'utf8'))
 
 describe('Vercel production config', () => {
   it('does not rewrite every unknown URL to the homepage', () => {
@@ -26,6 +27,7 @@ describe('Vercel production config', () => {
     const globalRule = (config.headers || []).find((rule) => rule.source === '/(.*)')
     const headers = Object.fromEntries((globalRule?.headers || []).map(({ key, value }) => [key, value]))
 
+    expect(headers['Content-Security-Policy']).toContain("frame-ancestors 'none'")
     expect(headers['X-Content-Type-Options']).toBe('nosniff')
     expect(headers['X-Frame-Options']).toBe('DENY')
     expect(headers['Referrer-Policy']).toBe('strict-origin-when-cross-origin')
