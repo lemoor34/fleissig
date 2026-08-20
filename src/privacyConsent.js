@@ -5,6 +5,17 @@ const ATTRIBUTION_KEYS = ['fleissig-attribution-v3', 'fleissig-attribution-v2']
 const GA_MEASUREMENT_ID = 'G-GY6PDS53F7'
 const META_PIXEL_ID = '1607333053899638'
 
+// Transitional guard while historical page components are being removed.
+// These legacy contact events used to be emitted in addition to the canonical
+// whatsapp_click / phone_click events from tracking.js. Dropping them here
+// ensures GA4 receives one contact conversion per user action even if an old
+// page-local handler still calls gtag directly.
+const LEGACY_CONTACT_EVENTS = new Set([
+  'conversion_event_contact',
+  'umzug_whatsapp_click',
+  'fenster_whatsapp_click',
+])
+
 const DENIED = {
   ad_storage: 'denied',
   analytics_storage: 'denied',
@@ -25,7 +36,10 @@ const MEASUREMENT_GRANTED = {
 function ensureGtag() {
   window.dataLayer = window.dataLayer || []
   if (typeof window.gtag !== 'function') {
-    window.gtag = function gtag(){ window.dataLayer.push(arguments) }
+    window.gtag = function gtag(){
+      if (arguments[0] === 'event' && LEGACY_CONTACT_EVENTS.has(arguments[1])) return
+      window.dataLayer.push(arguments)
+    }
   }
   return window.gtag
 }
