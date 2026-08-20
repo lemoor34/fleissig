@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - 'scripts/attribution_sync.py'
+      - 'scripts/attribution_job.py'
       - 'scripts/google_ads_export.py'
       - '.github/workflows/ga4-sync.yml'
   schedule:
@@ -46,7 +47,7 @@ jobs:
         env:
           FLEISSIG_SPREADSHEET_ID: 162L8UbKvna-uha_dC8XTsBqo38mlM9iGFIaszZOIHc8
           GA4_PROPERTY_NAME: Fleissig-Reinigung
-        run: python scripts/attribution_sync.py
+        run: python scripts/attribution_job.py
 
       - name: Prepare Google Ads offline conversions
         env:
