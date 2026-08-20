@@ -9,6 +9,7 @@ on:
       - 'scripts/attribution_sync.py'
       - 'scripts/attribution_job.py'
       - 'scripts/google_ads_export.py'
+      - 'scripts/test_google_ads_export.py'
       - '.github/workflows/ga4-sync.yml'
   schedule:
     - cron: '17 * * * *'
@@ -40,6 +41,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install google-analytics-data google-analytics-admin google-api-python-client
+
+      - name: Test Google Ads milestone timestamps
+        run: python -m unittest discover -s scripts -p 'test_google_ads_export.py'
 
       # CRM is the source of truth for orders/revenue; GA4 only supplies attribution.
       # Manual CRM status/revenue edits must survive every analytics refresh.
