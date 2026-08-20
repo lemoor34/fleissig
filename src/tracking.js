@@ -1,5 +1,6 @@
 const CONSENT_KEY = 'fleissig-consent'
-const ATTRIBUTION_KEY = 'fleissig-attribution-v1'
+const ATTRIBUTION_KEY = 'fleissig-attribution-v2'
+const HISTORY_KEY = '__fleissig_attribution_v2'
 
 const ATTRIBUTION_PARAMS = [
   'gclid',
@@ -21,26 +22,40 @@ function hasAnalyticsConsent() {
   }
 }
 
-function readIncomingAttribution() {
-  const params = new URLSearchParams(window.location.search)
+function readIncomingAttribution(search = window.location.search) {
+  const params = new URLSearchParams(search)
   const incoming = {}
 
   for (const key of ATTRIBUTION_PARAMS) {
     const value = params.get(key)
-    if (value) incoming[key] = value.slice(0, 250)
+    if (value) incoming[key] = value.slice(0, 500)
   }
 
   return incoming
 }
 
-function inferSource() {
-  const referrer = document.referrer
+function hasPaidClickId(incoming) {
+  return Boolean(incoming?.gclid || incoming?.gbraid || incoming?.wbraid)
+}
+
+function inferSource(incoming, referrer = document.referrer) {
+  if (hasPaidClickId(incoming)) return { source: 'google', medium: 'cpc' }
+
+  if (incoming?.utm_source) {
+    return {
+      source: incoming.utm_source,
+      medium: incoming.utm_medium || 'campaign',
+    }
+  }
+
   if (!referrer) return { source: 'direct', medium: '(none)' }
 
   try {
     const host = new URL(referrer).hostname.replace(/^www\./, '')
     if (host.includes('google.')) return { source: 'google', medium: 'organic' }
-    if (host.includes('bing.')) return { source: 'bing', medium: 'organic' }
+    if (host.includes('bing.') || host.includes('duckduckgo.')) {
+      return { source: host, medium: 'organic' }
+    }
     if (host === window.location.hostname.replace(/^www\./, '')) {
       return { source: 'internal', medium: 'navigation' }
     }
@@ -49,6 +64,61 @@ function inferSource() {
     return { source: 'unknown', medium: 'referral' }
   }
 }
+
+function buildTouch({ incoming, referrer, landingPage }) {
+  const inferred = inferSource(incoming, referrer)
+  return {
+    ...incoming,
+    source: incoming.utm_source || inferred.source,
+    medium: incoming.utm_medium || inferred.medium,
+    landing_page: landingPage.slice(0, 1000),
+    referrer: (referrer || '').slice(0, 1000),
+    captured_at: new Date().toISOString(),
+  }
+}
+
+function createCurrentTouch() {
+  return buildTouch({
+    incoming: readIncomingAttribution(),
+    referrer: document.referrer,
+    landingPage: `${window.location.pathname}${window.location.search}`,
+  })
+}
+
+function readHistoryTouch() {
+  try {
+    const state = window.history.state
+    if (!state || typeof state !== 'object') return null
+    return state[HISTORY_KEY] || null
+  } catch {
+    return null
+  }
+}
+
+function persistHistoryTouch(touch) {
+  try {
+    const state = window.history.state && typeof window.history.state === 'object'
+      ? window.history.state
+      : {}
+    window.history.replaceState({ ...state, [HISTORY_KEY]: touch }, document.title)
+  } catch {
+    // Losing the pre-consent snapshot is non-fatal; GA4 can still use the URL.
+  }
+}
+
+function captureInitialTouch() {
+  const existing = readHistoryTouch()
+  if (existing) return existing
+
+  const touch = createCurrentTouch()
+  persistHistoryTouch(touch)
+  return touch
+}
+
+// Captured before the cookie banner can reload the page. history.state survives
+// same-page reloads, so the original Google/referrer context is not lost while
+// analytics itself still remains disabled until consent is accepted.
+const INITIAL_TOUCH = captureInitialTouch()
 
 function readStoredAttribution() {
   try {
@@ -62,23 +132,16 @@ function readStoredAttribution() {
 function persistAttributionIfAllowed() {
   if (!hasAnalyticsConsent()) return readStoredAttribution()
 
-  const incoming = readIncomingAttribution()
-  const hasIncoming = Object.keys(incoming).length > 0
   const existing = readStoredAttribution() || {}
-  const inferred = inferSource()
-  const now = new Date().toISOString()
-
-  const touch = {
-    ...incoming,
-    source: incoming.utm_source || inferred.source,
-    medium: incoming.utm_medium || inferred.medium,
-    landing_page: `${window.location.pathname}${window.location.search}`.slice(0, 500),
-    captured_at: now,
-  }
+  const currentIncoming = readIncomingAttribution()
+  const hasCurrentCampaign = Object.keys(currentIncoming).length > 0
+  const currentTouch = hasCurrentCampaign ? createCurrentTouch() : INITIAL_TOUCH
 
   const next = {
-    first_touch: existing.first_touch || touch,
-    last_touch: hasIncoming ? touch : (existing.last_touch || touch),
+    first_touch: existing.first_touch || INITIAL_TOUCH || currentTouch,
+    last_touch: hasCurrentCampaign
+      ? currentTouch
+      : (existing.last_touch || INITIAL_TOUCH || currentTouch),
   }
 
   try {
@@ -93,20 +156,33 @@ function persistAttributionIfAllowed() {
 function eventAttributionParams() {
   const stored = persistAttributionIfAllowed()
   const incoming = readIncomingAttribution()
-  const touch = stored?.last_touch || stored?.first_touch || {}
+  const touch = stored?.last_touch || stored?.first_touch || INITIAL_TOUCH || {}
+  const source = incoming.utm_source || touch.source
+  const medium = incoming.utm_medium || touch.medium
 
   return {
-    traffic_source: incoming.utm_source || touch.source,
-    traffic_medium: incoming.utm_medium || touch.medium,
+    // Human attribution helpers used by our CRM sync.
+    traffic_source: source,
+    traffic_medium: medium,
+
+    // Standard campaign parameter names improve GA4's own attribution too.
+    campaign_source: source,
+    campaign_medium: medium,
     campaign_name: incoming.utm_campaign || touch.utm_campaign,
     campaign_term: incoming.utm_term || touch.utm_term,
     campaign_content: incoming.utm_content || touch.utm_content,
     campaign_id: incoming.utm_id || touch.utm_id,
+
     gclid: incoming.gclid || touch.gclid,
     gbraid: incoming.gbraid || touch.gbraid,
     wbraid: incoming.wbraid || touch.wbraid,
     landing_page: stored?.first_touch?.landing_page || touch.landing_page,
     current_page: window.location.pathname,
+
+    // Explicit built-in page fields give the GA4 Data API a second recovery
+    // path when session source/medium are unavailable after consent handling.
+    page_location: window.location.href.slice(0, 1000),
+    page_referrer: (touch.referrer || document.referrer || '').slice(0, 1000),
   }
 }
 
@@ -151,16 +227,10 @@ function installContactTracking() {
     }
 
     if (href.includes('wa.me/') || href.includes('api.whatsapp.com/')) {
-      const service = serviceFromPath()
       trackEvent('whatsapp_click', {
-        service,
+        service: serviceFromPath(),
         link_label: label,
       })
-
-      // Umzugsreinigung already emits its own detailed event with estimate values.
-      if (service === 'fensterreinigung') {
-        trackEvent('fenster_whatsapp_click', { service })
-      }
     }
   }, { capture: true })
 }
@@ -187,8 +257,8 @@ function installCalculatorTracking() {
     attributeFilter: ['class'],
   })
 
-  // If consent is accepted after the calculator is already complete,
-  // retry immediately after the consent click handler has run.
+  // If consent is accepted after the calculator is already complete, retry on
+  // the next click. The event is sent only once after gtag is available.
   document.addEventListener('click', () => {
     window.setTimeout(check, 0)
   }, { capture: true })
@@ -201,9 +271,9 @@ export function initTracking() {
   installContactTracking()
   installCalculatorTracking()
 
-  // Helpful for manual QA in the browser console without exposing anything to customers.
   window.fleissigTracking = {
     getAttribution: readStoredAttribution,
+    captureAttribution: persistAttributionIfAllowed,
     trackEvent,
   }
 }
