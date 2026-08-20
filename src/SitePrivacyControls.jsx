@@ -33,7 +33,7 @@ const PRIVACY_SECTIONS = [
   ],
   [
     'Google Consent Mode v2',
-    'Analyse- und Marketingdienste von Google werden auf dieser Website erst nach Ihrer Einwilligung aktiviert. Vor Ihrer Entscheidung stehen ad_storage, analytics_storage, ad_user_data und ad_personalization auf „denied“. Bei „Alle akzeptieren“ werden diese Signale auf „granted“ gesetzt und die optionalen Messdienste geladen. Bei „Nur notwendige“ bleiben sie deaktiviert.',
+    'Analyse- und Werbemessungsdienste von Google werden auf dieser Website erst nach Ihrer Einwilligung aktiviert. Vor Ihrer Entscheidung stehen ad_storage, analytics_storage, ad_user_data und ad_personalization auf „denied“. Bei „Alle akzeptieren“ werden ad_storage, analytics_storage und ad_user_data für Analyse und Conversion-Messung auf „granted“ gesetzt. ad_personalization bleibt weiterhin „denied“, da wir derzeit keine personalisierte Google-Werbung über diese Einwilligung aktivieren. Bei „Nur notwendige“ bleiben alle vier Signale auf „denied“.',
   ],
   [
     'Offline-Conversion-Messung',
@@ -57,7 +57,7 @@ const PRIVACY_SECTIONS = [
   ],
   [
     'Ihre Rechte und Widerruf',
-    `Sie können im Rahmen des anwendbaren schweizerischen Datenschutzrechts Auskunft, Berichtigung oder Löschung Ihrer Personendaten verlangen. Eine erteilte Einwilligung für Analyse und Marketing können Sie jederzeit mit Wirkung für die Zukunft ändern. Schreiben Sie uns dazu an ${EMAIL} oder öffnen Sie über den Footer erneut die Datenschutzeinstellungen.`,
+    `Sie können im Rahmen des anwendbaren schweizerischen Datenschutzrechts Auskunft, Berichtigung oder Löschung Ihrer Personendaten verlangen. Eine erteilte Einwilligung für Analyse und Werbemessung können Sie jederzeit mit Wirkung für die Zukunft ändern. Schreiben Sie uns dazu an ${EMAIL} oder öffnen Sie über den Footer erneut die Datenschutzeinstellungen.`,
   ],
   [
     'Stand',
@@ -142,7 +142,7 @@ export default function SitePrivacyControls() {
               <h2>Ihre aktuelle Auswahl</h2>
               <p>
                 {choice === 'accepted'
-                  ? 'Analyse und Marketing sind aktuell erlaubt.'
+                  ? 'Analyse und Werbemessung sind aktuell erlaubt.'
                   : choice === 'rejected'
                     ? 'Es sind aktuell nur notwendige Dienste erlaubt.'
                     : 'Sie haben noch keine Auswahl getroffen.'}
