@@ -14,6 +14,8 @@ const CONFIG = {
   uid: "CHE-461.009.759",
 };
 
+const GOOGLE_PROFILE = "https://maps.app.goo.gl/npUZ2ia8aKGwAgNE8?g_st=ic";
+
 const waText = {
   regular: "Grüezi! Ich interessiere mich für eine einmalige oder regelmässige Wohnungsreinigung und möchte einen Termin anfragen.",
   moving: "Grüezi! Ich benötige eine Umzugsreinigung und möchte eine verbindliche Offerte.",
@@ -106,10 +108,10 @@ function Services() {
     {
       icon: Home,
       title: "Wohnungsreinigung",
-      price: "Ab CHF 55 pro Stunde",
-      detail: "Einmalig oder regelmässig. Für Wohnungen und Privathaushalte im Kanton Aargau.",
-      cta: "Termin anfragen",
-      type: "regular",
+      price: "Neukundenpreis CHF 50 pro Stunde",
+      detail: "Einmalig oder regelmässig. Erste Reinigung CHF 50/Std., danach CHF 55/Std.",
+      cta: "Wohnungsreinigung ansehen",
+      href: "/wohnungsreinigung-aargau",
     },
     {
       icon: Truck,
@@ -205,7 +207,7 @@ function SeoServiceDetails() {
               Für die einmalige Grundpflege oder regelmässige Reinigung Ihrer Wohnung. Küche, Bad, Böden und Oberflächen
               werden nach dem vereinbarten Umfang gereinigt. Reinigungsmittel sind bei normalen Aufträgen inklusive.
             </p>
-            <WhatsAppButton label="Wohnungsreinigung anfragen" type="regular" secondary />
+            <a className="text-link" href="/wohnungsreinigung-aargau">Wohnungsreinigung im Aargau ansehen →</a>
           </article>
           <article>
             <h3>Umzugsreinigung mit Abgabegarantie</h3>
@@ -344,6 +346,9 @@ export default function AppV4() {
             <div className="stars">{[1,2,3,4,5].map(n => <Star key={n} size={20} fill="currentColor" />)}</div>
             <blockquote>«Herzlichen Dank 😍, ihr habt SUPER ARBEIT geleistet 👏🏼👏🏼👏🏼 Mache sehr gerne für Euch Werbung 🥰»</blockquote>
             <strong>Daniela & Martin</strong>
+            <a className="google-profile-link" href={GOOGLE_PROFILE} target="_blank" rel="noopener noreferrer">
+              <MapPin size={17} /> Fleissig Reinigung auf Google ansehen
+            </a>
           </div>
         </section>
 
@@ -371,8 +376,10 @@ export default function AppV4() {
         <div className="shell footer">
           <div><strong>Fleissig Reinigung</strong><span>Reinigung & Gartenpflege im Kanton Aargau</span></div>
           <div className="footer-links">
+            <a href="/wohnungsreinigung-aargau">Wohnungsreinigung</a>
             <a href="/umzugsreinigung-aargau">Umzugsreinigung</a>
             <a href="/fensterreinigung-aargau">Fensterreinigung</a>
+            <a href={GOOGLE_PROFILE} target="_blank" rel="noopener noreferrer">Google-Profil</a>
             <button onClick={() => setLegal("imprint")}>Impressum</button>
             <button onClick={() => setLegal("privacy")}>Datenschutz</button>
             <a href={`mailto:${CONFIG.email}`}>E-Mail</a>
@@ -456,7 +463,9 @@ a{color:inherit}
 .review{padding:72px 0;background:var(--dark);color:#fff;text-align:center}
 .stars{display:flex;justify-content:center;gap:4px;color:#ffd65a}
 .review blockquote{max-width:780px;margin:20px auto 16px;font-size:clamp(20px,3vw,29px);line-height:1.5;font-weight:650}
-.review strong{font-size:14px;color:#cfe2d4}
+.review strong{display:block;font-size:14px;color:#cfe2d4}
+.google-profile-link{display:inline-flex;align-items:center;gap:7px;margin-top:22px;border:1px solid rgba(255,255,255,.34);border-radius:10px;padding:10px 14px;color:#fff;text-decoration:none;font-size:13px;font-weight:700;background:rgba(255,255,255,.06)}
+.google-profile-link:hover{background:rgba(255,255,255,.12)}
 .faq{background:#fff}
 .faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .faq-grid article{border:1px solid var(--line);border-radius:15px;padding:22px}
