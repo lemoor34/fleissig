@@ -1,4 +1,7 @@
 const CONSENT_KEY = 'fleissig-consent'
+const CONSENT_VERSION_KEY = 'fleissig-consent-version'
+const CONSENT_VERSION = '2'
+const ATTRIBUTION_KEYS = ['fleissig-attribution-v3', 'fleissig-attribution-v2']
 const GA_MEASUREMENT_ID = 'G-GY6PDS53F7'
 const META_PIXEL_ID = '1607333053899638'
 
@@ -9,11 +12,14 @@ const DENIED = {
   ad_personalization: 'denied',
 }
 
-const GRANTED = {
+// We currently use Google for analytics and conversion measurement, not for
+// personalized advertising. ad_personalization therefore stays denied even
+// after the visitor accepts the optional measurement services.
+const MEASUREMENT_GRANTED = {
   ad_storage: 'granted',
   analytics_storage: 'granted',
   ad_user_data: 'granted',
-  ad_personalization: 'granted',
+  ad_personalization: 'denied',
 }
 
 function ensureGtag() {
@@ -24,8 +30,32 @@ function ensureGtag() {
   return window.gtag
 }
 
+function clearOptionalAttributionStorage() {
+  try {
+    for (const key of ATTRIBUTION_KEYS) window.localStorage.removeItem(key)
+  } catch {
+    // Storage may be unavailable; consent signals still apply for this page.
+  }
+}
+
+function invalidateLegacyConsent() {
+  try {
+    const rawChoice = window.localStorage.getItem(CONSENT_KEY)
+    const version = window.localStorage.getItem(CONSENT_VERSION_KEY)
+    if (rawChoice && version !== CONSENT_VERSION) {
+      window.localStorage.removeItem(CONSENT_KEY)
+      window.localStorage.removeItem(CONSENT_VERSION_KEY)
+      clearOptionalAttributionStorage()
+    }
+  } catch {
+    // No persisted choice available.
+  }
+}
+
 export function getConsentChoice() {
   try {
+    const version = window.localStorage.getItem(CONSENT_VERSION_KEY)
+    if (version !== CONSENT_VERSION) return null
     const value = window.localStorage.getItem(CONSENT_KEY)
     return value === 'accepted' || value === 'rejected' ? value : null
   } catch {
@@ -35,7 +65,7 @@ export function getConsentChoice() {
 
 function updateGoogleConsent(choice) {
   const gtag = ensureGtag()
-  gtag('consent', 'update', choice === 'accepted' ? GRANTED : DENIED)
+  gtag('consent', 'update', choice === 'accepted' ? MEASUREMENT_GRANTED : DENIED)
 }
 
 function loadGoogleAnalytics() {
@@ -91,6 +121,7 @@ export function setConsentChoice(choice) {
   const normalized = choice === 'accepted' ? 'accepted' : 'rejected'
   try {
     window.localStorage.setItem(CONSENT_KEY, normalized)
+    window.localStorage.setItem(CONSENT_VERSION_KEY, CONSENT_VERSION)
   } catch {
     // Consent still applies for the current page even when storage is blocked.
   }
@@ -101,6 +132,7 @@ export function setConsentChoice(choice) {
     loadMeasurementServices()
   } else {
     revokeMetaConsent()
+    clearOptionalAttributionStorage()
   }
 
   window.dispatchEvent(new CustomEvent('fleissig-consent-changed', {
@@ -111,11 +143,12 @@ export function setConsentChoice(choice) {
 }
 
 export function initConsentMode() {
+  invalidateLegacyConsent()
   const gtag = ensureGtag()
 
   // Consent Mode v2 default must be set before any Google tag is loaded.
   // We use Basic Consent Mode: optional measurement tags are not loaded until
-  // the visitor actively accepts analytics/marketing services.
+  // the visitor actively accepts analytics/advertising measurement services.
   gtag('consent', 'default', {
     ...DENIED,
     wait_for_update: 500,
