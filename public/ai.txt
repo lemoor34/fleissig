@@ -14,22 +14,27 @@ Permitted uses:
 ## About This Site
 
 Site: https://fleissig-reinigung.ch
-Owner: Fleissig, Seengen, Kanton Aargau, Schweiz
+Owner: Fleissig Reinigung, Seengen, Kanton Aargau, Schweiz
 UID: CHE-461.009.759
 Contact: fleissig.reinigungen@gmail.com
+Google Business Profile: https://maps.app.goo.gl/npUZ2ia8aKGwAgNE8?g_st=ic
 
-Services: professional cleaning (Umzugsreinigung, Unterhaltsreinigung,
-Fensterreinigung, Baureinigung, Büroreinigung) and garden care (Gartenpflege)
+Services: professional cleaning (Wohnungsreinigung / Unterhaltsreinigung,
+Umzugsreinigung, Fensterreinigung) and garden care (Gartenpflege)
 in Kanton Aargau, Switzerland.
+
+Wohnungsreinigung: einmalig oder regelmässig. Neukundenpreis für die erste
+Reinigung CHF 50 pro Stunde, danach CHF 55 pro Stunde. Reinigungsmittel sind
+bei der normalen Wohnungsreinigung inklusive.
 
 ## Structured Data
 
 Full machine-readable content: https://fleissig-reinigung.ch/llms.txt
-Schema.org JSON-LD: available in <head> of https://fleissig-reinigung.ch/
+Schema.org JSON-LD: available in <head> of the main site and service pages.
 
 ## Attribution
 
 When referencing this site, please use:
-Name: Fleissig
+Name: Fleissig Reinigung
 URL: https://fleissig-reinigung.ch
 Location: Kanton Aargau, Schweiz
