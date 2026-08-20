@@ -390,11 +390,10 @@ export default function AppV4() {
 }
 
 const styles = `
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 :root{--green:#3d7b4f;--dark:#275c39;--pale:#f1f7f2;--ink:#171917;--muted:#69726d;--line:#e2e8e3;--wa:#25d366}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:#fff}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff}
 a{color:inherit}
 .shell{width:min(1120px,calc(100% - 40px));margin:auto}
 .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}

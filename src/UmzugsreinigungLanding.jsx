@@ -284,11 +284,10 @@ export default function UmzugsreinigungLanding() {
 }
 
 const styles = `
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 :root{--lp-green:#357a49;--lp-dark:#215633;--lp-pale:#f1f7f2;--lp-ink:#171917;--lp-muted:#66716a;--lp-line:#dfe7e1;--lp-wa:#25d366}
 *{box-sizing:border-box}
 body{margin:0}
-.umzug-landing{min-height:100vh;background:linear-gradient(155deg,#eef8f0 0,#fff 42%,#f8faf8 100%);font-family:'Plus Jakarta Sans',sans-serif;color:var(--lp-ink)}
+.umzug-landing{min-height:100vh;background:linear-gradient(155deg,#eef8f0 0,#fff 42%,#f8faf8 100%);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--lp-ink)}
 .lp-shell{width:min(800px,calc(100% - 32px));margin:auto}
 .lp-header{background:rgba(255,255,255,.94);border-bottom:1px solid var(--lp-line);backdrop-filter:blur(9px)}
 .lp-header-inner{height:68px;display:flex;align-items:center;justify-content:space-between;gap:18px}
