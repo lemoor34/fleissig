@@ -40,6 +40,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-analytics-data google-analytics-admin google-api-python-client
 
+      # CRM is the source of truth for orders/revenue; GA4 only supplies attribution.
       - name: Sync attribution and CRM
         env:
           FLEISSIG_SPREADSHEET_ID: 162L8UbKvna-uha_dC8XTsBqo38mlM9iGFIaszZOIHc8
