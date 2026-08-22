@@ -3,15 +3,24 @@ from datetime import datetime, timezone
 import attribution_sync as core
 
 
-# Historical analytics QA clicks created while we were wiring the CRM.
-# They stay available in the raw Analytics tabs but must never count as CRM leads.
+# Historical analytics QA clicks and known contact clicks that were never real
+# customer enquiries. They stay available in the raw Analytics tabs but must
+# never count as CRM leads.
 TEST_LEAD_IDS = {
     "FR-260816-1747-22DCF909",
     "FR-260816-1749-D8D31538",
     "FR-260816-1750-B79D00E5",
     "FR-260816-1819-D8D80DEB",
     "FR-260818-2021-D0D98B4E",
+    "FR-260821-1235-7D1F1596",
 }
+
+# GA4 contact clicks are micro-conversions, not proof that a customer actually
+# contacted us. Keep them in Analytics, but do not auto-create CRM leads from
+# whatsapp_click / phone_click. Real leads are confirmed in CRM, and booked or
+# completed jobs are the conversion milestones returned to Google Ads.
+core.LEAD_EVENTS.clear()
+core.TARGET_EVENTS.add("regular_cleaning_whatsapp_click")
 
 # GA4 can temporarily return this value while advertising attribution is still
 # being processed. It is not a real traffic source and must never be converted
@@ -102,7 +111,7 @@ def main():
     added, enriched = core.sync_leads(data, sheets, property_id, synced_at)
     removed_tests = remove_historical_test_leads(sheets)
 
-    # Build the business readout only after QA/test rows are removed.
+    # Build the business readout only after QA/test/non-lead rows are removed.
     readout = core.build_attribution_readout(core.read_all_leads(sheets), synced_at)
     core.replace_sheet(sheets, "Attribution", readout, clear_range="A:K")
 

@@ -1,6 +1,7 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { initTracking } from './tracking.js'
+import { initRegularCleaningTracking } from './regularCleaningTracking.js'
 import { initConsentMode } from './privacyConsent.js'
 import SitePrivacyControls from './SitePrivacyControls.jsx'
 
@@ -12,6 +13,7 @@ const WohnungsreinigungLanding = lazy(() => import('./WohnungsreinigungLanding.j
 // Consent Mode v2 defaults must be established before any Google tag loads.
 initConsentMode()
 initTracking()
+initRegularCleaningTracking()
 
 const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/'
 const isUmzugsreinigungLanding =
