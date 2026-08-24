@@ -6,13 +6,20 @@ export const ROOM_CONFIG = {
   "5-5.5": { label: "5–5.5 Zimmer", bands: [{ maxArea: 120, lower: 1000, upper: 1100 }, { maxArea: 135, lower: 1100, upper: 1250 }] },
 };
 
+export const MIN_AREA = 20;
+export const MAX_AREA = 300;
+
 const roundUpTo50 = (value) => Math.ceil(value / 50) * 50;
+
+function isValidArea(area) {
+  return Number.isFinite(area) && area >= MIN_AREA && area <= MAX_AREA;
+}
 
 export function calculateUmzugsreinigungEstimate(form) {
   const room = ROOM_CONFIG[form.rooms];
   const area = Number(form.area);
 
-  if (!room || !Number.isFinite(area) || area <= 0) return null;
+  if (!room || !isValidArea(area)) return null;
 
   const directBand = room.bands.find((band) => area <= band.maxArea);
   if (directBand) {
@@ -37,7 +44,8 @@ export function calculateUmzugsreinigungEstimate(form) {
 }
 
 export function isEstimateFormComplete(form) {
-  return Boolean(ROOM_CONFIG[form.rooms] && Number(form.area) > 0);
+  const area = Number(form.area);
+  return Boolean(ROOM_CONFIG[form.rooms] && isValidArea(area));
 }
 
 export function buildWhatsAppMessage(form, estimate) {
