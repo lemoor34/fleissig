@@ -17,12 +17,6 @@ const CONFIG = {
 const initialForm = {
   rooms: "",
   area: "",
-  dirt: "",
-  pets: "",
-  windows: "",
-  blinds: "",
-  extras: [],
-  handoverDate: "",
 };
 
 function LegalModal({ type, onClose }) {
@@ -70,8 +64,8 @@ function SeoSection() {
   const places = ["Seengen", "Lenzburg", "Aarau", "Wohlen", "Baden", "Brugg", "Zofingen"];
   const faq = [
     ["Was bedeutet Abgabegarantie?", "Wenn bei der Wohnungsübergabe eine Reinigung der vereinbarten Leistungen beanstandet wird, kümmern wir uns um die notwendige Nachreinigung im Rahmen der bestätigten Offerte."],
-    ["Ist die Online-Preisschätzung verbindlich?", "Nein. Sie ist eine schnelle Vorabschätzung. Der verbindliche Fixpreis wird nach einem kurzen Foto- oder Video-Check bestätigt."],
-    ["Was beeinflusst den Preis?", "Wohnfläche, Zimmerzahl, Verschmutzung, Fenster, Storen sowie zusätzliche Bereiche wie Balkon, Keller oder Garage beeinflussen den Aufwand."],
+    ["Ist die Online-Preisschätzung verbindlich?", "Nein. Sie ist eine schnelle Vorabschätzung anhand von Zimmerzahl und Wohnfläche. Der verbindliche Fixpreis wird nach einem kurzen Foto- oder Video-Check bestätigt."],
+    ["Was beeinflusst den endgültigen Preis?", "Neben Wohnfläche und Zimmerzahl beeinflussen vor allem Zustand, Fenster, Storen sowie zusätzliche Bereiche wie Balkon, Keller oder Garage den tatsächlichen Aufwand."],
     ["Muss ich bei der Reinigung zuhause sein?", "Nein. Eine Schlüsselübergabe kann individuell vereinbart werden."],
     ["In welchen Regionen reinigen Sie?", "Wir arbeiten von Seengen aus im ganzen Kanton Aargau."],
   ];
@@ -96,10 +90,10 @@ function SeoSection() {
 
       <section className="lp-how">
         <span className="lp-eyebrow">So funktioniert es</span>
-        <h2>Vom Online-Preis zum verbindlichen Fixpreis</h2>
+        <h2>Von der Preisschätzung zum verbindlichen Fixpreis</h2>
         <div className="lp-steps">
-          <article><div><BadgeCheck size={22} /></div><h3>1. Preis berechnen</h3><p>Sie beantworten die Fragen zur Wohnung und sehen direkt eine vorläufige Preisspanne.</p></article>
-          <article><div><Camera size={22} /></div><h3>2. Foto-Check</h3><p>Sie senden uns einige Fotos oder ein kurzes Video. Wir prüfen den tatsächlichen Aufwand.</p></article>
+          <article><div><BadgeCheck size={22} /></div><h3>1. Preis sofort sehen</h3><p>Sie geben nur Zimmerzahl und Wohnfläche an und erhalten direkt eine vorläufige Preisspanne.</p></article>
+          <article><div><Camera size={22} /></div><h3>2. Foto-Check per WhatsApp</h3><p>Sie senden uns einige Fotos oder ein kurzes Video. Wir prüfen den tatsächlichen Aufwand.</p></article>
           <article><div><KeyRound size={22} /></div><h3>3. Fixpreis & Termin</h3><p>Nach der Prüfung bestätigen wir den verbindlichen Umfang und den Preis für den vereinbarten Termin.</p></article>
         </div>
       </section>
@@ -139,10 +133,6 @@ export default function UmzugsreinigungLanding() {
   const estimate = useMemo(() => complete ? calculateUmzugsreinigungEstimate(form) : null, [complete, form]);
 
   const set = (key, value) => setForm((current) => ({ ...current, [key]: value }));
-  const toggleExtra = (key) => setForm((current) => ({
-    ...current,
-    extras: current.extras.includes(key) ? current.extras.filter((item) => item !== key) : [...current.extras, key],
-  }));
 
   const whatsappHref = estimate
     ? `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(buildWhatsAppMessage(form, estimate))}`
@@ -161,7 +151,7 @@ export default function UmzugsreinigungLanding() {
         <section className="lp-intro">
           <div className="lp-badge"><BadgeCheck size={17} /> Mit Abgabegarantie</div>
           <h1>Umzugsreinigung Aargau mit Abgabegarantie – Preis berechnen</h1>
-          <p>Beantworten Sie kurz die Fragen. Ihre vorläufige Preisschätzung erscheint direkt – ohne Registrierung und ohne Anruf.</p>
+          <p>Nur 2 Angaben: Zimmerzahl und Wohnfläche. Ihre vorläufige Preisschätzung erscheint sofort – ohne Registrierung und ohne Anruf.</p>
           <div className="lp-trust">
             <span><ShieldCheck size={18} /> Fixpreis nach Foto-Check</span>
             <span><ReceiptText size={18} /> Offizielle Rechnung</span>
@@ -194,63 +184,19 @@ export default function UmzugsreinigungLanding() {
             </div>
           </Field>
 
-          <Field number="3" title="Wie stark ist die Wohnung verschmutzt?">
-            <div className="lp-options three">
-              <Choice selected={form.dirt === "light"} onClick={() => set("dirt", "light")}><strong>Leicht</strong><small>regelmässig gereinigt</small></Choice>
-              <Choice selected={form.dirt === "normal"} onClick={() => set("dirt", "normal")}><strong>Normal</strong><small>übliche Verschmutzung</small></Choice>
-              <Choice selected={form.dirt === "strong"} onClick={() => set("dirt", "strong")}><strong>Stark</strong><small>viel Fett, Kalk oder Schmutz</small></Choice>
-            </div>
-          </Field>
-
-          <Field number="4" title="Gab es Haustiere in der Wohnung?">
-            <div className="lp-options two">
-              <Choice selected={form.pets === "no"} onClick={() => set("pets", "no")}>Nein</Choice>
-              <Choice selected={form.pets === "yes"} onClick={() => set("pets", "yes")}>Ja</Choice>
-            </div>
-          </Field>
-
-          <Field number="5" title="Welche Fenster hat die Wohnung überwiegend?">
-            <div className="lp-options three">
-              <Choice selected={form.windows === "small"} onClick={() => set("windows", "small")}>Klein</Choice>
-              <Choice selected={form.windows === "normal"} onClick={() => set("windows", "normal")}>Normal</Choice>
-              <Choice selected={form.windows === "panorama"} onClick={() => set("windows", "panorama")}>Normal + grosse/Panoramafenster</Choice>
-            </div>
-          </Field>
-
-          <Field number="6" title="Welche Storen oder Jalousien gibt es?">
-            <div className="lp-options four">
-              <Choice selected={form.blinds === "none"} onClick={() => set("blinds", "none")}>Keine</Choice>
-              <Choice selected={form.blinds === "roller"} onClick={() => set("blinds", "roller")}>Rollläden</Choice>
-              <Choice selected={form.blinds === "lamella"} onClick={() => set("blinds", "lamella")}>Lamellen</Choice>
-              <Choice selected={form.blinds === "other"} onClick={() => set("blinds", "other")}>Andere</Choice>
-            </div>
-          </Field>
-
-          <Field number="7" title="Was soll zusätzlich gereinigt werden?" hint="Mehrfachauswahl möglich.">
-            <div className="lp-options three checks">
-              {[["balcony", "Balkon"], ["cellar", "Keller"], ["garage", "Garage"]].map(([key, label]) => (
-                <Choice key={key} selected={form.extras.includes(key)} onClick={() => toggleExtra(key)}><Check size={17} />{label}</Choice>
-              ))}
-            </div>
-          </Field>
-
-          <Field number="8" title="Wann ist die Wohnungsabgabe?">
-            <input className="lp-date" type="date" value={form.handoverDate} onChange={(event) => set("handoverDate", event.target.value)} />
-          </Field>
-
           <div className={`lp-result ${estimate ? "ready" : ""}`} aria-live="polite">
             {estimate ? (
               <>
                 <span className="lp-result-label">Ihre vorläufige Preisschätzung</span>
                 <strong>CHF {estimate.lower}–{estimate.upper}</strong>
-                <p>Unverbindliche Vorabschätzung auf Basis Ihrer Angaben. Nach einem kurzen Foto-Check bestätigen wir Ihnen den verbindlichen Fixpreis.</p>
+                <p>Diese Spanne basiert auf Zimmerzahl und Wohnfläche. Der tatsächliche Aufwand hängt unter anderem vom Zustand, den Fenstern und Storen ab. Senden Sie uns kurz Fotos oder ein Video – danach bestätigen wir Ihnen den verbindlichen Fixpreis.</p>
                 <a className="lp-wa" href={whatsappHref} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle size={21} /> Fixpreis per WhatsApp bestätigen
+                  <MessageCircle size={21} /> Genauen Fixpreis per WhatsApp erhalten
                 </a>
-                <small>Ihre Angaben und die Preisspanne werden automatisch in die WhatsApp-Nachricht übernommen. Sie müssen nur noch auf „Senden“ tippen.</small>
+                <small>Unverbindlich · keine Registrierung · dauert ca. 1 Minute</small>
               </>
             ) : (
-              <p className="lp-incomplete">Füllen Sie alle Angaben aus – Ihre Preisschätzung erscheint automatisch.</p>
+              <p className="lp-incomplete">Nur Zimmerzahl und Wohnfläche angeben – Ihre Preisschätzung erscheint sofort.</p>
             )}
           </div>
         </section>
@@ -307,14 +253,10 @@ body{margin:0}
 .lp-field legend small{display:block;font-weight:500;color:var(--lp-muted);font-size:12px;margin-top:3px}
 .lp-options{display:grid;gap:9px}
 .lp-options.rooms{grid-template-columns:repeat(5,1fr)}
-.lp-options.two{grid-template-columns:repeat(2,1fr)}
-.lp-options.three{grid-template-columns:repeat(3,1fr)}
-.lp-options.four{grid-template-columns:repeat(4,1fr)}
 .lp-choice{min-height:49px;border:1px solid #cfdad2;border-radius:10px;background:#fff;color:#334039;padding:10px 11px;font:inherit;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;flex-direction:column}
-.lp-choice small{font-size:10px;color:var(--lp-muted)}
 .lp-choice.selected{border-color:var(--lp-green);background:var(--lp-pale);color:var(--lp-dark);box-shadow:inset 0 0 0 1px var(--lp-green)}
 .lp-area-wrap{position:relative;max-width:230px}
-.lp-area-wrap input,.lp-date{width:100%;height:50px;border:1px solid #cfdad2;border-radius:10px;padding:0 42px 0 13px;font:inherit;font-size:16px}
+.lp-area-wrap input{width:100%;height:50px;border:1px solid #cfdad2;border-radius:10px;padding:0 42px 0 13px;font:inherit;font-size:16px}
 .lp-area-wrap span{position:absolute;right:13px;top:15px;color:var(--lp-muted)}
 .lp-result{padding:28px;text-align:center;background:#f7faf7}
 .lp-result.ready{background:linear-gradient(145deg,#eff9f1,#f9fcfa)}
@@ -351,12 +293,6 @@ body{margin:0}
 .lp-footer span{font-size:12px;color:var(--lp-muted)}
 .lp-footer div div{display:flex;gap:12px;flex-wrap:wrap}
 .lp-footer a,.lp-footer button{border:0;background:none;color:#526159;text-decoration:none;font:inherit;font-size:12px;cursor:pointer;padding:0}
-.lp-cookie{position:fixed;left:18px;right:18px;bottom:18px;z-index:100;margin:auto;max-width:880px;background:#fff;border:1px solid var(--lp-line);box-shadow:0 15px 45px rgba(0,0,0,.14);border-radius:14px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:18px}
-.lp-cookie>div:first-child{display:flex;flex-direction:column;gap:4px}
-.lp-cookie span{font-size:12px;color:var(--lp-muted)}
-.lp-cookie-actions{display:flex;gap:7px}
-.lp-cookie button{padding:8px 11px;border-radius:8px;border:1px solid var(--lp-line);background:#fff;cursor:pointer}
-.lp-cookie .primary{background:var(--lp-green);color:#fff;border-color:var(--lp-green)}
 .lp-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.44);z-index:110;display:grid;place-items:center;padding:20px}
 .lp-modal{position:relative;background:#fff;border-radius:17px;padding:28px;width:min(650px,100%);max-height:88vh;overflow:auto}
 .lp-close{position:absolute;right:14px;top:14px;border:0;background:#f1f4f2;border-radius:8px;padding:7px}
@@ -365,11 +301,8 @@ body{margin:0}
 @media(max-width:650px){
   .lp-main{padding-top:36px}
   .lp-options.rooms{grid-template-columns:repeat(2,1fr)}
-  .lp-options.three,.lp-options.four{grid-template-columns:1fr}
   .lp-bottom-trust,.lp-feature-grid,.lp-faq{grid-template-columns:1fr}
   .lp-steps{grid-template-columns:1fr}
   .lp-footer .lp-shell{align-items:flex-start;flex-direction:column}
-  .lp-cookie{flex-direction:column;align-items:stretch}
-  .lp-cookie-actions{justify-content:flex-end}
 }
 `;
