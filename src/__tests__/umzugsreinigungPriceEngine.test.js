@@ -35,13 +35,20 @@ describe('calculateUmzugsreinigungEstimate', () => {
     expect(result.lower).toBe(900)
     expect(result.upper).toBe(1050)
   })
+
+  it('does not calculate impossible or out-of-range living areas', () => {
+    expect(calculateUmzugsreinigungEstimate({ ...baseForm, area: '6' })).toBeNull()
+    expect(calculateUmzugsreinigungEstimate({ ...baseForm, area: '301' })).toBeNull()
+  })
 })
 
 describe('form and WhatsApp handoff', () => {
-  it('requires only room count and living area before showing an estimate', () => {
+  it('requires room count and a living area between 20 and 300 m²', () => {
     expect(isEstimateFormComplete(baseForm)).toBe(true)
     expect(isEstimateFormComplete({ ...baseForm, rooms: '' })).toBe(false)
     expect(isEstimateFormComplete({ ...baseForm, area: '' })).toBe(false)
+    expect(isEstimateFormComplete({ ...baseForm, area: '6' })).toBe(false)
+    expect(isEstimateFormComplete({ ...baseForm, area: '301' })).toBe(false)
   })
 
   it('includes the two answers and estimate in the WhatsApp message', () => {
