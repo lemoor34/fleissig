@@ -1,37 +1,9 @@
 export const ROOM_CONFIG = {
-  "1-1.5": { label: "1–1.5 Zimmer", base: 549, normalAreaMax: 40, strongDirt: 100 },
-  "2-2.5": { label: "2–2.5 Zimmer", base: 649, normalAreaMax: 65, strongDirt: 150 },
-  "3-3.5": { label: "3–3.5 Zimmer", base: 799, normalAreaMax: 90, strongDirt: 200 },
-  "4-4.5": { label: "4–4.5 Zimmer", base: 949, normalAreaMax: 115, strongDirt: 250 },
-  "5-5.5": { label: "5–5.5 Zimmer", base: 1149, normalAreaMax: 140, strongDirt: 300 },
-};
-
-export const LABELS = {
-  dirt: {
-    light: "Leicht",
-    normal: "Normal",
-    strong: "Stark",
-  },
-  pets: {
-    no: "Nein",
-    yes: "Ja",
-  },
-  windows: {
-    small: "Klein",
-    normal: "Normal",
-    panorama: "Panoramafenster",
-  },
-  blinds: {
-    none: "Keine",
-    roller: "Rollläden",
-    lamella: "Lamellenstoren",
-    other: "Andere",
-  },
-  extras: {
-    balcony: "Balkon",
-    cellar: "Keller",
-    garage: "Garage",
-  },
+  "1-1.5": { label: "1–1.5 Zimmer", bands: [{ maxArea: 40, lower: 390, upper: 450 }, { maxArea: 50, lower: 430, upper: 490 }] },
+  "2-2.5": { label: "2–2.5 Zimmer", bands: [{ maxArea: 55, lower: 490, upper: 550 }, { maxArea: 70, lower: 550, upper: 650 }] },
+  "3-3.5": { label: "3–3.5 Zimmer", bands: [{ maxArea: 75, lower: 650, upper: 750 }, { maxArea: 90, lower: 700, upper: 850 }] },
+  "4-4.5": { label: "4–4.5 Zimmer", bands: [{ maxArea: 95, lower: 850, upper: 950 }, { maxArea: 110, lower: 900, upper: 1050 }] },
+  "5-5.5": { label: "5–5.5 Zimmer", bands: [{ maxArea: 120, lower: 1000, upper: 1100 }, { maxArea: 135, lower: 1100, upper: 1250 }] },
 };
 
 const roundUpTo50 = (value) => Math.ceil(value / 50) * 50;
@@ -42,80 +14,42 @@ export function calculateUmzugsreinigungEstimate(form) {
 
   if (!room || !Number.isFinite(area) || area <= 0) return null;
 
-  let raw = room.base;
-  const excessArea = Math.max(0, area - room.normalAreaMax);
-  if (excessArea > 0) raw += Math.ceil(excessArea / 10) * 50;
-
-  if (form.dirt === "normal") raw += 50;
-  if (form.dirt === "strong") raw += room.strongDirt;
-
-  if (form.windows === "panorama") {
-    raw += ["1-1.5", "2-2.5", "3-3.5"].includes(form.rooms) ? 100 : 120;
+  const directBand = room.bands.find((band) => area <= band.maxArea);
+  if (directBand) {
+    return {
+      lower: directBand.lower,
+      upper: directBand.upper,
+      excessArea: 0,
+    };
   }
 
-  if (form.blinds === "lamella" || form.blinds === "other") raw += 40;
-
-  const extras = Array.isArray(form.extras) ? form.extras : [];
-  if (extras.includes("balcony")) raw += 50;
-  if (extras.includes("cellar")) raw += 40;
-  if (extras.includes("garage")) raw += 60;
-
-  const lower = roundUpTo50(raw);
-  const higherUncertainty =
-    form.dirt === "strong" ||
-    form.windows === "panorama" ||
-    excessArea > 20 ||
-    form.pets === "yes" ||
-    form.blinds === "other";
-
-  const upper = lower + (higherUncertainty ? 100 : 50);
+  const lastBand = room.bands[room.bands.length - 1];
+  const excessArea = area - lastBand.maxArea;
+  const surcharge = Math.ceil(excessArea / 10) * 50;
+  const lower = roundUpTo50(lastBand.lower + surcharge);
+  const upper = roundUpTo50(lastBand.upper + surcharge);
 
   return {
-    raw,
     lower,
     upper,
     excessArea,
-    higherUncertainty,
   };
 }
 
 export function isEstimateFormComplete(form) {
-  return Boolean(
-    ROOM_CONFIG[form.rooms] &&
-      Number(form.area) > 0 &&
-      form.dirt &&
-      form.pets &&
-      form.windows &&
-      form.blinds &&
-      form.handoverDate
-  );
-}
-
-export function formatSwissDate(value) {
-  if (!value) return "";
-  const [year, month, day] = value.split("-");
-  if (!year || !month || !day) return value;
-  return `${day}.${month}.${year}`;
+  return Boolean(ROOM_CONFIG[form.rooms] && Number(form.area) > 0);
 }
 
 export function buildWhatsAppMessage(form, estimate) {
   const room = ROOM_CONFIG[form.rooms];
-  const extras = (form.extras || []).map((key) => LABELS.extras[key]).filter(Boolean);
 
   return [
-    "Grüezi! Ich möchte meine Umzugsreinigung zum Fixpreis bestätigen lassen.",
+    "Grüezi! Ich möchte den verbindlichen Fixpreis für meine Umzugsreinigung erhalten.",
     "",
     `Wohnung: ${room?.label || form.rooms}`,
     `Wohnfläche: ${form.area} m²`,
-    `Verschmutzung: ${LABELS.dirt[form.dirt] || form.dirt}`,
-    `Haustiere: ${LABELS.pets[form.pets] || form.pets}`,
-    `Fenster: ${LABELS.windows[form.windows] || form.windows}`,
-    `Storen/Jalousien: ${LABELS.blinds[form.blinds] || form.blinds}`,
-    `Zusätzlich: ${extras.length ? extras.join(", ") : "Nichts"}`,
-    `Wohnungsabgabe: ${formatSwissDate(form.handoverDate)}`,
-    "",
     `Vorläufige Preisschätzung: CHF ${estimate.lower}–${estimate.upper}`,
     "",
-    "Ich sende Ihnen gerne Fotos für die verbindliche Fixpreis-Offerte.",
+    "Ich sende Ihnen gerne Fotos oder ein kurzes Video der Wohnung für die genaue Offerte.",
   ].join("\n");
 }
